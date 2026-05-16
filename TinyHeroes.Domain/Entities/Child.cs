@@ -13,4 +13,5 @@ public class Child
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public Family Family { get; set; } = null!;
+    public ICollection<GoodDeed> Deeds { get; set; } = [];
 }

@@ -10,4 +10,5 @@ public class Family
 
     public ICollection<FamilyMember> Members { get; set; } = [];
     public ICollection<Child> Children { get; set; } = [];
+    public ICollection<FamilyInvite> Invites { get; set; } = [];
 }

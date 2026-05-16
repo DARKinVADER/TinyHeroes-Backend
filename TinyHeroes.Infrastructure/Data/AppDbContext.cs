@@ -14,6 +14,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<FamilyInvite> FamilyInvites => Set<FamilyInvite>();
     public DbSet<GoodDeed> GoodDeeds => Set<GoodDeed>();
     public DbSet<DeedPreset> DeedPresets => Set<DeedPreset>();
+    public DbSet<WeekSummary> WeekSummaries => Set<WeekSummary>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

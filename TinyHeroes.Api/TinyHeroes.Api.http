@@ -1,6 +1,0 @@
-@TinyHeroes.Api_HostAddress = http://localhost:5032
-
-GET {{TinyHeroes.Api_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

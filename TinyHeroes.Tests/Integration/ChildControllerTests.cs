@@ -1,42 +1,19 @@
 using System.Net;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using FluentAssertions;
-using TinyHeroes.Application.DTOs.Auth;
 using TinyHeroes.Application.DTOs.Child;
-using TinyHeroes.Application.DTOs.Family;
 using TinyHeroes.Domain.Enums;
+using TinyHeroes.Tests.Integration.Helpers;
 
 namespace TinyHeroes.Tests.Integration;
 
 public class ChildControllerTests(TestWebApplicationFactory<Program> factory)
     : IClassFixture<TestWebApplicationFactory<Program>>
 {
-    private async Task<HttpClient> CreateAuthenticatedClientWithFamily()
-    {
-        var client = factory.CreateClient();
-        var email = $"user_{Guid.NewGuid()}@test.com";
-        var regResponse = await client.PostAsJsonAsync("/api/auth/register", new RegisterRequest("Parent", email, "Password123!"));
-        var auth = await regResponse.Content.ReadFromJsonAsync<AuthResponse>();
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", auth!.AccessToken);
-        await client.PostAsJsonAsync("/api/families", new CreateFamilyRequest("Test Family", DayOfWeek.Monday));
-        return client;
-    }
-
-    private async Task<HttpClient> CreateAuthenticatedClientWithoutFamily()
-    {
-        var client = factory.CreateClient();
-        var email = $"user_{Guid.NewGuid()}@test.com";
-        var regResponse = await client.PostAsJsonAsync("/api/auth/register", new RegisterRequest("Parent", email, "Password123!"));
-        var auth = await regResponse.Content.ReadFromJsonAsync<AuthResponse>();
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", auth!.AccessToken);
-        return client;
-    }
-
     [Fact]
     public async Task Create_WithValidData_Returns200()
     {
-        var client = await CreateAuthenticatedClientWithFamily();
+        var client = await TestAuthHelper.RegisterWithFamily(factory);
         var response = await client.PostAsJsonAsync("/api/children", new CreateChildRequest("Emma", 7, Gender.Girl, "🦄"));
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var child = await response.Content.ReadFromJsonAsync<ChildResponse>();
@@ -49,7 +26,7 @@ public class ChildControllerTests(TestWebApplicationFactory<Program> factory)
     [Fact]
     public async Task Create_WithoutFamily_Returns400()
     {
-        var client = await CreateAuthenticatedClientWithoutFamily();
+        var client = await TestAuthHelper.RegisterOnly(factory);
         var response = await client.PostAsJsonAsync("/api/children", new CreateChildRequest("Emma", 7, Gender.Girl, "🦄"));
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
@@ -57,7 +34,7 @@ public class ChildControllerTests(TestWebApplicationFactory<Program> factory)
     [Fact]
     public async Task List_ReturnsAllFamilyChildren()
     {
-        var client = await CreateAuthenticatedClientWithFamily();
+        var client = await TestAuthHelper.RegisterWithFamily(factory);
         await client.PostAsJsonAsync("/api/children", new CreateChildRequest("Child1", 5, Gender.Boy, "🦁"));
         await client.PostAsJsonAsync("/api/children", new CreateChildRequest("Child2", 8, Gender.Girl, "🦊"));
 
@@ -70,7 +47,7 @@ public class ChildControllerTests(TestWebApplicationFactory<Program> factory)
     [Fact]
     public async Task Get_ReturnsChild()
     {
-        var client = await CreateAuthenticatedClientWithFamily();
+        var client = await TestAuthHelper.RegisterWithFamily(factory);
         var createResp = await client.PostAsJsonAsync("/api/children", new CreateChildRequest("Solo", 6, Gender.Boy, "🐯"));
         var created = await createResp.Content.ReadFromJsonAsync<ChildResponse>();
 
@@ -83,7 +60,7 @@ public class ChildControllerTests(TestWebApplicationFactory<Program> factory)
     [Fact]
     public async Task Update_ModifiesChild()
     {
-        var client = await CreateAuthenticatedClientWithFamily();
+        var client = await TestAuthHelper.RegisterWithFamily(factory);
         var createResp = await client.PostAsJsonAsync("/api/children", new CreateChildRequest("OldName", 5, Gender.Boy, "🦁"));
         var created = await createResp.Content.ReadFromJsonAsync<ChildResponse>();
 
@@ -97,7 +74,7 @@ public class ChildControllerTests(TestWebApplicationFactory<Program> factory)
     [Fact]
     public async Task Delete_AsAdmin_Succeeds()
     {
-        var client = await CreateAuthenticatedClientWithFamily();
+        var client = await TestAuthHelper.RegisterWithFamily(factory);
         var createResp = await client.PostAsJsonAsync("/api/children", new CreateChildRequest("ToDelete", 4, Gender.Girl, "🐼"));
         var created = await createResp.Content.ReadFromJsonAsync<ChildResponse>();
 

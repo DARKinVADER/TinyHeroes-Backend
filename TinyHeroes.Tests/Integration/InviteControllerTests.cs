@@ -1,38 +1,20 @@
 using System.Net;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using FluentAssertions;
-using TinyHeroes.Application.DTOs.Auth;
 using TinyHeroes.Application.DTOs.Family;
 using TinyHeroes.Application.DTOs.Invite;
 using TinyHeroes.Domain.Enums;
+using TinyHeroes.Tests.Integration.Helpers;
 
 namespace TinyHeroes.Tests.Integration;
 
 public class InviteControllerTests(TestWebApplicationFactory<Program> factory)
     : IClassFixture<TestWebApplicationFactory<Program>>
 {
-    private async Task<HttpClient> CreateAuthenticatedClient()
-    {
-        var client = factory.CreateClient();
-        var email = $"user_{Guid.NewGuid()}@test.com";
-        var regResponse = await client.PostAsJsonAsync("/api/auth/register", new RegisterRequest("Parent", email, "Password123!"));
-        var auth = await regResponse.Content.ReadFromJsonAsync<AuthResponse>();
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", auth!.AccessToken);
-        return client;
-    }
-
-    private async Task<HttpClient> CreateAuthenticatedClientWithFamily()
-    {
-        var client = await CreateAuthenticatedClient();
-        await client.PostAsJsonAsync("/api/families", new CreateFamilyRequest("Test Family", DayOfWeek.Monday));
-        return client;
-    }
-
     [Fact]
     public async Task GetMine_ReturnsFamily_WithMembers()
     {
-        var client = await CreateAuthenticatedClientWithFamily();
+        var client = await TestAuthHelper.RegisterWithFamily(factory);
 
         var response = await client.GetAsync("/api/families/mine");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -47,7 +29,7 @@ public class InviteControllerTests(TestWebApplicationFactory<Program> factory)
     [Fact]
     public async Task GetMine_WhenNoFamily_Returns404()
     {
-        var client = await CreateAuthenticatedClient();
+        var client = await TestAuthHelper.RegisterOnly(factory);
 
         var response = await client.GetAsync("/api/families/mine");
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -56,7 +38,7 @@ public class InviteControllerTests(TestWebApplicationFactory<Program> factory)
     [Fact]
     public async Task CreateInvite_WithEmail_ReturnsToken()
     {
-        var client = await CreateAuthenticatedClientWithFamily();
+        var client = await TestAuthHelper.RegisterWithFamily(factory);
 
         var response = await client.PostAsJsonAsync("/api/invites", new CreateInviteRequest("friend@test.com"));
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -71,12 +53,12 @@ public class InviteControllerTests(TestWebApplicationFactory<Program> factory)
     public async Task CreateInvite_AsNonAdmin_Returns403()
     {
         // User A creates family and invite
-        var adminClient = await CreateAuthenticatedClientWithFamily();
+        var adminClient = await TestAuthHelper.RegisterWithFamily(factory);
         var inviteResponse = await adminClient.PostAsJsonAsync("/api/invites", new CreateInviteRequest(null));
         var invite = await inviteResponse.Content.ReadFromJsonAsync<InviteResponse>();
 
         // User B accepts the invite (becomes CoParent)
-        var coParentClient = await CreateAuthenticatedClient();
+        var coParentClient = await TestAuthHelper.RegisterOnly(factory);
         await coParentClient.PostAsync($"/api/invites/{invite!.Token}/accept", null);
 
         // User B tries to create an invite — should be forbidden
@@ -88,12 +70,12 @@ public class InviteControllerTests(TestWebApplicationFactory<Program> factory)
     public async Task AcceptInvite_JoinsFamily()
     {
         // User A creates family and invite
-        var adminClient = await CreateAuthenticatedClientWithFamily();
+        var adminClient = await TestAuthHelper.RegisterWithFamily(factory);
         var inviteResponse = await adminClient.PostAsJsonAsync("/api/invites", new CreateInviteRequest(null));
         var invite = await inviteResponse.Content.ReadFromJsonAsync<InviteResponse>();
 
         // User B accepts
-        var userBClient = await CreateAuthenticatedClient();
+        var userBClient = await TestAuthHelper.RegisterOnly(factory);
         var acceptResponse = await userBClient.PostAsync($"/api/invites/{invite!.Token}/accept", null);
         acceptResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -108,7 +90,7 @@ public class InviteControllerTests(TestWebApplicationFactory<Program> factory)
     [Fact]
     public async Task AcceptInvite_InvalidToken_Returns404()
     {
-        var client = await CreateAuthenticatedClient();
+        var client = await TestAuthHelper.RegisterOnly(factory);
 
         var response = await client.PostAsync("/api/invites/nonexistenttoken123/accept", null);
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -118,12 +100,12 @@ public class InviteControllerTests(TestWebApplicationFactory<Program> factory)
     public async Task AcceptInvite_WhenAlreadyInFamily_Returns409()
     {
         // User A creates family and invite
-        var adminClient = await CreateAuthenticatedClientWithFamily();
+        var adminClient = await TestAuthHelper.RegisterWithFamily(factory);
         var inviteResponse = await adminClient.PostAsJsonAsync("/api/invites", new CreateInviteRequest(null));
         var invite = await inviteResponse.Content.ReadFromJsonAsync<InviteResponse>();
 
         // User B already has a family
-        var userBClient = await CreateAuthenticatedClientWithFamily();
+        var userBClient = await TestAuthHelper.RegisterWithFamily(factory);
 
         // User B tries to accept the invite — should conflict
         var response = await userBClient.PostAsync($"/api/invites/{invite!.Token}/accept", null);

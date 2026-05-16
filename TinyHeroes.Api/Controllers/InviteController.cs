@@ -62,7 +62,15 @@ public class InviteController(AppDbContext db) : ControllerBase
 
         invite.Accepted = true;
         db.FamilyMembers.Add(member);
-        await db.SaveChangesAsync();
+
+        try
+        {
+            await db.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            return Conflict("User already belongs to a family.");
+        }
 
         return Ok();
     }

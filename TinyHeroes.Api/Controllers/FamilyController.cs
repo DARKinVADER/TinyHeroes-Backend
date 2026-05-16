@@ -21,7 +21,7 @@ public class FamilyController(AppDbContext db) : ControllerBase
     {
         var userId = GetUserId();
 
-        if (db.FamilyMembers.Any(m => m.UserId == userId))
+        if (await db.FamilyMembers.AnyAsync(m => m.UserId == userId))
             return Conflict("User already belongs to a family.");
 
         var family = new Family { Id = Guid.NewGuid(), Name = req.Name, WeekStartDay = req.WeekStartDay, CreatedByUserId = userId };
@@ -38,15 +38,13 @@ public class FamilyController(AppDbContext db) : ControllerBase
     public async Task<ActionResult<FamilyDetailResponse>> GetMine()
     {
         var userId = GetUserId();
-        var membership = await db.FamilyMembers.FirstOrDefaultAsync(m => m.UserId == userId);
-        if (membership is null) return NotFound("User does not belong to a family.");
-
         var family = await db.Families
-            .Include(f => f.Members)
-                .ThenInclude(m => m.User)
-            .FirstOrDefaultAsync(f => f.Id == membership.FamilyId);
+            .Include(f => f.Members).ThenInclude(m => m.User)
+            .FirstOrDefaultAsync(f => f.Members.Any(m => m.UserId == userId));
 
-        var members = family!.Members.Select(m => new FamilyMemberResponse(
+        if (family is null) return NotFound("User does not belong to a family.");
+
+        var members = family.Members.Select(m => new FamilyMemberResponse(
             m.UserId, m.User.DisplayName, m.User.Email!, m.Role
         )).ToList();
 

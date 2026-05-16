@@ -15,6 +15,7 @@ public static class DependencyInjection
             opt.UseNpgsql(config.GetConnectionString("Default")));
 
         services.AddScoped<ITokenService, JwtTokenService>();
+        services.AddScoped<ISummaryService, SummaryService>();
 
         return services;
     }

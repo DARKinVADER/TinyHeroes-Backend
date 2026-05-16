@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using TinyHeroes.Application.Interfaces;
 using TinyHeroes.Infrastructure.Data;
+using TinyHeroes.Infrastructure.Services;
 
 namespace TinyHeroes.Infrastructure;
 
@@ -11,6 +13,8 @@ public static class DependencyInjection
     {
         services.AddDbContext<AppDbContext>(opt =>
             opt.UseNpgsql(config.GetConnectionString("Default")));
+
+        services.AddScoped<ITokenService, JwtTokenService>();
 
         return services;
     }

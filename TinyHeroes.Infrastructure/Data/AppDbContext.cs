@@ -13,6 +13,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<Child> Children => Set<Child>();
     public DbSet<FamilyInvite> FamilyInvites => Set<FamilyInvite>();
     public DbSet<GoodDeed> GoodDeeds => Set<GoodDeed>();
+    public DbSet<DeedPreset> DeedPresets => Set<DeedPreset>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

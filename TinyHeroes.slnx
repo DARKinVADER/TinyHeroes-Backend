@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="TinyHeroes.Api/TinyHeroes.Api.csproj" />
+  <Project Path="TinyHeroes.Application/TinyHeroes.Application.csproj" />
+  <Project Path="TinyHeroes.Domain/TinyHeroes.Domain.csproj" />
+  <Project Path="TinyHeroes.Infrastructure/TinyHeroes.Infrastructure.csproj" />
+  <Project Path="TinyHeroes.Tests/TinyHeroes.Tests.csproj" />
+</Solution>

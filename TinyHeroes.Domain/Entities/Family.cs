@@ -9,4 +9,5 @@ public class Family
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public ICollection<FamilyMember> Members { get; set; } = [];
+    public ICollection<Child> Children { get; set; } = [];
 }

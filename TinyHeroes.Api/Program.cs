@@ -1,4 +1,7 @@
 using System.Text;
+using AspNet.Security.OAuth.Apple;
+using Microsoft.AspNetCore.Authentication.Facebook;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +25,7 @@ builder.Services.AddIdentity<User, IdentityRole<Guid>>(opt =>
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
 
-builder.Services.AddAuthentication(opt =>
+var authBuilder = builder.Services.AddAuthentication(opt =>
 {
     opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -41,6 +44,34 @@ builder.Services.AddAuthentication(opt =>
         IssuerSigningKey = new SymmetricSecurityKey(key)
     };
 });
+
+if (!string.IsNullOrEmpty(builder.Configuration["Auth:Google:ClientId"]))
+{
+    authBuilder.AddGoogle(opt =>
+    {
+        opt.ClientId = builder.Configuration["Auth:Google:ClientId"]!;
+        opt.ClientSecret = builder.Configuration["Auth:Google:ClientSecret"]!;
+    });
+}
+
+if (!string.IsNullOrEmpty(builder.Configuration["Auth:Facebook:AppId"]))
+{
+    authBuilder.AddFacebook(opt =>
+    {
+        opt.AppId = builder.Configuration["Auth:Facebook:AppId"]!;
+        opt.AppSecret = builder.Configuration["Auth:Facebook:AppSecret"]!;
+    });
+}
+
+if (!string.IsNullOrEmpty(builder.Configuration["Auth:Apple:ClientId"]))
+{
+    authBuilder.AddApple(opt =>
+    {
+        opt.ClientId = builder.Configuration["Auth:Apple:ClientId"]!;
+        opt.KeyId = builder.Configuration["Auth:Apple:KeyId"] ?? string.Empty;
+        opt.TeamId = builder.Configuration["Auth:Apple:TeamId"] ?? string.Empty;
+    });
+}
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

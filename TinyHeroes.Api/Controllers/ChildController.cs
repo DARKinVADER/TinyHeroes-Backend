@@ -35,7 +35,7 @@ public class ChildController(AppDbContext db) : ControllerBase
         db.Children.Add(child);
         await db.SaveChangesAsync();
 
-        return Ok(new ChildResponse(child.Id, child.Name, child.Age, child.Gender, child.AvatarEmoji));
+        return Ok(new ChildResponse(child.Id, child.Name, child.Age, child.Gender, child.AvatarEmoji, child.AvatarUrl));
     }
 
     [HttpGet]
@@ -47,7 +47,7 @@ public class ChildController(AppDbContext db) : ControllerBase
 
         var children = await db.Children
             .Where(c => c.FamilyId == membership.FamilyId)
-            .Select(c => new ChildResponse(c.Id, c.Name, c.Age, c.Gender, c.AvatarEmoji))
+            .Select(c => new ChildResponse(c.Id, c.Name, c.Age, c.Gender, c.AvatarEmoji, c.AvatarUrl))
             .ToListAsync();
 
         return Ok(children);
@@ -63,7 +63,7 @@ public class ChildController(AppDbContext db) : ControllerBase
         var child = await db.Children.FirstOrDefaultAsync(c => c.Id == id && c.FamilyId == membership.FamilyId);
         if (child is null) return NotFound();
 
-        return Ok(new ChildResponse(child.Id, child.Name, child.Age, child.Gender, child.AvatarEmoji));
+        return Ok(new ChildResponse(child.Id, child.Name, child.Age, child.Gender, child.AvatarEmoji, child.AvatarUrl));
     }
 
     [HttpPut("{id:guid}")]
@@ -82,7 +82,7 @@ public class ChildController(AppDbContext db) : ControllerBase
         child.AvatarEmoji = req.AvatarEmoji;
         await db.SaveChangesAsync();
 
-        return Ok(new ChildResponse(child.Id, child.Name, child.Age, child.Gender, child.AvatarEmoji));
+        return Ok(new ChildResponse(child.Id, child.Name, child.Age, child.Gender, child.AvatarEmoji, child.AvatarUrl));
     }
 
     [HttpDelete("{id:guid}")]

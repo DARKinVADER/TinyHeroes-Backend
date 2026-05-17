@@ -18,6 +18,7 @@ public static class DependencyInjection
         services.AddScoped<ITokenService, JwtTokenService>();
         services.AddScoped<ISummaryService, SummaryService>();
         services.AddScoped<IAiImageService, HuggingFaceImageService>();
+        services.AddScoped<IFileStorageService, LocalFileStorageService>();
 
         return services;
     }

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using TinyHeroes.Api.Middleware;
 using TinyHeroes.Domain.Entities;
@@ -101,11 +102,27 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+var uploadsPath = ParseUploadsPath(app.Configuration["Storage:ConnectionString"]);
+Directory.CreateDirectory(uploadsPath);
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(uploadsPath),
+    RequestPath = "/uploads"
+});
+
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+static string ParseUploadsPath(string? connectionString)
+{
+    if (string.IsNullOrWhiteSpace(connectionString)) return "/app/uploads";
+    var idx = connectionString.IndexOf("path=", StringComparison.OrdinalIgnoreCase);
+    return idx >= 0 ? connectionString[(idx + 5)..] : "/app/uploads";
+}
 
 public partial class Program { }

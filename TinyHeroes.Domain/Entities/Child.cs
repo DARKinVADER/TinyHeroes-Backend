@@ -10,6 +10,7 @@ public class Child
     public int Age { get; set; }
     public Gender Gender { get; set; }
     public string AvatarEmoji { get; set; } = "🦸";
+    public string? AvatarUrl { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public Family Family { get; set; } = null!;

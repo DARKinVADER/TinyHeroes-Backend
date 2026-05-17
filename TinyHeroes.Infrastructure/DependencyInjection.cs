@@ -14,8 +14,10 @@ public static class DependencyInjection
         services.AddDbContext<AppDbContext>(opt =>
             opt.UseNpgsql(config.GetConnectionString("Default")));
 
+        services.AddHttpClient();
         services.AddScoped<ITokenService, JwtTokenService>();
         services.AddScoped<ISummaryService, SummaryService>();
+        services.AddScoped<IAiImageService, HuggingFaceImageService>();
 
         return services;
     }

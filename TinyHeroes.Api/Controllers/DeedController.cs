@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TinyHeroes.Application.DTOs.Deed;
+using TinyHeroes.Application.Interfaces;
 using TinyHeroes.Domain.Entities;
 using TinyHeroes.Infrastructure.Data;
 
@@ -11,7 +12,7 @@ namespace TinyHeroes.Api.Controllers;
 [ApiController]
 [Route("api/deeds")]
 [Authorize]
-public class DeedController(AppDbContext db) : ControllerBase
+public class DeedController(AppDbContext db, IAiImageService aiImageService) : ControllerBase
 {
     private Guid GetUserId() => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub")!);
 
@@ -32,7 +33,7 @@ public class DeedController(AppDbContext db) : ControllerBase
             ChildId = req.ChildId,
             AddedByUserId = userId,
             Description = req.Description,
-            ImageType = "library",
+            ImageType = req.ImageType,
             ImageValue = req.ImageValue,
             CreatedAt = DateTime.UtcNow
         };
@@ -85,5 +86,22 @@ public class DeedController(AppDbContext db) : ControllerBase
             .ToListAsync();
 
         return Ok(children);
+    }
+
+    [HttpPost("generate-image")]
+    public async Task<ActionResult<GenerateImageResponse>> GenerateImage(GenerateImageRequest req, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(req.Prompt))
+            return BadRequest("Prompt is required.");
+
+        try
+        {
+            var dataUrl = await aiImageService.GenerateDataUrlAsync(req.Prompt, ct);
+            return Ok(new GenerateImageResponse(dataUrl));
+        }
+        catch (InvalidOperationException ex)
+        {
+            return StatusCode(503, ex.Message);
+        }
     }
 }

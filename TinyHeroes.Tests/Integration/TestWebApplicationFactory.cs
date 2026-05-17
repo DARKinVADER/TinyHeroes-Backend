@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using TinyHeroes.Application.Interfaces;
 using TinyHeroes.Infrastructure.Data;
 
 namespace TinyHeroes.Tests.Integration;
@@ -25,6 +26,17 @@ public class TestWebApplicationFactory<TProgram> : WebApplicationFactory<TProgra
                 optionsBuilder.UseInMemoryDatabase(_dbName);
                 return optionsBuilder.Options;
             }));
+
+            // Replace the real AI image service with a fake for tests.
+            var aiDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IAiImageService));
+            if (aiDescriptor != null) services.Remove(aiDescriptor);
+            services.AddScoped<IAiImageService>(_ => new FakeAiImageService());
         });
+    }
+
+    private class FakeAiImageService : IAiImageService
+    {
+        public Task<string> GenerateDataUrlAsync(string prompt, CancellationToken ct = default)
+            => Task.FromResult("data:image/jpeg;base64,/9j/FAKEDATA==");
     }
 }

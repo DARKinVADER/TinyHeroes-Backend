@@ -129,4 +129,57 @@ public class DeedControllerTests(TestWebApplicationFactory<Program> factory)
         childStats.WeeklyCount.Should().Be(1);
         childStats.WeeklyCount.Should().Be(childStats.TotalCount);
     }
+
+    [Fact]
+    public async Task CreateDeed_WithLibraryImage_Succeeds()
+    {
+        var client = await TestAuthHelper.RegisterWithFamily(factory);
+        var childResp = await client.PostAsJsonAsync("/api/children", new CreateChildRequest("Hero", 7, Gender.Boy, "🦸"));
+        childResp.EnsureSuccessStatusCode();
+
+        var childrenResp = await client.GetAsync("/api/children");
+        var children = await childrenResp.Content.ReadFromJsonAsync<List<ChildResponse>>();
+        var childId = children![0].Id;
+
+        var resp = await client.PostAsJsonAsync("/api/deeds", new CreateDeedRequest(childId, "Did homework", "📚", "library"));
+        resp.StatusCode.Should().Be(HttpStatusCode.OK);
+        var deed = await resp.Content.ReadFromJsonAsync<DeedResponse>();
+        deed!.ImageType.Should().Be("library");
+        deed.ImageValue.Should().Be("📚");
+    }
+
+    [Fact]
+    public async Task CreateDeed_WithAiImage_StoresDataUrl()
+    {
+        var client = await TestAuthHelper.RegisterWithFamily(factory);
+        var childResp = await client.PostAsJsonAsync("/api/children", new CreateChildRequest("Hero", 7, Gender.Boy, "🦸"));
+        childResp.EnsureSuccessStatusCode();
+
+        var childrenResp = await client.GetAsync("/api/children");
+        var children = await childrenResp.Content.ReadFromJsonAsync<List<ChildResponse>>();
+        var childId = children![0].Id;
+
+        var resp = await client.PostAsJsonAsync("/api/deeds", new CreateDeedRequest(childId, "Drew a picture", "data:image/jpeg;base64,FAKE", "ai"));
+        resp.StatusCode.Should().Be(HttpStatusCode.OK);
+        var deed = await resp.Content.ReadFromJsonAsync<DeedResponse>();
+        deed!.ImageType.Should().Be("ai");
+    }
+
+    [Fact]
+    public async Task GenerateImage_WithValidPrompt_ReturnsDataUrl()
+    {
+        var client = await TestAuthHelper.RegisterWithFamily(factory);
+        var resp = await client.PostAsJsonAsync("/api/deeds/generate-image", new GenerateImageRequest("A child helping with dishes"));
+        resp.StatusCode.Should().Be(HttpStatusCode.OK);
+        var result = await resp.Content.ReadFromJsonAsync<GenerateImageResponse>();
+        result!.DataUrl.Should().StartWith("data:image/");
+    }
+
+    [Fact]
+    public async Task GenerateImage_WithEmptyPrompt_Returns400()
+    {
+        var client = await TestAuthHelper.RegisterWithFamily(factory);
+        var resp = await client.PostAsJsonAsync("/api/deeds/generate-image", new GenerateImageRequest(""));
+        resp.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
 }

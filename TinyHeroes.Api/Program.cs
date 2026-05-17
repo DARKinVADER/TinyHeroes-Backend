@@ -3,6 +3,7 @@ using AspNet.Security.OAuth.Apple;
 using Microsoft.AspNetCore.Authentication.Facebook;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
@@ -75,8 +76,6 @@ if (!string.IsNullOrEmpty(builder.Configuration["Auth:Apple:ClientId"]))
 }
 
 builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 builder.Services.AddCors(opt =>
     opt.AddDefaultPolicy(p => p
@@ -93,12 +92,6 @@ using (var scope = app.Services.CreateScope())
         dbContext.Database.Migrate();
     else
         dbContext.Database.EnsureCreated();
-}
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
 }
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();

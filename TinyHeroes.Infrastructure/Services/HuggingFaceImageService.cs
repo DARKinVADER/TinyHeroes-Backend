@@ -1,5 +1,7 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text;
+using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using TinyHeroes.Application.Interfaces;
 
@@ -15,13 +17,17 @@ public class HuggingFaceImageService(IHttpClientFactory httpFactory, IConfigurat
         if (string.IsNullOrWhiteSpace(apiKey))
             throw new InvalidOperationException("Hugging Face API key is not configured.");
 
-        var client = httpFactory.CreateClient();
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
-
         var url  = $"https://api-inference.huggingface.co/models/{model}";
-        var body = new { inputs = prompt };
+        var json = JsonSerializer.Serialize(new { inputs = prompt });
 
-        var response = await client.PostAsJsonAsync(url, body, ct);
+        using var request = new HttpRequestMessage(HttpMethod.Post, url)
+        {
+            Headers = { Authorization = new AuthenticationHeaderValue("Bearer", apiKey) },
+            Content = new StringContent(json, Encoding.UTF8, "application/json")
+        };
+
+        var client = httpFactory.CreateClient();
+        var response = await client.SendAsync(request, ct);
         response.EnsureSuccessStatusCode();
 
         var bytes = await response.Content.ReadAsByteArrayAsync(ct);

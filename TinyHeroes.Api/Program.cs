@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
+using Scalar.AspNetCore;
 using TinyHeroes.Api.Middleware;
 using TinyHeroes.Domain.Entities;
 using TinyHeroes.Infrastructure;
@@ -77,6 +79,44 @@ if (!string.IsNullOrEmpty(builder.Configuration["Auth:Apple:ClientId"]))
 
 builder.Services.AddControllers();
 
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer((document, context, cancellationToken) =>
+    {
+        document.Components ??= new();
+        document.Components.SecuritySchemes = new Dictionary<string, IOpenApiSecurityScheme>
+        {
+            ["Bearer"] = new OpenApiSecurityScheme
+            {
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT",
+                In = ParameterLocation.Header,
+                Description = "Paste your JWT from POST /api/auth/login"
+            }
+        };
+        return Task.CompletedTask;
+    });
+
+    options.AddOperationTransformer((operation, context, cancellationToken) =>
+    {
+        var hasAuthorize = context.Description.ActionDescriptor.EndpointMetadata
+            .OfType<IAuthorizeData>().Any();
+        if (hasAuthorize)
+        {
+            operation.Security =
+            [
+                new OpenApiSecurityRequirement
+                {
+                    [new OpenApiSecuritySchemeReference("Bearer", context.Document, string.Empty)] = []
+                }
+            ];
+        }
+
+        return Task.CompletedTask;
+    });
+});
+
 builder.Services.AddCors(opt =>
     opt.AddDefaultPolicy(p => p
         .WithOrigins(builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() ?? ["http://localhost:4200"])
@@ -92,6 +132,12 @@ using (var scope = app.Services.CreateScope())
         dbContext.Database.Migrate();
     else
         dbContext.Database.EnsureCreated();
+}
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();

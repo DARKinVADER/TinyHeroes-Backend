@@ -1,0 +1,232 @@
+### TinyHeroes API - sample requests
+### Run top-to-bottom for happy-path flow.
+### After Login, copy the token value from the response and set @token below.
+
+@host = http://localhost:5000
+@token = PASTE_TOKEN_HERE
+@childId = PASTE_CHILD_ID_HERE
+@inviteToken = PASTE_INVITE_TOKEN_HERE
+@presetId = PASTE_PRESET_ID_HERE
+@prizePresetId = PASTE_PRIZE_PRESET_ID_HERE
+
+### AUTH
+
+### Register
+POST {{host}}/api/auth/register
+Content-Type: application/json
+
+{
+  "displayName": "Alex Parent",
+  "email": "parent@example.com",
+  "password": "P@ssw0rd1!"
+}
+
+### Login - copy token from response, paste into @token above
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "parent@example.com",
+  "password": "P@ssw0rd1!"
+}
+
+### USERS
+
+### Get my profile
+GET {{host}}/api/users/me
+Authorization: Bearer {{token}}
+
+### Update my profile
+PATCH {{host}}/api/users/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "displayName": "Alex",
+  "preferredLanguage": "en",
+  "pushNotificationsEnabled": false,
+  "weeklyEmailEnabled": true
+}
+
+### FAMILIES
+
+### Create family
+POST {{host}}/api/families
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Smith Family",
+  "weekStartDay": 1
+}
+
+### Get my family
+GET {{host}}/api/families/mine
+Authorization: Bearer {{token}}
+
+### Update my family
+PATCH {{host}}/api/families/mine
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Smith Family",
+  "weekStartDay": 1
+}
+
+### INVITES
+
+### Create invite - copy token from response, paste into @inviteToken above
+POST {{host}}/api/invites
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "email": "partner@example.com"
+}
+
+### Accept invite (run as the invited user after they register/login)
+POST {{host}}/api/invites/{{inviteToken}}/accept
+Authorization: Bearer {{token}}
+
+### CHILDREN
+
+### Create child - copy id from response, paste into @childId above
+### gender: 0=Boy 1=Girl  |  weekStartDay: 0=Sun 1=Mon 2=Tue 3=Wed 4=Thu 5=Fri 6=Sat
+POST {{host}}/api/children
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Emma",
+  "age": 8,
+  "gender": 1,
+  "avatarEmoji": "👧"
+}
+
+### List children
+GET {{host}}/api/children
+Authorization: Bearer {{token}}
+
+### Get child by ID
+GET {{host}}/api/children/{{childId}}
+Authorization: Bearer {{token}}
+
+### Update child
+PUT {{host}}/api/children/{{childId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Emma",
+  "age": 9,
+  "gender": 1,
+  "avatarEmoji": "👧"
+}
+
+### Delete child
+DELETE {{host}}/api/children/{{childId}}
+Authorization: Bearer {{token}}
+
+### DEEDS
+
+### Log a good deed
+POST {{host}}/api/deeds
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "childId": "{{childId}}",
+  "description": "Helped with dishes",
+  "imageType": "emoji",
+  "imageValue": "🍽️"
+}
+
+### List deeds for a child
+GET {{host}}/api/deeds?childId={{childId}}
+Authorization: Bearer {{token}}
+
+### Get deed stats (weekly + total per child)
+GET {{host}}/api/deeds/stats
+Authorization: Bearer {{token}}
+
+### Generate AI image for a deed
+POST {{host}}/api/deeds/generate-image
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "prompt": "a child helping with dishes, cartoon style"
+}
+
+### PRESETS
+
+### List deed presets (system + family)
+GET {{host}}/api/presets
+Authorization: Bearer {{token}}
+
+### Create custom deed preset - copy id from response, paste into @presetId above
+POST {{host}}/api/presets
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "label": "Set the table",
+  "imageValue": "🍽️"
+}
+
+### Delete custom deed preset (admin only, system presets are protected)
+DELETE {{host}}/api/presets/{{presetId}}
+Authorization: Bearer {{token}}
+
+### PRIZE PRESETS
+
+### List prize presets
+GET {{host}}/api/prize-presets
+Authorization: Bearer {{token}}
+
+### Create prize preset - copy id from response, paste into @prizePresetId above
+POST {{host}}/api/prize-presets
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "label": "Ice cream",
+  "emoji": "🍦"
+}
+
+### Delete prize preset (admin only)
+DELETE {{host}}/api/prize-presets/{{prizePresetId}}
+Authorization: Bearer {{token}}
+
+### PRIZE ASSIGNMENTS
+
+### List prize assignments for my family
+GET {{host}}/api/prize-assignments
+Authorization: Bearer {{token}}
+
+### Set/upsert a prize assignment (admin only)
+PUT {{host}}/api/prize-assignments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "scope": "Week",
+  "rank": 1,
+  "emoji": "🥇",
+  "label": "Gold Star"
+}
+
+### SUMMARIES
+
+### Get weekly summaries
+GET {{host}}/api/summaries/weeks
+Authorization: Bearer {{token}}
+
+### Get monthly summaries
+GET {{host}}/api/summaries/months
+Authorization: Bearer {{token}}
+
+### Get current month live standings
+GET {{host}}/api/summaries/current-month
+Authorization: Bearer {{token}}

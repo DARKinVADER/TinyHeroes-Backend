@@ -115,9 +115,13 @@ public class ChildController(AppDbContext db, IFileStorageService fileStorage) :
         var child = await db.Children.FirstOrDefaultAsync(c => c.Id == id && c.FamilyId == membership.FamilyId);
         if (child is null) return NotFound();
 
-        var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+        var ext = Path.GetExtension(file.FileName ?? "").ToLowerInvariant();
         if (ext is not (".jpg" or ".jpeg" or ".png" or ".webp"))
             return BadRequest("Only .jpg, .jpeg, .png, and .webp files are allowed.");
+
+        var allowedMimeTypes = new[] { "image/jpeg", "image/png", "image/webp" };
+        if (!allowedMimeTypes.Contains(file.ContentType))
+            return BadRequest("Invalid file content type.");
 
         if (!string.IsNullOrEmpty(child.AvatarUrl))
         {

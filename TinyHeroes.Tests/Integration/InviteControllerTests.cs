@@ -3,7 +3,6 @@ using System.Net.Http.Json;
 using FluentAssertions;
 using TinyHeroes.Application.DTOs.Family;
 using TinyHeroes.Application.DTOs.Invite;
-using TinyHeroes.Domain.Enums;
 using TinyHeroes.Tests.Integration.Helpers;
 
 namespace TinyHeroes.Tests.Integration;
@@ -23,7 +22,7 @@ public class InviteControllerTests(TestWebApplicationFactory<Program> factory)
         family!.Name.Should().Be("Test Family");
         family.WeekStartDay.Should().Be(DayOfWeek.Monday);
         family.Members.Should().HaveCount(1);
-        family.Members[0].Role.Should().Be(FamilyRole.Admin);
+        family.Members[0].Role.Should().Be("Admin");
     }
 
     [Fact]
@@ -84,7 +83,7 @@ public class InviteControllerTests(TestWebApplicationFactory<Program> factory)
         familyResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var family = await familyResponse.Content.ReadFromJsonAsync<FamilyDetailResponse>();
         family!.Members.Should().HaveCount(2);
-        family.Members.Should().Contain(m => m.Role == FamilyRole.CoParent);
+        family.Members.Should().Contain(m => m.Role == "CoParent");
     }
 
     [Fact]

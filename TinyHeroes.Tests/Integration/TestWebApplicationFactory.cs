@@ -31,6 +31,11 @@ public class TestWebApplicationFactory<TProgram> : WebApplicationFactory<TProgra
             var aiDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IAiImageService));
             if (aiDescriptor != null) services.Remove(aiDescriptor);
             services.AddScoped<IAiImageService>(_ => new FakeAiImageService());
+
+            // Replace the real file storage service with a fake for tests.
+            var fsDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IFileStorageService));
+            if (fsDescriptor != null) services.Remove(fsDescriptor);
+            services.AddScoped<IFileStorageService>(_ => new FakeFileStorageService());
         });
     }
 
@@ -38,5 +43,12 @@ public class TestWebApplicationFactory<TProgram> : WebApplicationFactory<TProgra
     {
         public Task<string> GenerateDataUrlAsync(string prompt, CancellationToken ct = default)
             => Task.FromResult("data:image/jpeg;base64,/9j/FAKEDATA==");
+    }
+
+    private class FakeFileStorageService : IFileStorageService
+    {
+        public Task<string> SaveAsync(Stream content, string subPath, string fileName, CancellationToken ct = default)
+            => Task.FromResult($"/uploads/{subPath}/{fileName}");
+        public void Delete(string subPath, string fileName) { }
     }
 }

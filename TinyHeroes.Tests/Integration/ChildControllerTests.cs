@@ -92,4 +92,51 @@ public class ChildControllerTests(TestWebApplicationFactory<Program> factory)
         var response = await client.DeleteAsync($"/api/children/{Guid.NewGuid()}");
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
+
+    [Fact]
+    public async Task UploadAvatar_WithValidJpeg_SetsAvatarUrl()
+    {
+        var client = await TestAuthHelper.RegisterWithFamily(factory);
+        var childResp = await client.PostAsJsonAsync("/api/children", new CreateChildRequest("Hero", 7, Gender.Boy, "🦸"));
+        var child = await childResp.Content.ReadFromJsonAsync<ChildResponse>();
+
+        using var content = new MultipartFormDataContent();
+        var imageBytes = new byte[] { 0xFF, 0xD8, 0xFF, 0xE0 };
+        content.Add(new ByteArrayContent(imageBytes) { Headers = { ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg") } }, "file", "avatar.jpg");
+
+        var resp = await client.PostAsync($"/api/children/{child!.Id}/avatar", content);
+        resp.StatusCode.Should().Be(HttpStatusCode.OK);
+        var updated = await resp.Content.ReadFromJsonAsync<ChildResponse>();
+        updated!.AvatarUrl.Should().Contain("/uploads/avatars/");
+    }
+
+    [Fact]
+    public async Task UploadAvatar_WithInvalidExtension_Returns400()
+    {
+        var client = await TestAuthHelper.RegisterWithFamily(factory);
+        var childResp = await client.PostAsJsonAsync("/api/children", new CreateChildRequest("Hero", 7, Gender.Boy, "🦸"));
+        var child = await childResp.Content.ReadFromJsonAsync<ChildResponse>();
+
+        using var content = new MultipartFormDataContent();
+        content.Add(new ByteArrayContent([0x00]) { Headers = { ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream") } }, "file", "avatar.gif");
+
+        var resp = await client.PostAsync($"/api/children/{child!.Id}/avatar", content);
+        resp.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task UploadAvatar_ForOtherFamilyChild_Returns404()
+    {
+        var client1 = await TestAuthHelper.RegisterWithFamily(factory);
+        var client2 = await TestAuthHelper.RegisterWithFamily(factory);
+
+        var childResp = await client1.PostAsJsonAsync("/api/children", new CreateChildRequest("Hero", 7, Gender.Boy, "🦸"));
+        var child = await childResp.Content.ReadFromJsonAsync<ChildResponse>();
+
+        using var content = new MultipartFormDataContent();
+        content.Add(new ByteArrayContent([0xFF, 0xD8]) { Headers = { ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg") } }, "file", "avatar.jpg");
+
+        var resp = await client2.PostAsync($"/api/children/{child!.Id}/avatar", content);
+        resp.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
 }

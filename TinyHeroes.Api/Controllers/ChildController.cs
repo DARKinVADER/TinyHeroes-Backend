@@ -1,8 +1,10 @@
+using System.IO;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TinyHeroes.Application.DTOs.Child;
+using TinyHeroes.Application.Interfaces;
 using TinyHeroes.Domain.Entities;
 using TinyHeroes.Domain.Enums;
 using TinyHeroes.Infrastructure.Data;
@@ -12,7 +14,7 @@ namespace TinyHeroes.Api.Controllers;
 [ApiController]
 [Route("api/children")]
 [Authorize]
-public class ChildController(AppDbContext db) : ControllerBase
+public class ChildController(AppDbContext db, IFileStorageService fileStorage) : ControllerBase
 {
     private Guid GetUserId() => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub")!);
 
@@ -100,5 +102,36 @@ public class ChildController(AppDbContext db) : ControllerBase
         await db.SaveChangesAsync();
 
         return NoContent();
+    }
+
+    [HttpPost("{id:guid}/avatar")]
+    [RequestSizeLimit(5 * 1024 * 1024)]
+    public async Task<ActionResult<ChildResponse>> UploadAvatar(Guid id, IFormFile file, CancellationToken ct)
+    {
+        var userId = GetUserId();
+        var membership = await db.FamilyMembers.FirstOrDefaultAsync(m => m.UserId == userId);
+        if (membership is null) return BadRequest("User does not belong to a family.");
+
+        var child = await db.Children.FirstOrDefaultAsync(c => c.Id == id && c.FamilyId == membership.FamilyId);
+        if (child is null) return NotFound();
+
+        var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+        if (ext is not (".jpg" or ".jpeg" or ".png" or ".webp"))
+            return BadRequest("Only .jpg, .jpeg, .png, and .webp files are allowed.");
+
+        if (!string.IsNullOrEmpty(child.AvatarUrl))
+        {
+            var oldFileName = Path.GetFileName(child.AvatarUrl);
+            fileStorage.Delete("avatars", oldFileName);
+        }
+
+        var fileName = $"{Guid.NewGuid()}{ext}";
+        await using var stream = file.OpenReadStream();
+        var url = await fileStorage.SaveAsync(stream, "avatars", fileName, ct);
+
+        child.AvatarUrl = url;
+        await db.SaveChangesAsync();
+
+        return Ok(new ChildResponse(child.Id, child.Name, child.Age, child.Gender, child.AvatarEmoji, child.AvatarUrl));
     }
 }

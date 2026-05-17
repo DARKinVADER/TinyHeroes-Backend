@@ -9,9 +9,8 @@ public class LocalFileStorageService(IConfiguration config) : IFileStorageServic
 
     public async Task<string> SaveAsync(Stream content, string subPath, string fileName, CancellationToken ct = default)
     {
-        var dir = Path.Combine(BasePath, subPath);
-        Directory.CreateDirectory(dir);
-        var fullPath = Path.Combine(dir, fileName);
+        var fullPath = ResolveSafe(subPath, fileName);
+        Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
         await using var fs = new FileStream(fullPath, FileMode.Create, FileAccess.Write);
         await content.CopyToAsync(fs, ct);
         return $"/uploads/{subPath}/{fileName}";
@@ -19,9 +18,18 @@ public class LocalFileStorageService(IConfiguration config) : IFileStorageServic
 
     public void Delete(string subPath, string fileName)
     {
-        var fullPath = Path.Combine(BasePath, subPath, fileName);
+        var fullPath = ResolveSafe(subPath, fileName);
         if (File.Exists(fullPath))
             File.Delete(fullPath);
+    }
+
+    private string ResolveSafe(string subPath, string fileName)
+    {
+        var root = Path.GetFullPath(BasePath);
+        var resolved = Path.GetFullPath(Path.Combine(root, subPath, fileName));
+        if (!resolved.StartsWith(root + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+            throw new InvalidOperationException("Path is outside the storage root.");
+        return resolved;
     }
 
     private static string ParseBasePath(string? connectionString)

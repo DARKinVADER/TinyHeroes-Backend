@@ -41,8 +41,24 @@ public class AzureBlobStorageServiceTests
         act.Should().Throw<InvalidOperationException>().WithMessage("*AccountName*");
     }
 
+    [Fact]
+    public void ParseConnectionString_ThrowsOnMissingAccountKey()
+    {
+        var cs = "azureblob://AccountName=testaccount;ContainerName=uploads";
+        var act = () => AzureBlobStorageService.ParseConnectionString(cs);
+        act.Should().Throw<InvalidOperationException>().WithMessage("*AccountKey*");
+    }
+
+    [Fact]
+    public void ParseConnectionString_ThrowsOnMissingContainerName()
+    {
+        var cs = "azureblob://AccountName=testaccount;AccountKey=dGVzdA==";
+        var act = () => AzureBlobStorageService.ParseConnectionString(cs);
+        act.Should().Throw<InvalidOperationException>().WithMessage("*ContainerName*");
+    }
+
     [Theory]
-    [InlineData("azureblob://AccountName=a;AccountKey=b;ContainerName=uploads", typeof(AzureBlobStorageService))]
+    [InlineData("azureblob://AccountName=testaccount;AccountKey=dGVzdA==;ContainerName=uploads", typeof(AzureBlobStorageService))]
     [InlineData("disk://path=/app/uploads", typeof(LocalFileStorageService))]
     public void DependencyInjection_RegistersCorrectImplementation(string connectionString, Type expectedType)
     {

@@ -5,25 +5,51 @@ using TinyHeroes.Application.Interfaces;
 
 namespace TinyHeroes.Infrastructure.Services;
 
-public class AzureBlobStorageService(IConfiguration config) : IFileStorageService
+public class AzureBlobStorageService : IFileStorageService
 {
-    public record BlobConnectionInfo(string AccountName, string AccountKey, string ContainerName);
+    public record BlobConnectionInfo(string AccountName, string AccountKey, string ContainerName)
+    {
+        public override string ToString() =>
+            $"BlobConnectionInfo {{ AccountName = {AccountName}, AccountKey = [REDACTED], ContainerName = {ContainerName} }}";
+    }
+
+    private readonly BlobContainerClient _container;
+    private readonly string _accountName;
+    private readonly string _containerName;
+
+    public AzureBlobStorageService(IConfiguration config)
+    {
+        var info = ParseConnectionString(config["Storage:ConnectionString"]);
+        _accountName = info.AccountName;
+        _containerName = info.ContainerName;
+        _container = CreateContainerClient(info);
+    }
 
     public async Task<string> SaveAsync(Stream content, string subPath, string fileName, CancellationToken ct = default)
     {
-        var info = ParseConnectionString(config["Storage:ConnectionString"]);
-        var container = CreateContainerClient(info);
         var blobName = $"{subPath}/{fileName}";
-        var blob = container.GetBlobClient(blobName);
-        await blob.UploadAsync(content, new BlobUploadOptions { HttpHeaders = new BlobHttpHeaders() }, ct);
-        return $"https://{info.AccountName}.blob.core.windows.net/{info.ContainerName}/{blobName}";
+        var blob = _container.GetBlobClient(blobName);
+
+        var contentType = Path.GetExtension(fileName).ToLowerInvariant() switch
+        {
+            ".jpg" or ".jpeg" => "image/jpeg",
+            ".png" => "image/png",
+            ".gif" => "image/gif",
+            ".webp" => "image/webp",
+            _ => "application/octet-stream"
+        };
+
+        await blob.UploadAsync(content, new BlobUploadOptions
+        {
+            HttpHeaders = new BlobHttpHeaders { ContentType = contentType }
+        }, ct);
+
+        return $"https://{_accountName}.blob.core.windows.net/{_containerName}/{blobName}";
     }
 
     public void Delete(string subPath, string fileName)
     {
-        var info = ParseConnectionString(config["Storage:ConnectionString"]);
-        var container = CreateContainerClient(info);
-        container.GetBlobClient($"{subPath}/{fileName}").DeleteIfExists();
+        _container.GetBlobClient($"{subPath}/{fileName}").DeleteIfExists();
     }
 
     public static BlobConnectionInfo ParseConnectionString(string? connectionString)

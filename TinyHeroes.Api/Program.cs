@@ -164,7 +164,8 @@ static string ParseUploadsPath(string? connectionString)
 {
     if (string.IsNullOrWhiteSpace(connectionString)) return "/app/uploads";
     var idx = connectionString.IndexOf("path=", StringComparison.OrdinalIgnoreCase);
-    return idx >= 0 ? connectionString[(idx + 5)..] : "/app/uploads";
+    var path = idx >= 0 ? connectionString[(idx + 5)..] : "/app/uploads";
+    return Path.IsPathRooted(path) ? path : Path.GetFullPath(path);
 }
 
 public partial class Program { }

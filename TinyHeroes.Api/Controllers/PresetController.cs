@@ -27,7 +27,7 @@ public class PresetController(AppDbContext db) : ControllerBase
             .Where(p => p.FamilyId == null || p.FamilyId == membership.FamilyId)
             .OrderBy(p => p.FamilyId == null ? 0 : 1)
             .ThenBy(p => p.CreatedAt)
-            .Select(p => new PresetResponse(p.Id, p.Label, p.ImageValue, p.Enabled, p.FamilyId == null))
+            .Select(p => new PresetResponse(p.Id, p.Label, p.ImageValue, p.Enabled, p.FamilyId == null, p.LabelKey))
             .ToListAsync();
 
         return Ok(presets);
@@ -50,7 +50,7 @@ public class PresetController(AppDbContext db) : ControllerBase
         db.DeedPresets.Add(preset);
         await db.SaveChangesAsync();
 
-        return Ok(new PresetResponse(preset.Id, preset.Label, preset.ImageValue, preset.Enabled, false));
+        return Ok(new PresetResponse(preset.Id, preset.Label, preset.ImageValue, preset.Enabled, false, null));
     }
 
     [HttpDelete("{id:guid}")]

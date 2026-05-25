@@ -7,6 +7,7 @@ public class DeedPreset
     public string Label { get; set; } = string.Empty;
     public string ImageValue { get; set; } = "⭐";
     public bool Enabled { get; set; } = true;
+    public string? LabelKey { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public Family? Family { get; set; }

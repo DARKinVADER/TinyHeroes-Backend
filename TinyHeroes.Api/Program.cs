@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json.Serialization;
 using AspNet.Security.OAuth.Apple;
 using Microsoft.AspNetCore.Authentication.Facebook;
 using Microsoft.AspNetCore.Authentication.Google;
@@ -77,7 +78,9 @@ if (!string.IsNullOrEmpty(builder.Configuration["Auth:Apple:ClientId"]))
     });
 }
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(opt =>
+        opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 builder.Services.AddOpenApi(options =>
 {

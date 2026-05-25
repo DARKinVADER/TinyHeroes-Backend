@@ -18,7 +18,11 @@ public static class DependencyInjection
         services.AddScoped<ITokenService, JwtTokenService>();
         services.AddScoped<ISummaryService, SummaryService>();
         services.AddScoped<IAiImageService, HuggingFaceImageService>();
-        services.AddScoped<IFileStorageService, LocalFileStorageService>();
+        var storageConn = config["Storage:ConnectionString"] ?? "";
+        if (storageConn.StartsWith("azureblob://", StringComparison.OrdinalIgnoreCase))
+            services.AddScoped<IFileStorageService, AzureBlobStorageService>();
+        else
+            services.AddScoped<IFileStorageService, LocalFileStorageService>();
 
         return services;
     }

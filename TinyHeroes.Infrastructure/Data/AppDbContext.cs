@@ -18,6 +18,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<WeekSummary> WeekSummaries => Set<WeekSummary>();
     public DbSet<MonthSummary> MonthSummaries => Set<MonthSummary>();
     public DbSet<PrizeAssignment> PrizeAssignments => Set<PrizeAssignment>();
+    public DbSet<PrizeClaim> PrizeClaims => Set<PrizeClaim>();
+    public DbSet<PrizeComment> PrizeComments => Set<PrizeComment>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

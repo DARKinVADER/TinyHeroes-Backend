@@ -27,7 +27,7 @@ public class PrizeAssignmentControllerTests(TestWebApplicationFactory<Program> f
 
         var assignments = await response.Content.ReadFromJsonAsync<List<PrizeAssignmentResponse>>(TestWebApplicationFactory<Program>.JsonOptions);
         assignments.Should().NotBeNull();
-        assignments!.Any(a => a.Scope == "weekly" && a.Rank == 1 && a.Label == "Gold trophy").Should().BeTrue();
+        assignments!.Should().ContainSingle(a => a.Scope == "weekly" && a.Rank == 1 && a.Label == "Gold trophy");
     }
 
     [Fact]
@@ -74,7 +74,7 @@ public class PrizeAssignmentControllerTests(TestWebApplicationFactory<Program> f
         var adminClient = await TestAuthHelper.RegisterWithFamily(factory);
 
         // Create invite for co-parent
-        var inviteResponse = await adminClient.PostAsJsonAsync("/api/invites", new CreateInviteRequest("coparent@test.com"));
+        var inviteResponse = await adminClient.PostAsJsonAsync("/api/invites", new CreateInviteRequest(null));
         inviteResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var invite = await inviteResponse.Content.ReadFromJsonAsync<InviteResponse>(TestWebApplicationFactory<Program>.JsonOptions);
 

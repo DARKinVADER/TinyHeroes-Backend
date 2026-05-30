@@ -29,16 +29,22 @@ public class FamilySettingsControllerTests(TestWebApplicationFactory<Program> fa
     public async Task UpdateFamily_AsCoParent_Returns403()
     {
         var adminClient = await TestAuthHelper.RegisterWithFamily(factory);
-        var inviteResponse = await adminClient.PostAsJsonAsync("/api/invites", new CreateInviteRequest("coparent@test.com"));
+        var inviteResponse = await adminClient.PostAsJsonAsync("/api/invites", new CreateInviteRequest(null));
         var invite = await inviteResponse.Content.ReadFromJsonAsync<InviteResponse>(TestWebApplicationFactory<Program>.JsonOptions);
 
         var coParentClient = await TestAuthHelper.RegisterOnly(factory);
-        await coParentClient.PostAsync($"/api/invites/{invite!.Token}/accept", null);
+        var acceptResponse = await coParentClient.PostAsync($"/api/invites/{invite!.Token}/accept", null);
+        acceptResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var response = await coParentClient.PatchAsJsonAsync("/api/families/mine",
             new UpdateFamilyRequest("Hacked Name", DayOfWeek.Friday));
 
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+
+        // Verify the mutation did not persist
+        var familyResponse = await adminClient.GetAsync("/api/families/mine");
+        var family = await familyResponse.Content.ReadFromJsonAsync<FamilyDetailResponse>(TestWebApplicationFactory<Program>.JsonOptions);
+        family!.Name.Should().Be("Test Family");
     }
 
     [Fact]
@@ -49,7 +55,8 @@ public class FamilySettingsControllerTests(TestWebApplicationFactory<Program> fa
         var invite = await inviteResponse.Content.ReadFromJsonAsync<InviteResponse>(TestWebApplicationFactory<Program>.JsonOptions);
 
         var coParentClient = await TestAuthHelper.RegisterOnly(factory);
-        await coParentClient.PostAsync($"/api/invites/{invite!.Token}/accept", null);
+        var acceptResponse = await coParentClient.PostAsync($"/api/invites/{invite!.Token}/accept", null);
+        acceptResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
         // Get the co-parent's userId from the family details
         var familyResponse = await adminClient.GetAsync("/api/families/mine");
@@ -83,14 +90,23 @@ public class FamilySettingsControllerTests(TestWebApplicationFactory<Program> fa
     [Fact]
     public async Task DeleteFamily_AsAdmin_Succeeds()
     {
-        var client = await TestAuthHelper.RegisterWithFamily(factory);
+        var adminClient = await TestAuthHelper.RegisterWithFamily(factory);
+        var inviteResponse = await adminClient.PostAsJsonAsync("/api/invites", new CreateInviteRequest(null));
+        var invite = await inviteResponse.Content.ReadFromJsonAsync<InviteResponse>(TestWebApplicationFactory<Program>.JsonOptions);
+        var coParentClient = await TestAuthHelper.RegisterOnly(factory);
+        var acceptResponse = await coParentClient.PostAsync($"/api/invites/{invite!.Token}/accept", null);
+        acceptResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var deleteResponse = await client.DeleteAsync("/api/families/mine");
+        var deleteResponse = await adminClient.DeleteAsync("/api/families/mine");
         deleteResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-        // Subsequent GET should return 404
-        var getResponse = await client.GetAsync("/api/families/mine");
-        getResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        // Admin can no longer see the family
+        var adminGetResponse = await adminClient.GetAsync("/api/families/mine");
+        adminGetResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
+
+        // Co-parent also loses access — confirming the Family entity was deleted, not just the admin's membership
+        var coParentGetResponse = await coParentClient.GetAsync("/api/families/mine");
+        coParentGetResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
@@ -101,7 +117,8 @@ public class FamilySettingsControllerTests(TestWebApplicationFactory<Program> fa
         var invite = await inviteResponse.Content.ReadFromJsonAsync<InviteResponse>(TestWebApplicationFactory<Program>.JsonOptions);
 
         var coParentClient = await TestAuthHelper.RegisterOnly(factory);
-        await coParentClient.PostAsync($"/api/invites/{invite!.Token}/accept", null);
+        var acceptResponse = await coParentClient.PostAsync($"/api/invites/{invite!.Token}/accept", null);
+        acceptResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var response = await coParentClient.DeleteAsync("/api/families/mine");
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);

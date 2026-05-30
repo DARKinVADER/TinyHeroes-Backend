@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -46,6 +47,13 @@ public class InviteController(AppDbContext db) : ApiControllerBase
         if (invite is null) return NotFound("Invite not found or already accepted.");
 
         if (invite.ExpiresAt < DateTime.UtcNow) return BadRequest("Invite has expired.");
+
+        if (invite.Email is not null)
+        {
+            var currentEmail = User.FindFirstValue(ClaimTypes.Email);
+            if (!string.Equals(invite.Email, currentEmail, StringComparison.OrdinalIgnoreCase))
+                return Forbid();
+        }
 
         if (await db.FamilyMembers.AnyAsync(m => m.UserId == userId))
             return Conflict("User already belongs to a family.");

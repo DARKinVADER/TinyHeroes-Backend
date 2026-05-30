@@ -20,6 +20,14 @@ using TinyHeroes.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor
+                             | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddMemoryCache();
 
@@ -142,6 +150,8 @@ builder.Services.AddRateLimiter(opt =>
 });
 
 var app = builder.Build();
+
+app.UseForwardedHeaders();
 
 using (var scope = app.Services.CreateScope())
 {

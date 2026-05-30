@@ -14,7 +14,8 @@ public class AuthController(
     UserManager<User> userManager,
     SignInManager<User> signInManager,
     ITokenService tokenService,
-    AppDbContext db) : ControllerBase
+    AppDbContext db,
+    IConfiguration config) : ControllerBase
 {
     [HttpPost("register")]
     public async Task<ActionResult<AuthResponse>> Register(RegisterRequest req)
@@ -70,6 +71,7 @@ public class AuthController(
 
         var hasFamily = db.FamilyMembers.Any(m => m.UserId == user.Id);
         var token = tokenService.GenerateAccessToken(user);
-        return Redirect($"http://localhost:4200/auth/callback?token={token}&hasFamily={hasFamily}");
+        var frontendUrl = config["Auth:FrontendUrl"] ?? "http://localhost:4200";
+        return Redirect($"{frontendUrl}/auth/callback?token={token}&hasFamily={hasFamily}");
     }
 }

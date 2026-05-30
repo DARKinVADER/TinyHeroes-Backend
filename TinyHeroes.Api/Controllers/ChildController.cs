@@ -1,5 +1,4 @@
 using System.IO;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,9 +13,8 @@ namespace TinyHeroes.Api.Controllers;
 [ApiController]
 [Route("api/children")]
 [Authorize]
-public class ChildController(AppDbContext db, IFileStorageService fileStorage) : ControllerBase
+public class ChildController(AppDbContext db, IFileStorageService fileStorage) : ApiControllerBase
 {
-    private Guid GetUserId() => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub")!);
 
     [HttpPost]
     public async Task<ActionResult<ChildResponse>> Create(CreateChildRequest req)

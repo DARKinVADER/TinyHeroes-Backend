@@ -20,7 +20,7 @@ public class PrizeClaimControllerTests(TestWebApplicationFactory<Program> factor
         var response = await client.GetAsync($"/api/prize-claims?weekSummaryId={summaryId}");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var claims = await response.Content.ReadFromJsonAsync<List<PrizeClaimDto>>();
+        var claims = await response.Content.ReadFromJsonAsync<List<PrizeClaimDto>>(TestWebApplicationFactory<Program>.JsonOptions);
         claims.Should().BeEmpty();
     }
 
@@ -33,7 +33,7 @@ public class PrizeClaimControllerTests(TestWebApplicationFactory<Program> factor
         var response = await client.GetAsync($"/api/prize-claims?monthSummaryId={summaryId}");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var claims = await response.Content.ReadFromJsonAsync<List<PrizeClaimDto>>();
+        var claims = await response.Content.ReadFromJsonAsync<List<PrizeClaimDto>>(TestWebApplicationFactory<Program>.JsonOptions);
         claims.Should().BeEmpty();
     }
 
@@ -48,7 +48,7 @@ public class PrizeClaimControllerTests(TestWebApplicationFactory<Program> factor
         var response = await client.PostAsJsonAsync("/api/prize-claims", req);
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
-        var claim = await response.Content.ReadFromJsonAsync<PrizeClaimDto>();
+        var claim = await response.Content.ReadFromJsonAsync<PrizeClaimDto>(TestWebApplicationFactory<Program>.JsonOptions);
         claim.Should().NotBeNull();
         claim!.PrizeLabel.Should().Be("Pizza night");
         claim.IsUsed.Should().BeFalse();
@@ -68,8 +68,8 @@ public class PrizeClaimControllerTests(TestWebApplicationFactory<Program> factor
 
         first.StatusCode.Should().Be(HttpStatusCode.Created);
         second.StatusCode.Should().Be(HttpStatusCode.OK);
-        var c1 = await first.Content.ReadFromJsonAsync<PrizeClaimDto>();
-        var c2 = await second.Content.ReadFromJsonAsync<PrizeClaimDto>();
+        var c1 = await first.Content.ReadFromJsonAsync<PrizeClaimDto>(TestWebApplicationFactory<Program>.JsonOptions);
+        var c2 = await second.Content.ReadFromJsonAsync<PrizeClaimDto>(TestWebApplicationFactory<Program>.JsonOptions);
         c1!.Id.Should().Be(c2!.Id);
     }
 
@@ -81,12 +81,12 @@ public class PrizeClaimControllerTests(TestWebApplicationFactory<Program> factor
         var childId = Guid.NewGuid();
         var createReq = new CreatePrizeClaimRequest("weekly", summaryId, null, 1, childId, "Alice", "🍕", "Pizza night");
         var createResponse = await client.PostAsJsonAsync("/api/prize-claims", createReq);
-        var claim = await createResponse.Content.ReadFromJsonAsync<PrizeClaimDto>();
+        var claim = await createResponse.Content.ReadFromJsonAsync<PrizeClaimDto>(TestWebApplicationFactory<Program>.JsonOptions);
 
         var response = await client.PutAsJsonAsync($"/api/prize-claims/{claim!.Id}/used", new UpdateUsedRequest(true));
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var updated = await response.Content.ReadFromJsonAsync<PrizeClaimDto>();
+        var updated = await response.Content.ReadFromJsonAsync<PrizeClaimDto>(TestWebApplicationFactory<Program>.JsonOptions);
         updated!.IsUsed.Should().BeTrue();
         updated.UsedAt.Should().NotBeNull();
     }
@@ -99,13 +99,13 @@ public class PrizeClaimControllerTests(TestWebApplicationFactory<Program> factor
         var childId = Guid.NewGuid();
         var createReq = new CreatePrizeClaimRequest("weekly", summaryId, null, 1, childId, "Alice", "🍕", "Pizza night");
         var createResponse = await client.PostAsJsonAsync("/api/prize-claims", createReq);
-        var claim = await createResponse.Content.ReadFromJsonAsync<PrizeClaimDto>();
+        var claim = await createResponse.Content.ReadFromJsonAsync<PrizeClaimDto>(TestWebApplicationFactory<Program>.JsonOptions);
         await client.PutAsJsonAsync($"/api/prize-claims/{claim!.Id}/used", new UpdateUsedRequest(true));
 
         var response = await client.PutAsJsonAsync($"/api/prize-claims/{claim.Id}/used", new UpdateUsedRequest(false));
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var updated = await response.Content.ReadFromJsonAsync<PrizeClaimDto>();
+        var updated = await response.Content.ReadFromJsonAsync<PrizeClaimDto>(TestWebApplicationFactory<Program>.JsonOptions);
         updated!.IsUsed.Should().BeFalse();
         updated.UsedAt.Should().BeNull();
     }
@@ -118,13 +118,13 @@ public class PrizeClaimControllerTests(TestWebApplicationFactory<Program> factor
         var childId = Guid.NewGuid();
         var createReq = new CreatePrizeClaimRequest("weekly", summaryId, null, 1, childId, "Alice", "🍕", "Pizza night");
         var createResponse = await client.PostAsJsonAsync("/api/prize-claims", createReq);
-        var claim = await createResponse.Content.ReadFromJsonAsync<PrizeClaimDto>();
+        var claim = await createResponse.Content.ReadFromJsonAsync<PrizeClaimDto>(TestWebApplicationFactory<Program>.JsonOptions);
 
         var commentResponse = await client.PostAsJsonAsync($"/api/prize-claims/{claim!.Id}/comments", new AddCommentRequest("Given out Friday!"));
 
         commentResponse.StatusCode.Should().Be(HttpStatusCode.Created);
         var getResponse = await client.GetAsync($"/api/prize-claims?weekSummaryId={summaryId}");
-        var claims = await getResponse.Content.ReadFromJsonAsync<List<PrizeClaimDto>>();
+        var claims = await getResponse.Content.ReadFromJsonAsync<List<PrizeClaimDto>>(TestWebApplicationFactory<Program>.JsonOptions);
         claims!.Single().Comments.Should().ContainSingle(c => c.Text == "Given out Friday!");
     }
 
@@ -136,15 +136,15 @@ public class PrizeClaimControllerTests(TestWebApplicationFactory<Program> factor
         var childId = Guid.NewGuid();
         var createReq = new CreatePrizeClaimRequest("weekly", summaryId, null, 1, childId, "Alice", "🍕", "Pizza night");
         var createResponse = await client.PostAsJsonAsync("/api/prize-claims", createReq);
-        var claim = await createResponse.Content.ReadFromJsonAsync<PrizeClaimDto>();
+        var claim = await createResponse.Content.ReadFromJsonAsync<PrizeClaimDto>(TestWebApplicationFactory<Program>.JsonOptions);
         var commentResponse = await client.PostAsJsonAsync($"/api/prize-claims/{claim!.Id}/comments", new AddCommentRequest("Given out Friday!"));
-        var comment = await commentResponse.Content.ReadFromJsonAsync<PrizeCommentDto>();
+        var comment = await commentResponse.Content.ReadFromJsonAsync<PrizeCommentDto>(TestWebApplicationFactory<Program>.JsonOptions);
 
         var deleteResponse = await client.DeleteAsync($"/api/prize-claims/{claim.Id}/comments/{comment!.Id}");
 
         deleteResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
         var getResponse = await client.GetAsync($"/api/prize-claims?weekSummaryId={summaryId}");
-        var claims = await getResponse.Content.ReadFromJsonAsync<List<PrizeClaimDto>>();
+        var claims = await getResponse.Content.ReadFromJsonAsync<List<PrizeClaimDto>>(TestWebApplicationFactory<Program>.JsonOptions);
         claims!.Single().Comments.Should().BeEmpty();
     }
 
@@ -165,7 +165,7 @@ public class PrizeClaimControllerTests(TestWebApplicationFactory<Program> factor
     {
         var adminClient = await TestAuthHelper.RegisterWithFamily(factory);
         var inviteResponse = await adminClient.PostAsJsonAsync("/api/invites", new CreateInviteRequest("coparent@test.com"));
-        var invite = await inviteResponse.Content.ReadFromJsonAsync<InviteResponse>();
+        var invite = await inviteResponse.Content.ReadFromJsonAsync<InviteResponse>(TestWebApplicationFactory<Program>.JsonOptions);
         var coParentClient = await TestAuthHelper.RegisterOnly(factory);
         await coParentClient.PostAsync($"/api/invites/{invite!.Token}/accept", null);
 
@@ -175,7 +175,7 @@ public class PrizeClaimControllerTests(TestWebApplicationFactory<Program> factor
 
         var createResponse = await coParentClient.PostAsJsonAsync("/api/prize-claims", createReq);
         createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
-        var claim = await createResponse.Content.ReadFromJsonAsync<PrizeClaimDto>();
+        var claim = await createResponse.Content.ReadFromJsonAsync<PrizeClaimDto>(TestWebApplicationFactory<Program>.JsonOptions);
 
         var usedResponse = await coParentClient.PutAsJsonAsync($"/api/prize-claims/{claim!.Id}/used", new UpdateUsedRequest(true));
         usedResponse.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -194,7 +194,7 @@ public class PrizeClaimControllerTests(TestWebApplicationFactory<Program> factor
         var childId = Guid.NewGuid();
         var req = new CreatePrizeClaimRequest("weekly", summaryId, null, 1, childId, "Alice", "🍕", "Pizza night");
         var createResponse = await client1.PostAsJsonAsync("/api/prize-claims", req);
-        var claim = await createResponse.Content.ReadFromJsonAsync<PrizeClaimDto>();
+        var claim = await createResponse.Content.ReadFromJsonAsync<PrizeClaimDto>(TestWebApplicationFactory<Program>.JsonOptions);
 
         var response = await client2.PutAsJsonAsync($"/api/prize-claims/{claim!.Id}/used", new UpdateUsedRequest(true));
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);

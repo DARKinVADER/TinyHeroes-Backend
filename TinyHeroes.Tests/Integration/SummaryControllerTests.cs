@@ -23,7 +23,7 @@ public class SummaryControllerTests(TestWebApplicationFactory<Program> factory)
         var response = await client.GetAsync("/api/summaries/weeks");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var summaries = await response.Content.ReadFromJsonAsync<List<WeekSummaryResponse>>();
+        var summaries = await response.Content.ReadFromJsonAsync<List<WeekSummaryResponse>>(TestWebApplicationFactory<Program>.JsonOptions);
         summaries.Should().BeEmpty();
     }
 
@@ -32,7 +32,7 @@ public class SummaryControllerTests(TestWebApplicationFactory<Program> factory)
     {
         var client = await TestAuthHelper.RegisterWithFamily(factory);
         var childResp = await client.PostAsJsonAsync("/api/children", new CreateChildRequest("Alice", 7, Gender.Girl, "🦄"));
-        var child = await childResp.Content.ReadFromJsonAsync<ChildResponse>();
+        var child = await childResp.Content.ReadFromJsonAsync<ChildResponse>(TestWebApplicationFactory<Program>.JsonOptions);
 
         // Insert a deed dated 14 days ago directly via DB
         using var scope = factory.Services.CreateScope();
@@ -53,7 +53,7 @@ public class SummaryControllerTests(TestWebApplicationFactory<Program> factory)
         var response = await client.GetAsync("/api/summaries/weeks");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var summaries = await response.Content.ReadFromJsonAsync<List<WeekSummaryResponse>>();
+        var summaries = await response.Content.ReadFromJsonAsync<List<WeekSummaryResponse>>(TestWebApplicationFactory<Program>.JsonOptions);
         summaries.Should().NotBeEmpty();
         summaries!.Should().Contain(s => s.Rankings.Any(r => r.ChildId == child.Id && r.DeedCount > 0));
     }
@@ -63,7 +63,7 @@ public class SummaryControllerTests(TestWebApplicationFactory<Program> factory)
     {
         var client = await TestAuthHelper.RegisterWithFamily(factory);
         var childResp = await client.PostAsJsonAsync("/api/children", new CreateChildRequest("Bob", 5, Gender.Boy, "🦁"));
-        var child = await childResp.Content.ReadFromJsonAsync<ChildResponse>();
+        var child = await childResp.Content.ReadFromJsonAsync<ChildResponse>(TestWebApplicationFactory<Program>.JsonOptions);
 
         // Insert a deed dated 90 days ago directly via DB (safely in a past completed month)
         using var scope = factory.Services.CreateScope();
@@ -84,7 +84,7 @@ public class SummaryControllerTests(TestWebApplicationFactory<Program> factory)
         var response = await client.GetAsync("/api/summaries/months");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var summaries = await response.Content.ReadFromJsonAsync<List<MonthSummaryResponse>>();
+        var summaries = await response.Content.ReadFromJsonAsync<List<MonthSummaryResponse>>(TestWebApplicationFactory<Program>.JsonOptions);
         summaries.Should().NotBeEmpty();
         summaries!.Should().Contain(s => s.ChampionChildId == child.Id);
     }
@@ -94,7 +94,7 @@ public class SummaryControllerTests(TestWebApplicationFactory<Program> factory)
     {
         var client = await TestAuthHelper.RegisterWithFamily(factory);
         var childResp = await client.PostAsJsonAsync("/api/children", new CreateChildRequest("Charlie", 8, Gender.Boy, "🐻"));
-        var child = await childResp.Content.ReadFromJsonAsync<ChildResponse>();
+        var child = await childResp.Content.ReadFromJsonAsync<ChildResponse>(TestWebApplicationFactory<Program>.JsonOptions);
 
         // Add a deed via API (CreatedAt = now = current month)
         await client.PostAsJsonAsync("/api/deeds", new CreateDeedRequest(child!.Id, "Good deed today", "⭐"));
@@ -102,7 +102,7 @@ public class SummaryControllerTests(TestWebApplicationFactory<Program> factory)
         var response = await client.GetAsync("/api/summaries/current-month");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var currentMonth = await response.Content.ReadFromJsonAsync<CurrentMonthResponse>();
+        var currentMonth = await response.Content.ReadFromJsonAsync<CurrentMonthResponse>(TestWebApplicationFactory<Program>.JsonOptions);
         currentMonth.Should().NotBeNull();
         currentMonth!.Year.Should().Be(DateTime.UtcNow.Year);
         currentMonth.Month.Should().Be(DateTime.UtcNow.Month);

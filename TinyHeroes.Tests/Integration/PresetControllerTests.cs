@@ -20,7 +20,7 @@ public class PresetControllerTests(TestWebApplicationFactory<Program> factory)
         var response = await client.GetAsync("/api/presets");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var presets = await response.Content.ReadFromJsonAsync<List<PresetResponse>>();
+        var presets = await response.Content.ReadFromJsonAsync<List<PresetResponse>>(TestWebApplicationFactory<Program>.JsonOptions);
         presets.Should().NotBeNull();
 
         // System presets should appear
@@ -37,7 +37,7 @@ public class PresetControllerTests(TestWebApplicationFactory<Program> factory)
         var response = await client.PostAsJsonAsync("/api/presets", new CreatePresetRequest("Feed the cat", "🐱"));
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var preset = await response.Content.ReadFromJsonAsync<PresetResponse>();
+        var preset = await response.Content.ReadFromJsonAsync<PresetResponse>(TestWebApplicationFactory<Program>.JsonOptions);
         preset.Should().NotBeNull();
         preset!.Label.Should().Be("Feed the cat");
         preset.ImageValue.Should().Be("🐱");
@@ -46,7 +46,7 @@ public class PresetControllerTests(TestWebApplicationFactory<Program> factory)
 
         // Verify it appears in list
         var listResponse = await client.GetAsync("/api/presets");
-        var presets = await listResponse.Content.ReadFromJsonAsync<List<PresetResponse>>();
+        var presets = await listResponse.Content.ReadFromJsonAsync<List<PresetResponse>>(TestWebApplicationFactory<Program>.JsonOptions);
         presets!.Any(p => p.Id == preset.Id && !p.IsSystem).Should().BeTrue();
     }
 
@@ -67,7 +67,7 @@ public class PresetControllerTests(TestWebApplicationFactory<Program> factory)
         // Create a custom preset
         var createResponse = await client.PostAsJsonAsync("/api/presets", new CreatePresetRequest("Delete me", "🗑️"));
         createResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-        var preset = await createResponse.Content.ReadFromJsonAsync<PresetResponse>();
+        var preset = await createResponse.Content.ReadFromJsonAsync<PresetResponse>(TestWebApplicationFactory<Program>.JsonOptions);
 
         // Delete it
         var deleteResponse = await client.DeleteAsync($"/api/presets/{preset!.Id}");
@@ -75,7 +75,7 @@ public class PresetControllerTests(TestWebApplicationFactory<Program> factory)
 
         // Verify it's gone from list
         var listResponse = await client.GetAsync("/api/presets");
-        var presets = await listResponse.Content.ReadFromJsonAsync<List<PresetResponse>>();
+        var presets = await listResponse.Content.ReadFromJsonAsync<List<PresetResponse>>(TestWebApplicationFactory<Program>.JsonOptions);
         presets!.Any(p => p.Id == preset.Id).Should().BeFalse();
     }
 

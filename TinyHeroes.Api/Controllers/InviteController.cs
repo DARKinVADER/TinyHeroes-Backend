@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,9 +11,8 @@ namespace TinyHeroes.Api.Controllers;
 [ApiController]
 [Route("api/invites")]
 [Authorize]
-public class InviteController(AppDbContext db) : ControllerBase
+public class InviteController(AppDbContext db) : ApiControllerBase
 {
-    private Guid GetUserId() => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub")!);
 
     [HttpPost]
     public async Task<ActionResult<InviteResponse>> Create(CreateInviteRequest req)

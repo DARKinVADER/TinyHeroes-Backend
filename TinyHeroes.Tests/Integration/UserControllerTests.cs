@@ -17,7 +17,7 @@ public class UserControllerTests(TestWebApplicationFactory<Program> factory)
         var response = await client.GetAsync("/api/users/me");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var profile = await response.Content.ReadFromJsonAsync<UserProfileResponse>();
+        var profile = await response.Content.ReadFromJsonAsync<UserProfileResponse>(TestWebApplicationFactory<Program>.JsonOptions);
         profile.Should().NotBeNull();
         profile!.DisplayName.Should().NotBeNullOrEmpty();
         profile.Email.Should().NotBeNullOrEmpty();
@@ -33,7 +33,7 @@ public class UserControllerTests(TestWebApplicationFactory<Program> factory)
             new UpdateUserProfileRequest("New Name", null, null, null));
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var profile = await response.Content.ReadFromJsonAsync<UserProfileResponse>();
+        var profile = await response.Content.ReadFromJsonAsync<UserProfileResponse>(TestWebApplicationFactory<Program>.JsonOptions);
         profile!.DisplayName.Should().Be("New Name");
     }
 
@@ -46,7 +46,7 @@ public class UserControllerTests(TestWebApplicationFactory<Program> factory)
             new UpdateUserProfileRequest(null, "hu", false, true));
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var profile = await response.Content.ReadFromJsonAsync<UserProfileResponse>();
+        var profile = await response.Content.ReadFromJsonAsync<UserProfileResponse>(TestWebApplicationFactory<Program>.JsonOptions);
         profile!.PreferredLanguage.Should().Be("hu");
         profile.PushNotificationsEnabled.Should().BeFalse();
         profile.WeeklyEmailEnabled.Should().BeTrue();

@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,9 +9,8 @@ namespace TinyHeroes.Api.Controllers;
 [ApiController]
 [Route("api/users")]
 [Authorize]
-public class UserController(UserManager<User> userManager) : ControllerBase
+public class UserController(UserManager<User> userManager) : ApiControllerBase
 {
-    private Guid GetUserId() => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub")!);
 
     [HttpGet("me")]
     public async Task<ActionResult<UserProfileResponse>> GetMe()

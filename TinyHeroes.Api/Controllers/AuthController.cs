@@ -1,6 +1,8 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Caching.Memory;
 using TinyHeroes.Application.DTOs.Auth;
 using TinyHeroes.Application.Interfaces;
 using TinyHeroes.Domain.Entities;
@@ -15,9 +17,11 @@ public class AuthController(
     SignInManager<User> signInManager,
     ITokenService tokenService,
     AppDbContext db,
-    IConfiguration config) : ControllerBase
+    IConfiguration config,
+    IMemoryCache cache) : ControllerBase
 {
     [HttpPost("register")]
+    [EnableRateLimiting("auth")]
     public async Task<ActionResult<AuthResponse>> Register(RegisterRequest req)
     {
         var user = new User { DisplayName = req.DisplayName, Email = req.Email, UserName = req.Email };
@@ -30,12 +34,17 @@ public class AuthController(
     }
 
     [HttpPost("login")]
+    [EnableRateLimiting("auth")]
     public async Task<ActionResult<AuthResponse>> Login(LoginRequest req)
     {
         var user = await userManager.FindByEmailAsync(req.Email);
-        if (user is null) return Unauthorized();
+        if (user is null)
+        {
+            await userManager.CheckPasswordAsync(new User(), req.Password);
+            return Unauthorized();
+        }
 
-        var result = await signInManager.CheckPasswordSignInAsync(user, req.Password, lockoutOnFailure: false);
+        var result = await signInManager.CheckPasswordSignInAsync(user, req.Password, lockoutOnFailure: true);
         if (!result.Succeeded) return Unauthorized();
 
         var hasFamily = db.FamilyMembers.Any(m => m.UserId == user.Id);
@@ -43,6 +52,7 @@ public class AuthController(
     }
 
     [HttpGet("social/{provider}")]
+    [EnableRateLimiting("auth")]
     public IActionResult SocialLogin(string provider, [FromQuery] string returnUrl = "/")
     {
         var redirectUrl = Url.Action(nameof(SocialCallback), new { provider, returnUrl });
@@ -71,7 +81,26 @@ public class AuthController(
 
         var hasFamily = db.FamilyMembers.Any(m => m.UserId == user.Id);
         var token = tokenService.GenerateAccessToken(user);
+        var code = Guid.NewGuid().ToString("N");
+        cache.Set(code, (token, hasFamily), TimeSpan.FromSeconds(60));
+
         var frontendUrl = config["Auth:FrontendUrl"] ?? "http://localhost:4200";
-        return Redirect($"{frontendUrl}/auth/callback?token={token}&hasFamily={hasFamily}");
+        return Redirect($"{frontendUrl}/auth/callback?code={code}");
+    }
+
+    [HttpPost("exchange")]
+    public IActionResult Exchange([FromBody] ExchangeCodeRequest req)
+    {
+        if (!cache.TryGetValue<(string token, bool hasFamily)>(req.Code, out var val))
+            return BadRequest("Invalid or expired code.");
+        cache.Remove(req.Code);
+
+        var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
+        var jwt = handler.ReadJwtToken(val.token);
+        var userId = jwt.Subject;
+        var displayName = jwt.Claims.FirstOrDefault(c => c.Type == "displayName")?.Value ?? string.Empty;
+        var email = jwt.Claims.FirstOrDefault(c => c.Type == System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Email)?.Value ?? string.Empty;
+
+        return Ok(new AuthResponse(val.token, userId, displayName, email, val.hasFamily));
     }
 }

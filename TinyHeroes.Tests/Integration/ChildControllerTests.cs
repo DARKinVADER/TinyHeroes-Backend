@@ -16,7 +16,7 @@ public class ChildControllerTests(TestWebApplicationFactory<Program> factory)
         var client = await TestAuthHelper.RegisterWithFamily(factory);
         var response = await client.PostAsJsonAsync("/api/children", new CreateChildRequest("Emma", 7, Gender.Girl, "🦄"));
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var child = await response.Content.ReadFromJsonAsync<ChildResponse>();
+        var child = await response.Content.ReadFromJsonAsync<ChildResponse>(TestWebApplicationFactory<Program>.JsonOptions);
         child!.Name.Should().Be("Emma");
         child.Age.Should().Be(7);
         child.Gender.Should().Be(Gender.Girl);
@@ -40,7 +40,7 @@ public class ChildControllerTests(TestWebApplicationFactory<Program> factory)
 
         var response = await client.GetAsync("/api/children");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var children = await response.Content.ReadFromJsonAsync<List<ChildResponse>>();
+        var children = await response.Content.ReadFromJsonAsync<List<ChildResponse>>(TestWebApplicationFactory<Program>.JsonOptions);
         children!.Count.Should().Be(2);
     }
 
@@ -49,11 +49,11 @@ public class ChildControllerTests(TestWebApplicationFactory<Program> factory)
     {
         var client = await TestAuthHelper.RegisterWithFamily(factory);
         var createResp = await client.PostAsJsonAsync("/api/children", new CreateChildRequest("Solo", 6, Gender.Boy, "🐯"));
-        var created = await createResp.Content.ReadFromJsonAsync<ChildResponse>();
+        var created = await createResp.Content.ReadFromJsonAsync<ChildResponse>(TestWebApplicationFactory<Program>.JsonOptions);
 
         var response = await client.GetAsync($"/api/children/{created!.Id}");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var child = await response.Content.ReadFromJsonAsync<ChildResponse>();
+        var child = await response.Content.ReadFromJsonAsync<ChildResponse>(TestWebApplicationFactory<Program>.JsonOptions);
         child!.Name.Should().Be("Solo");
     }
 
@@ -62,11 +62,11 @@ public class ChildControllerTests(TestWebApplicationFactory<Program> factory)
     {
         var client = await TestAuthHelper.RegisterWithFamily(factory);
         var createResp = await client.PostAsJsonAsync("/api/children", new CreateChildRequest("OldName", 5, Gender.Boy, "🦁"));
-        var created = await createResp.Content.ReadFromJsonAsync<ChildResponse>();
+        var created = await createResp.Content.ReadFromJsonAsync<ChildResponse>(TestWebApplicationFactory<Program>.JsonOptions);
 
         var response = await client.PutAsJsonAsync($"/api/children/{created!.Id}", new UpdateChildRequest("NewName", 6, Gender.Boy, "🐯"));
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var updated = await response.Content.ReadFromJsonAsync<ChildResponse>();
+        var updated = await response.Content.ReadFromJsonAsync<ChildResponse>(TestWebApplicationFactory<Program>.JsonOptions);
         updated!.Name.Should().Be("NewName");
         updated.Age.Should().Be(6);
     }
@@ -76,7 +76,7 @@ public class ChildControllerTests(TestWebApplicationFactory<Program> factory)
     {
         var client = await TestAuthHelper.RegisterWithFamily(factory);
         var createResp = await client.PostAsJsonAsync("/api/children", new CreateChildRequest("ToDelete", 4, Gender.Girl, "🐼"));
-        var created = await createResp.Content.ReadFromJsonAsync<ChildResponse>();
+        var created = await createResp.Content.ReadFromJsonAsync<ChildResponse>(TestWebApplicationFactory<Program>.JsonOptions);
 
         var response = await client.DeleteAsync($"/api/children/{created!.Id}");
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
@@ -98,7 +98,7 @@ public class ChildControllerTests(TestWebApplicationFactory<Program> factory)
     {
         var client = await TestAuthHelper.RegisterWithFamily(factory);
         var childResp = await client.PostAsJsonAsync("/api/children", new CreateChildRequest("Hero", 7, Gender.Boy, "🦸"));
-        var child = await childResp.Content.ReadFromJsonAsync<ChildResponse>();
+        var child = await childResp.Content.ReadFromJsonAsync<ChildResponse>(TestWebApplicationFactory<Program>.JsonOptions);
 
         using var content = new MultipartFormDataContent();
         var imageBytes = new byte[] { 0xFF, 0xD8, 0xFF, 0xE0 };
@@ -106,7 +106,7 @@ public class ChildControllerTests(TestWebApplicationFactory<Program> factory)
 
         var resp = await client.PostAsync($"/api/children/{child!.Id}/avatar", content);
         resp.StatusCode.Should().Be(HttpStatusCode.OK);
-        var updated = await resp.Content.ReadFromJsonAsync<ChildResponse>();
+        var updated = await resp.Content.ReadFromJsonAsync<ChildResponse>(TestWebApplicationFactory<Program>.JsonOptions);
         updated!.AvatarUrl.Should().Contain("/uploads/avatars/");
     }
 
@@ -115,7 +115,7 @@ public class ChildControllerTests(TestWebApplicationFactory<Program> factory)
     {
         var client = await TestAuthHelper.RegisterWithFamily(factory);
         var childResp = await client.PostAsJsonAsync("/api/children", new CreateChildRequest("Hero", 7, Gender.Boy, "🦸"));
-        var child = await childResp.Content.ReadFromJsonAsync<ChildResponse>();
+        var child = await childResp.Content.ReadFromJsonAsync<ChildResponse>(TestWebApplicationFactory<Program>.JsonOptions);
 
         using var content = new MultipartFormDataContent();
         content.Add(new ByteArrayContent([0x00]) { Headers = { ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream") } }, "file", "avatar.gif");
@@ -131,7 +131,7 @@ public class ChildControllerTests(TestWebApplicationFactory<Program> factory)
         var client2 = await TestAuthHelper.RegisterWithFamily(factory);
 
         var childResp = await client1.PostAsJsonAsync("/api/children", new CreateChildRequest("Hero", 7, Gender.Boy, "🦸"));
-        var child = await childResp.Content.ReadFromJsonAsync<ChildResponse>();
+        var child = await childResp.Content.ReadFromJsonAsync<ChildResponse>(TestWebApplicationFactory<Program>.JsonOptions);
 
         using var content = new MultipartFormDataContent();
         content.Add(new ByteArrayContent([0xFF, 0xD8]) { Headers = { ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg") } }, "file", "avatar.jpg");

@@ -1,5 +1,4 @@
 // backend/TinyHeroes.Api/Controllers/PrizeClaimController.cs
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,10 +11,8 @@ namespace TinyHeroes.Api.Controllers;
 [ApiController]
 [Route("api/prize-claims")]
 [Authorize]
-public class PrizeClaimController(AppDbContext db) : ControllerBase
+public class PrizeClaimController(AppDbContext db) : ApiControllerBase
 {
-    private Guid GetUserId() =>
-        Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub")!);
 
     private static PrizeClaimDto ToDto(PrizeClaim c) => new(
         c.Id, c.Scope, c.WeekSummaryId, c.MonthSummaryId, c.Rank,

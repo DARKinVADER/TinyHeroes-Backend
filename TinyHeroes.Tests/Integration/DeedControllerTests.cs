@@ -16,12 +16,12 @@ public class DeedControllerTests(TestWebApplicationFactory<Program> factory)
     {
         var client = await TestAuthHelper.RegisterWithFamily(factory);
         var childResp = await client.PostAsJsonAsync("/api/children", new CreateChildRequest("Emma", 7, Gender.Girl, "🦄"));
-        var child = await childResp.Content.ReadFromJsonAsync<ChildResponse>();
+        var child = await childResp.Content.ReadFromJsonAsync<ChildResponse>(TestWebApplicationFactory<Program>.JsonOptions);
 
         var response = await client.PostAsJsonAsync("/api/deeds", new CreateDeedRequest(child!.Id, "Helped with dishes", "🍽️"));
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var deed = await response.Content.ReadFromJsonAsync<DeedResponse>();
+        var deed = await response.Content.ReadFromJsonAsync<DeedResponse>(TestWebApplicationFactory<Program>.JsonOptions);
         deed!.Description.Should().Be("Helped with dishes");
         deed.ImageValue.Should().Be("🍽️");
         deed.ChildId.Should().Be(child.Id);
@@ -33,7 +33,7 @@ public class DeedControllerTests(TestWebApplicationFactory<Program> factory)
         // Family A creates a child
         var clientA = await TestAuthHelper.RegisterWithFamily(factory);
         var childResp = await clientA.PostAsJsonAsync("/api/children", new CreateChildRequest("ChildA", 5, Gender.Boy, "🦁"));
-        var childA = await childResp.Content.ReadFromJsonAsync<ChildResponse>();
+        var childA = await childResp.Content.ReadFromJsonAsync<ChildResponse>(TestWebApplicationFactory<Program>.JsonOptions);
 
         // Family B tries to add deed to Family A's child
         var clientB = await TestAuthHelper.RegisterWithFamily(factory);
@@ -54,7 +54,7 @@ public class DeedControllerTests(TestWebApplicationFactory<Program> factory)
     {
         var client = await TestAuthHelper.RegisterWithFamily(factory);
         var childResp = await client.PostAsJsonAsync("/api/children", new CreateChildRequest("Liam", 6, Gender.Boy, "🐯"));
-        var child = await childResp.Content.ReadFromJsonAsync<ChildResponse>();
+        var child = await childResp.Content.ReadFromJsonAsync<ChildResponse>(TestWebApplicationFactory<Program>.JsonOptions);
 
         await client.PostAsJsonAsync("/api/deeds", new CreateDeedRequest(child!.Id, "Deed 1", "⭐"));
         await client.PostAsJsonAsync("/api/deeds", new CreateDeedRequest(child.Id, "Deed 2", "🌟"));
@@ -62,7 +62,7 @@ public class DeedControllerTests(TestWebApplicationFactory<Program> factory)
         var response = await client.GetAsync($"/api/deeds?childId={child.Id}");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var deeds = await response.Content.ReadFromJsonAsync<List<DeedResponse>>();
+        var deeds = await response.Content.ReadFromJsonAsync<List<DeedResponse>>(TestWebApplicationFactory<Program>.JsonOptions);
         deeds!.Count.Should().Be(2);
         // Ordered descending by CreatedAt, so last created first
         deeds[0].Description.Should().Be("Deed 2");
@@ -75,7 +75,7 @@ public class DeedControllerTests(TestWebApplicationFactory<Program> factory)
         // Family A creates a child
         var clientA = await TestAuthHelper.RegisterWithFamily(factory);
         var childResp = await clientA.PostAsJsonAsync("/api/children", new CreateChildRequest("ChildA", 5, Gender.Boy, "🦁"));
-        var childA = await childResp.Content.ReadFromJsonAsync<ChildResponse>();
+        var childA = await childResp.Content.ReadFromJsonAsync<ChildResponse>(TestWebApplicationFactory<Program>.JsonOptions);
 
         // Family B tries to list deeds for Family A's child
         var clientB = await TestAuthHelper.RegisterWithFamily(factory);
@@ -89,10 +89,10 @@ public class DeedControllerTests(TestWebApplicationFactory<Program> factory)
         var client = await TestAuthHelper.RegisterWithFamily(factory);
 
         var child1Resp = await client.PostAsJsonAsync("/api/children", new CreateChildRequest("Alice", 7, Gender.Girl, "🦄"));
-        var child1 = await child1Resp.Content.ReadFromJsonAsync<ChildResponse>();
+        var child1 = await child1Resp.Content.ReadFromJsonAsync<ChildResponse>(TestWebApplicationFactory<Program>.JsonOptions);
 
         var child2Resp = await client.PostAsJsonAsync("/api/children", new CreateChildRequest("Bob", 5, Gender.Boy, "🦁"));
-        var child2 = await child2Resp.Content.ReadFromJsonAsync<ChildResponse>();
+        var child2 = await child2Resp.Content.ReadFromJsonAsync<ChildResponse>(TestWebApplicationFactory<Program>.JsonOptions);
 
         // Add 2 deeds to child1, none to child2
         await client.PostAsJsonAsync("/api/deeds", new CreateDeedRequest(child1!.Id, "Deed A", "⭐"));
@@ -101,7 +101,7 @@ public class DeedControllerTests(TestWebApplicationFactory<Program> factory)
         var response = await client.GetAsync("/api/deeds/stats");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var stats = await response.Content.ReadFromJsonAsync<List<ChildStatsResponse>>();
+        var stats = await response.Content.ReadFromJsonAsync<List<ChildStatsResponse>>(TestWebApplicationFactory<Program>.JsonOptions);
         stats!.Count.Should().Be(2);
 
         var child1Stats = stats.First(s => s.ChildId == child1.Id);
@@ -116,14 +116,14 @@ public class DeedControllerTests(TestWebApplicationFactory<Program> factory)
     {
         var client = await TestAuthHelper.RegisterWithFamily(factory);
         var childResp = await client.PostAsJsonAsync("/api/children", new CreateChildRequest("Charlie", 8, Gender.Boy, "🐻"));
-        var child = await childResp.Content.ReadFromJsonAsync<ChildResponse>();
+        var child = await childResp.Content.ReadFromJsonAsync<ChildResponse>(TestWebApplicationFactory<Program>.JsonOptions);
 
         await client.PostAsJsonAsync("/api/deeds", new CreateDeedRequest(child!.Id, "Today deed", "⭐"));
 
         var response = await client.GetAsync("/api/deeds/stats");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var stats = await response.Content.ReadFromJsonAsync<List<ChildStatsResponse>>();
+        var stats = await response.Content.ReadFromJsonAsync<List<ChildStatsResponse>>(TestWebApplicationFactory<Program>.JsonOptions);
         var childStats = stats!.First(s => s.ChildId == child.Id);
         // Deed added today should be in this week's count
         childStats.WeeklyCount.Should().Be(1);
@@ -138,12 +138,12 @@ public class DeedControllerTests(TestWebApplicationFactory<Program> factory)
         childResp.EnsureSuccessStatusCode();
 
         var childrenResp = await client.GetAsync("/api/children");
-        var children = await childrenResp.Content.ReadFromJsonAsync<List<ChildResponse>>();
+        var children = await childrenResp.Content.ReadFromJsonAsync<List<ChildResponse>>(TestWebApplicationFactory<Program>.JsonOptions);
         var childId = children![0].Id;
 
         var resp = await client.PostAsJsonAsync("/api/deeds", new CreateDeedRequest(childId, "Did homework", "📚", "library"));
         resp.StatusCode.Should().Be(HttpStatusCode.OK);
-        var deed = await resp.Content.ReadFromJsonAsync<DeedResponse>();
+        var deed = await resp.Content.ReadFromJsonAsync<DeedResponse>(TestWebApplicationFactory<Program>.JsonOptions);
         deed!.ImageType.Should().Be("library");
         deed.ImageValue.Should().Be("📚");
     }
@@ -156,12 +156,12 @@ public class DeedControllerTests(TestWebApplicationFactory<Program> factory)
         childResp.EnsureSuccessStatusCode();
 
         var childrenResp = await client.GetAsync("/api/children");
-        var children = await childrenResp.Content.ReadFromJsonAsync<List<ChildResponse>>();
+        var children = await childrenResp.Content.ReadFromJsonAsync<List<ChildResponse>>(TestWebApplicationFactory<Program>.JsonOptions);
         var childId = children![0].Id;
 
         var resp = await client.PostAsJsonAsync("/api/deeds", new CreateDeedRequest(childId, "Drew a picture", "data:image/jpeg;base64,FAKE", "ai"));
         resp.StatusCode.Should().Be(HttpStatusCode.OK);
-        var deed = await resp.Content.ReadFromJsonAsync<DeedResponse>();
+        var deed = await resp.Content.ReadFromJsonAsync<DeedResponse>(TestWebApplicationFactory<Program>.JsonOptions);
         deed!.ImageType.Should().Be("ai");
     }
 
@@ -171,7 +171,7 @@ public class DeedControllerTests(TestWebApplicationFactory<Program> factory)
         var client = await TestAuthHelper.RegisterWithFamily(factory);
         var resp = await client.PostAsJsonAsync("/api/deeds/generate-image", new GenerateImageRequest("A child helping with dishes"));
         resp.StatusCode.Should().Be(HttpStatusCode.OK);
-        var result = await resp.Content.ReadFromJsonAsync<GenerateImageResponse>();
+        var result = await resp.Content.ReadFromJsonAsync<GenerateImageResponse>(TestWebApplicationFactory<Program>.JsonOptions);
         result!.DataUrl.Should().StartWith("data:image/");
     }
 

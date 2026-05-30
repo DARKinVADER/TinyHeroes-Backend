@@ -11,5 +11,6 @@ public class FamilyMemberConfiguration : IEntityTypeConfiguration<FamilyMember>
         builder.HasOne(m => m.Family).WithMany(f => f.Members).HasForeignKey(m => m.FamilyId);
         builder.HasOne(m => m.User).WithMany(u => u.FamilyMemberships).HasForeignKey(m => m.UserId);
         builder.HasIndex(m => new { m.FamilyId, m.UserId }).IsUnique();
+        builder.HasIndex(m => m.UserId).IsUnique();
     }
 }

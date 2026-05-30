@@ -25,7 +25,7 @@ public class PrizeAssignmentControllerTests(TestWebApplicationFactory<Program> f
         var response = await client.GetAsync("/api/prize-assignments");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var assignments = await response.Content.ReadFromJsonAsync<List<PrizeAssignmentResponse>>();
+        var assignments = await response.Content.ReadFromJsonAsync<List<PrizeAssignmentResponse>>(TestWebApplicationFactory<Program>.JsonOptions);
         assignments.Should().NotBeNull();
         assignments!.Any(a => a.Scope == "weekly" && a.Rank == 1 && a.Label == "Gold trophy").Should().BeTrue();
     }
@@ -38,7 +38,7 @@ public class PrizeAssignmentControllerTests(TestWebApplicationFactory<Program> f
         var response = await client.PutAsJsonAsync("/api/prize-assignments", new SetPrizeRequest("weekly", 1, "🥇", "First place medal"));
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var assignment = await response.Content.ReadFromJsonAsync<PrizeAssignmentResponse>();
+        var assignment = await response.Content.ReadFromJsonAsync<PrizeAssignmentResponse>(TestWebApplicationFactory<Program>.JsonOptions);
         assignment.Should().NotBeNull();
         assignment!.Scope.Should().Be("weekly");
         assignment.Rank.Should().Be(1);
@@ -54,13 +54,13 @@ public class PrizeAssignmentControllerTests(TestWebApplicationFactory<Program> f
         // Create initial assignment
         var createResponse = await client.PutAsJsonAsync("/api/prize-assignments", new SetPrizeRequest("weekly", 2, "🥈", "Silver medal"));
         createResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-        var created = await createResponse.Content.ReadFromJsonAsync<PrizeAssignmentResponse>();
+        var created = await createResponse.Content.ReadFromJsonAsync<PrizeAssignmentResponse>(TestWebApplicationFactory<Program>.JsonOptions);
 
         // Update with same scope+rank but different label/emoji
         var updateResponse = await client.PutAsJsonAsync("/api/prize-assignments", new SetPrizeRequest("weekly", 2, "🎉", "Party time"));
         updateResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var updated = await updateResponse.Content.ReadFromJsonAsync<PrizeAssignmentResponse>();
+        var updated = await updateResponse.Content.ReadFromJsonAsync<PrizeAssignmentResponse>(TestWebApplicationFactory<Program>.JsonOptions);
         updated.Should().NotBeNull();
         updated!.Id.Should().Be(created!.Id); // same record was updated
         updated.Emoji.Should().Be("🎉");
@@ -76,7 +76,7 @@ public class PrizeAssignmentControllerTests(TestWebApplicationFactory<Program> f
         // Create invite for co-parent
         var inviteResponse = await adminClient.PostAsJsonAsync("/api/invites", new CreateInviteRequest("coparent@test.com"));
         inviteResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-        var invite = await inviteResponse.Content.ReadFromJsonAsync<InviteResponse>();
+        var invite = await inviteResponse.Content.ReadFromJsonAsync<InviteResponse>(TestWebApplicationFactory<Program>.JsonOptions);
 
         // User B: register without family
         var coParentClient = await TestAuthHelper.RegisterOnly(factory);

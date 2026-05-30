@@ -20,7 +20,7 @@ public class FamilySettingsControllerTests(TestWebApplicationFactory<Program> fa
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var family = await response.Content.ReadFromJsonAsync<FamilyResponse>();
+        var family = await response.Content.ReadFromJsonAsync<FamilyResponse>(TestWebApplicationFactory<Program>.JsonOptions);
         family!.Name.Should().Be("Updated Family");
         family.WeekStartDay.Should().Be(DayOfWeek.Sunday);
     }
@@ -30,7 +30,7 @@ public class FamilySettingsControllerTests(TestWebApplicationFactory<Program> fa
     {
         var adminClient = await TestAuthHelper.RegisterWithFamily(factory);
         var inviteResponse = await adminClient.PostAsJsonAsync("/api/invites", new CreateInviteRequest("coparent@test.com"));
-        var invite = await inviteResponse.Content.ReadFromJsonAsync<InviteResponse>();
+        var invite = await inviteResponse.Content.ReadFromJsonAsync<InviteResponse>(TestWebApplicationFactory<Program>.JsonOptions);
 
         var coParentClient = await TestAuthHelper.RegisterOnly(factory);
         await coParentClient.PostAsync($"/api/invites/{invite!.Token}/accept", null);
@@ -46,14 +46,14 @@ public class FamilySettingsControllerTests(TestWebApplicationFactory<Program> fa
     {
         var adminClient = await TestAuthHelper.RegisterWithFamily(factory);
         var inviteResponse = await adminClient.PostAsJsonAsync("/api/invites", new CreateInviteRequest(null));
-        var invite = await inviteResponse.Content.ReadFromJsonAsync<InviteResponse>();
+        var invite = await inviteResponse.Content.ReadFromJsonAsync<InviteResponse>(TestWebApplicationFactory<Program>.JsonOptions);
 
         var coParentClient = await TestAuthHelper.RegisterOnly(factory);
         await coParentClient.PostAsync($"/api/invites/{invite!.Token}/accept", null);
 
         // Get the co-parent's userId from the family details
         var familyResponse = await adminClient.GetAsync("/api/families/mine");
-        var family = await familyResponse.Content.ReadFromJsonAsync<FamilyDetailResponse>();
+        var family = await familyResponse.Content.ReadFromJsonAsync<FamilyDetailResponse>(TestWebApplicationFactory<Program>.JsonOptions);
         var coParentMember = family!.Members.First(m => m.Role == "CoParent");
 
         var removeResponse = await adminClient.DeleteAsync($"/api/families/mine/members/{coParentMember.UserId}");
@@ -61,7 +61,7 @@ public class FamilySettingsControllerTests(TestWebApplicationFactory<Program> fa
 
         // Verify member is no longer in the family
         var updatedFamilyResponse = await adminClient.GetAsync("/api/families/mine");
-        var updatedFamily = await updatedFamilyResponse.Content.ReadFromJsonAsync<FamilyDetailResponse>();
+        var updatedFamily = await updatedFamilyResponse.Content.ReadFromJsonAsync<FamilyDetailResponse>(TestWebApplicationFactory<Program>.JsonOptions);
         updatedFamily!.Members.Should().HaveCount(1);
         updatedFamily.Members.Should().NotContain(m => m.Role == "CoParent");
     }
@@ -73,7 +73,7 @@ public class FamilySettingsControllerTests(TestWebApplicationFactory<Program> fa
 
         // Get own userId
         var familyResponse = await adminClient.GetAsync("/api/families/mine");
-        var family = await familyResponse.Content.ReadFromJsonAsync<FamilyDetailResponse>();
+        var family = await familyResponse.Content.ReadFromJsonAsync<FamilyDetailResponse>(TestWebApplicationFactory<Program>.JsonOptions);
         var adminMember = family!.Members.First(m => m.Role == "Admin");
 
         var response = await adminClient.DeleteAsync($"/api/families/mine/members/{adminMember.UserId}");
@@ -98,7 +98,7 @@ public class FamilySettingsControllerTests(TestWebApplicationFactory<Program> fa
     {
         var adminClient = await TestAuthHelper.RegisterWithFamily(factory);
         var inviteResponse = await adminClient.PostAsJsonAsync("/api/invites", new CreateInviteRequest(null));
-        var invite = await inviteResponse.Content.ReadFromJsonAsync<InviteResponse>();
+        var invite = await inviteResponse.Content.ReadFromJsonAsync<InviteResponse>(TestWebApplicationFactory<Program>.JsonOptions);
 
         var coParentClient = await TestAuthHelper.RegisterOnly(factory);
         await coParentClient.PostAsync($"/api/invites/{invite!.Token}/accept", null);

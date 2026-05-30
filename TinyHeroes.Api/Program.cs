@@ -1,6 +1,8 @@
 using System.Text;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 using AspNet.Security.OAuth.Apple;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Authentication.Facebook;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -19,6 +21,7 @@ using TinyHeroes.Infrastructure.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddMemoryCache();
 
 builder.Services.AddIdentity<User, IdentityRole<Guid>>(opt =>
 {
@@ -126,6 +129,18 @@ builder.Services.AddCors(opt =>
         .AllowAnyMethod()
         .AllowAnyHeader()));
 
+builder.Services.AddRateLimiter(opt =>
+{
+    opt.AddFixedWindowLimiter("auth", limiter =>
+    {
+        limiter.PermitLimit = 10;
+        limiter.Window = TimeSpan.FromMinutes(1);
+        limiter.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        limiter.QueueLimit = 0;
+    });
+    opt.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+});
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -144,6 +159,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+if (!app.Environment.IsEnvironment("Testing"))
+    app.UseRateLimiter();
 
 var uploadsPath = ParseUploadsPath(app.Configuration["Storage:ConnectionString"]);
 Directory.CreateDirectory(uploadsPath);

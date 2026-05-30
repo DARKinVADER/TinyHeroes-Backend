@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,9 +11,8 @@ namespace TinyHeroes.Api.Controllers;
 [ApiController]
 [Route("api/deeds")]
 [Authorize]
-public class DeedController(AppDbContext db, IAiImageService aiImageService) : ControllerBase
+public class DeedController(AppDbContext db, IAiImageService aiImageService) : ApiControllerBase
 {
-    private Guid GetUserId() => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub")!);
 
     [HttpPost]
     public async Task<ActionResult<DeedResponse>> Create(CreateDeedRequest req)
@@ -93,6 +91,9 @@ public class DeedController(AppDbContext db, IAiImageService aiImageService) : C
     {
         if (string.IsNullOrWhiteSpace(req.Prompt))
             return BadRequest("Prompt is required.");
+
+        if (req.Prompt.Length > 500)
+            return BadRequest("Prompt must be 500 characters or fewer.");
 
         try
         {

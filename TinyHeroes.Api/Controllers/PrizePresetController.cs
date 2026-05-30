@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,9 +11,8 @@ namespace TinyHeroes.Api.Controllers;
 [ApiController]
 [Route("api/prize-presets")]
 [Authorize]
-public class PrizePresetController(AppDbContext db) : ControllerBase
+public class PrizePresetController(AppDbContext db) : ApiControllerBase
 {
-    private Guid GetUserId() => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub")!);
 
     [HttpGet]
     public async Task<ActionResult<List<PrizePresetResponse>>> List()

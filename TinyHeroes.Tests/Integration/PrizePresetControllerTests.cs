@@ -20,7 +20,7 @@ public class PrizePresetControllerTests(TestWebApplicationFactory<Program> facto
         var response = await client.GetAsync("/api/prize-presets");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var presets = await response.Content.ReadFromJsonAsync<List<PrizePresetResponse>>();
+        var presets = await response.Content.ReadFromJsonAsync<List<PrizePresetResponse>>(TestWebApplicationFactory<Program>.JsonOptions);
         presets.Should().NotBeNull();
 
         // 12 system presets + 1 custom
@@ -36,7 +36,7 @@ public class PrizePresetControllerTests(TestWebApplicationFactory<Program> facto
         var response = await client.PostAsJsonAsync("/api/prize-presets", new CreatePrizePresetRequest("Trampoline time", "🤸"));
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var preset = await response.Content.ReadFromJsonAsync<PrizePresetResponse>();
+        var preset = await response.Content.ReadFromJsonAsync<PrizePresetResponse>(TestWebApplicationFactory<Program>.JsonOptions);
         preset.Should().NotBeNull();
         preset!.Label.Should().Be("Trampoline time");
         preset.Emoji.Should().Be("🤸");
@@ -44,7 +44,7 @@ public class PrizePresetControllerTests(TestWebApplicationFactory<Program> facto
 
         // Verify it appears in list
         var listResponse = await client.GetAsync("/api/prize-presets");
-        var presets = await listResponse.Content.ReadFromJsonAsync<List<PrizePresetResponse>>();
+        var presets = await listResponse.Content.ReadFromJsonAsync<List<PrizePresetResponse>>(TestWebApplicationFactory<Program>.JsonOptions);
         presets!.Any(p => p.Id == preset.Id && !p.IsSystem).Should().BeTrue();
     }
 
@@ -65,7 +65,7 @@ public class PrizePresetControllerTests(TestWebApplicationFactory<Program> facto
         // Create a custom preset
         var createResponse = await client.PostAsJsonAsync("/api/prize-presets", new CreatePrizePresetRequest("Delete me", "🗑️"));
         createResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-        var preset = await createResponse.Content.ReadFromJsonAsync<PrizePresetResponse>();
+        var preset = await createResponse.Content.ReadFromJsonAsync<PrizePresetResponse>(TestWebApplicationFactory<Program>.JsonOptions);
 
         // Delete it
         var deleteResponse = await client.DeleteAsync($"/api/prize-presets/{preset!.Id}");
@@ -73,7 +73,7 @@ public class PrizePresetControllerTests(TestWebApplicationFactory<Program> facto
 
         // Verify it's gone from list
         var listResponse = await client.GetAsync("/api/prize-presets");
-        var presets = await listResponse.Content.ReadFromJsonAsync<List<PrizePresetResponse>>();
+        var presets = await listResponse.Content.ReadFromJsonAsync<List<PrizePresetResponse>>(TestWebApplicationFactory<Program>.JsonOptions);
         presets!.Any(p => p.Id == preset.Id).Should().BeFalse();
     }
 

@@ -1,15 +1,13 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using TinyHeroes.Application.Helpers;
 using TinyHeroes.Application.Interfaces;
-using TinyHeroes.Domain.Entities;
 using TinyHeroes.Infrastructure.Data;
 
 namespace TinyHeroes.Infrastructure.Services;
 
 public class SummaryService(AppDbContext db) : ISummaryService
 {
-    private record RankingEntry(Guid ChildId, string ChildName, int DeedCount, int Rank);
-
     public async Task GenerateMissingWeekSummaries(Guid familyId)
     {
         var family = await db.Families.AsNoTracking().FirstAsync(f => f.Id == familyId);
@@ -21,9 +19,7 @@ public class SummaryService(AppDbContext db) : ISummaryService
             .FirstOrDefaultAsync();
 
         var startDate = earliestDeed ?? family.CreatedAt;
-
         var today = DateTime.UtcNow.Date;
-
         var firstWeekStart = AlignToWeekStart(startDate, family.WeekStartDay);
 
         var children = await db.Children
@@ -38,12 +34,16 @@ public class SummaryService(AppDbContext db) : ISummaryService
 
         var existingSet = new HashSet<DateTime>(existingSummaries.Select(d => d.Date));
 
+        // Early-exit: if we already have a summary for the most recent completed week, nothing to do.
+        var currentWeekStart = AlignToWeekStart(today, family.WeekStartDay);
+        var latestStored = existingSet.Count > 0 ? existingSet.Max() : DateTime.MinValue;
+        if (latestStored >= currentWeekStart.AddDays(-7))
+            return;
+
         var weekStart = firstWeekStart;
         while (true)
         {
             var weekEnd = weekStart.AddDays(7);
-
-            // Only summarize completed weeks (today >= weekEnd)
             if (weekEnd > today)
                 break;
 
@@ -59,25 +59,10 @@ public class SummaryService(AppDbContext db) : ISummaryService
 
                 var countDict = deedCounts.ToDictionary(x => x.ChildId, x => x.Count);
 
-                var rankings = children
-                    .Select(c => new { c.Id, c.Name, DeedCount = countDict.GetValueOrDefault(c.Id, 0) })
-                    .OrderByDescending(x => x.DeedCount)
-                    .ToList();
+                var rankedList = RankingHelper.Rank(children.Select(c =>
+                    (c.Id, c.Name, DeedCount: countDict.GetValueOrDefault(c.Id, 0))));
 
-                int rank = 0;
-                int previousCount = -1;
-                var rankedList = new List<RankingEntry>();
-                for (int i = 0; i < rankings.Count; i++)
-                {
-                    if (rankings[i].DeedCount != previousCount)
-                    {
-                        rank = i + 1;
-                        previousCount = rankings[i].DeedCount;
-                    }
-                    rankedList.Add(new RankingEntry(rankings[i].Id, rankings[i].Name, rankings[i].DeedCount, rank));
-                }
-
-                var summary = new WeekSummary
+                var summary = new Domain.Entities.WeekSummary
                 {
                     Id = Guid.NewGuid(),
                     FamilyId = familyId,
@@ -113,10 +98,8 @@ public class SummaryService(AppDbContext db) : ISummaryService
             .FirstOrDefaultAsync();
 
         var startDate = earliestDeed ?? family.CreatedAt;
-
         var today = DateTime.UtcNow;
 
-        // Most recent completed month: the month before the current one
         var lastCompletedMonth = new DateTime(today.Year, today.Month, 1).AddDays(-1);
         var lastCompletedYear = lastCompletedMonth.Year;
         var lastCompletedMonthNum = lastCompletedMonth.Month;
@@ -133,6 +116,10 @@ public class SummaryService(AppDbContext db) : ISummaryService
 
         var existingSet = new HashSet<(int Year, int Month)>(
             existingSummaries.Select(s => (s.Year, s.Month)));
+
+        // Early-exit: if we already have the most recent completed month, nothing to do.
+        if (existingSet.Contains((lastCompletedYear, lastCompletedMonthNum)))
+            return;
 
         var currentYear = startDate.Year;
         var currentMonth = startDate.Month;
@@ -155,35 +142,20 @@ public class SummaryService(AppDbContext db) : ISummaryService
 
                 var countDict = deedCounts.ToDictionary(x => x.ChildId, x => x.Count);
 
-                var rankings = children
-                    .Select(c => new { c.Id, c.Name, DeedCount = countDict.GetValueOrDefault(c.Id, 0) })
-                    .OrderByDescending(x => x.DeedCount)
-                    .ToList();
-
-                int rank = 0;
-                int previousCount = -1;
-                var rankedList = new List<RankingEntry>();
-                for (int i = 0; i < rankings.Count; i++)
-                {
-                    if (rankings[i].DeedCount != previousCount)
-                    {
-                        rank = i + 1;
-                        previousCount = rankings[i].DeedCount;
-                    }
-                    rankedList.Add(new RankingEntry(rankings[i].Id, rankings[i].Name, rankings[i].DeedCount, rank));
-                }
+                var rankedList = RankingHelper.Rank(children.Select(c =>
+                    (c.Id, c.Name, DeedCount: countDict.GetValueOrDefault(c.Id, 0))));
 
                 var totalDeeds = deedCounts.Sum(x => x.Count);
-                var champion = rankings.FirstOrDefault(r => r.DeedCount > 0);
+                var champion = rankedList.FirstOrDefault(r => r.DeedCount > 0);
 
-                var summary = new MonthSummary
+                var summary = new Domain.Entities.MonthSummary
                 {
                     Id = Guid.NewGuid(),
                     FamilyId = familyId,
                     Year = currentYear,
                     Month = currentMonth,
-                    ChampionChildId = champion?.Id,
-                    ChampionName = champion?.Name,
+                    ChampionChildId = champion?.ChildId,
+                    ChampionName = champion?.ChildName,
                     TotalDeeds = totalDeeds,
                     Rankings = JsonSerializer.Serialize(rankedList.Select(r => new
                     {
@@ -198,7 +170,6 @@ public class SummaryService(AppDbContext db) : ISummaryService
                 db.MonthSummaries.Add(summary);
             }
 
-            // Advance to next month
             currentMonth++;
             if (currentMonth > 12)
             {

@@ -1,9 +1,9 @@
-using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TinyHeroes.Application.DTOs.Summary;
+using TinyHeroes.Application.Helpers;
 using TinyHeroes.Application.Interfaces;
 using TinyHeroes.Infrastructure.Data;
 
@@ -12,11 +12,9 @@ namespace TinyHeroes.Api.Controllers;
 [ApiController]
 [Route("api/summaries")]
 [Authorize]
-public class SummaryController(AppDbContext db, ISummaryService summaryService) : ControllerBase
+public class SummaryController(AppDbContext db, ISummaryService summaryService) : ApiControllerBase
 {
     private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
-
-    private Guid GetUserId() => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub")!);
 
     [HttpGet("weeks")]
     public async Task<ActionResult<List<WeekSummaryResponse>>> GetWeeks()
@@ -94,24 +92,10 @@ public class SummaryController(AppDbContext db, ISummaryService summaryService) 
 
         var countDict = deedCounts.ToDictionary(x => x.ChildId, x => x.Count);
 
-        var ranked = children
-            .Select(c => new { c.Id, c.Name, DeedCount = countDict.GetValueOrDefault(c.Id, 0) })
-            .OrderByDescending(x => x.DeedCount)
-            .ToList();
+        var rankings = RankingHelper.Rank(children.Select(c =>
+            (c.Id, c.Name, DeedCount: countDict.GetValueOrDefault(c.Id, 0))));
 
-        int rank = 0;
-        int previousCount = -1;
-        var rankings = new List<RankingEntry>();
-        for (int i = 0; i < ranked.Count; i++)
-        {
-            if (ranked[i].DeedCount != previousCount)
-            {
-                rank = i + 1;
-                previousCount = ranked[i].DeedCount;
-            }
-            rankings.Add(new RankingEntry(ranked[i].Id, ranked[i].Name, ranked[i].DeedCount, rank));
-        }
-
-        return Ok(new CurrentMonthResponse(now.Year, now.Month, rankings));
+        return Ok(new CurrentMonthResponse(now.Year, now.Month,
+            rankings.Select(r => new RankingEntry(r.ChildId, r.ChildName, r.DeedCount, r.Rank)).ToList()));
     }
 }

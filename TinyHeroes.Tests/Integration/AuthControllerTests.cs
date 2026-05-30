@@ -18,7 +18,7 @@ public class AuthControllerTests(TestWebApplicationFactory<Program> factory)
         var response = await _client.PostAsJsonAsync("/api/auth/register", request);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var body = await response.Content.ReadFromJsonAsync<AuthResponse>();
+        var body = await response.Content.ReadFromJsonAsync<AuthResponse>(TestWebApplicationFactory<Program>.JsonOptions);
         body!.AccessToken.Should().NotBeNullOrEmpty();
         body.DisplayName.Should().Be("Test User");
         body.HasFamily.Should().BeFalse();
@@ -33,7 +33,7 @@ public class AuthControllerTests(TestWebApplicationFactory<Program> factory)
         var response = await _client.PostAsJsonAsync("/api/auth/login", new LoginRequest(email, "Password123!"));
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var body = await response.Content.ReadFromJsonAsync<AuthResponse>();
+        var body = await response.Content.ReadFromJsonAsync<AuthResponse>(TestWebApplicationFactory<Program>.JsonOptions);
         body!.AccessToken.Should().NotBeNullOrEmpty();
     }
 

@@ -13,7 +13,7 @@ public static class TestAuthHelper
         var client = factory.CreateClient();
         var email = $"user_{Guid.NewGuid()}@test.com";
         var regResponse = await client.PostAsJsonAsync("/api/auth/register", new RegisterRequest("Parent", email, "Password123!"));
-        var auth = await regResponse.Content.ReadFromJsonAsync<AuthResponse>();
+        var auth = await regResponse.Content.ReadFromJsonAsync<AuthResponse>(TestWebApplicationFactory<Program>.JsonOptions);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", auth!.AccessToken);
         await client.PostAsJsonAsync("/api/families", new CreateFamilyRequest(familyName, weekStartDay));
         return client;
@@ -24,7 +24,7 @@ public static class TestAuthHelper
         var client = factory.CreateClient();
         var email = $"user_{Guid.NewGuid()}@test.com";
         var regResponse = await client.PostAsJsonAsync("/api/auth/register", new RegisterRequest("Parent", email, "Password123!"));
-        var auth = await regResponse.Content.ReadFromJsonAsync<AuthResponse>();
+        var auth = await regResponse.Content.ReadFromJsonAsync<AuthResponse>(TestWebApplicationFactory<Program>.JsonOptions);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", auth!.AccessToken);
         return client;
     }

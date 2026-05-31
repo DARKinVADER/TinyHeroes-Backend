@@ -29,7 +29,7 @@ public class FamilyController(AppDbContext db) : ApiControllerBase
         db.FamilyMembers.Add(member);
         await db.SaveChangesAsync();
 
-        return Ok(new FamilyResponse(family.Id, family.Name, family.WeekStartDay));
+        return Ok(new FamilyResponse(family.Id, family.Name, family.WeekStartDay, family.WeeklyMinDeeds, family.MonthlyMinDeeds));
     }
 
     [HttpGet("mine")]
@@ -46,7 +46,7 @@ public class FamilyController(AppDbContext db) : ApiControllerBase
             m.UserId, m.User.DisplayName, m.User.Email!, m.Role.ToString()
         )).ToList();
 
-        return Ok(new FamilyDetailResponse(family.Id, family.Name, family.WeekStartDay, members));
+        return Ok(new FamilyDetailResponse(family.Id, family.Name, family.WeekStartDay, members, family.WeeklyMinDeeds, family.MonthlyMinDeeds));
     }
 
     [HttpPatch("mine")]
@@ -64,7 +64,25 @@ public class FamilyController(AppDbContext db) : ApiControllerBase
         family.WeekStartDay = req.WeekStartDay;
         await db.SaveChangesAsync();
 
-        return Ok(new FamilyResponse(family.Id, family.Name, family.WeekStartDay));
+        return Ok(new FamilyResponse(family.Id, family.Name, family.WeekStartDay, family.WeeklyMinDeeds, family.MonthlyMinDeeds));
+    }
+
+    [HttpPatch("mine/prize-rules")]
+    public async Task<ActionResult<FamilyResponse>> UpdatePrizeRules(SetPrizeRulesRequest req)
+    {
+        var userId = GetUserId();
+        var member = await db.FamilyMembers.FirstOrDefaultAsync(m => m.UserId == userId);
+        if (member is null) return BadRequest("User does not belong to a family.");
+        if (member.Role != FamilyRole.Admin) return Forbid();
+
+        var family = await db.Families.FindAsync(member.FamilyId);
+        if (family is null) return NotFound();
+
+        family.WeeklyMinDeeds = req.WeeklyMinDeeds;
+        family.MonthlyMinDeeds = req.MonthlyMinDeeds;
+        await db.SaveChangesAsync();
+
+        return Ok(new FamilyResponse(family.Id, family.Name, family.WeekStartDay, family.WeeklyMinDeeds, family.MonthlyMinDeeds));
     }
 
     [HttpDelete("mine/members/{memberId:guid}")]

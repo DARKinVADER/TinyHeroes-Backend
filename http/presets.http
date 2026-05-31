@@ -1,0 +1,23 @@
+### Presets — Deed preset management (system + family-custom)
+
+### List all deed presets (system presets + family custom ones)
+GET {{host}}/api/presets
+Authorization: Bearer {{token}}
+
+###
+
+### Create a custom deed preset — copy id from response into http-client.env.json as presetId
+POST {{host}}/api/presets
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "label": "Set the table",
+  "imageValue": "🍽️"
+}
+
+###
+
+### Delete a custom deed preset (admin only; system presets are protected)
+DELETE {{host}}/api/presets/{{presetId}}
+Authorization: Bearer {{token}}

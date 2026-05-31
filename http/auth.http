@@ -1,0 +1,42 @@
+### Auth — Register, Login, Social, Exchange, Forgot Password
+
+### Register a new account
+POST {{host}}/api/auth/register
+Content-Type: application/json
+
+{
+  "displayName": "Alex Parent",
+  "email": "parent@example.com",
+  "password": "P@ssw0rd1!"
+}
+
+###
+
+### Login — copy token from response into http-client.env.json
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "parent@example.com",
+  "password": "P@ssw0rd1!"
+}
+
+###
+
+### Exchange short-lived code for JWT (social login callback)
+POST {{host}}/api/auth/exchange
+Content-Type: application/json
+
+{
+  "code": "PASTE_CODE_HERE"
+}
+
+###
+
+### Request password reset email
+POST {{host}}/api/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "parent@example.com"
+}

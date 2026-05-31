@@ -1,0 +1,41 @@
+### Families — Create, read, update family and prize rules
+
+### Create a family
+POST {{host}}/api/families
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Smith Family",
+  "weekStartDay": 1
+}
+
+###
+
+### Get my family
+GET {{host}}/api/families/mine
+Authorization: Bearer {{token}}
+
+###
+
+### Update family settings
+PATCH {{host}}/api/families/mine
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Smith Family",
+  "weekStartDay": 1
+}
+
+###
+
+### Update prize eligibility rules (admin only)
+PATCH {{host}}/api/families/mine/prize-rules
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "weeklyMinDeeds": 5,
+  "monthlyMinDeeds": 20
+}

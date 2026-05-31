@@ -1,0 +1,19 @@
+### Users — Profile management
+
+### Get my profile
+GET {{host}}/api/users/me
+Authorization: Bearer {{token}}
+
+###
+
+### Update my profile
+PATCH {{host}}/api/users/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "displayName": "Alex Parent",
+  "preferredLanguage": "en",
+  "pushNotificationsEnabled": false,
+  "weeklyEmailEnabled": true
+}

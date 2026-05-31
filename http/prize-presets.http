@@ -1,0 +1,23 @@
+### Prize Presets — Manage prize suggestion library
+
+### List all prize presets (system + family custom)
+GET {{host}}/api/prize-presets
+Authorization: Bearer {{token}}
+
+###
+
+### Create a custom prize preset — copy id from response into http-client.env.json as prizePresetId
+POST {{host}}/api/prize-presets
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "label": "Ice cream",
+  "emoji": "🍦"
+}
+
+###
+
+### Delete a custom prize preset (admin only)
+DELETE {{host}}/api/prize-presets/{{prizePresetId}}
+Authorization: Bearer {{token}}

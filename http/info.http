@@ -1,0 +1,4 @@
+### Info — Public endpoint, no auth required
+
+### Get API version and environment
+GET {{host}}/api/info

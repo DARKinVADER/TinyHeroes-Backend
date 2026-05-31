@@ -1,0 +1,17 @@
+### Invites — Create invite link, accept invite
+
+### Create invite (by email or shareable link)
+### Copy inviteToken from response into http-client.env.json
+POST {{host}}/api/invites
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "email": "partner@example.com"
+}
+
+###
+
+### Accept invite (run as the invited user after they register/login)
+POST {{host}}/api/invites/{{inviteToken}}/accept
+Authorization: Bearer {{token}}

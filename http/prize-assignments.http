@@ -1,0 +1,62 @@
+### Prize Assignments — Configure weekly/monthly prizes for each rank
+
+### List prize assignments for my family
+GET {{host}}/api/prize-assignments
+Authorization: Bearer {{token}}
+
+###
+
+### Set (upsert) a prize assignment (admin only)
+### scope: Week | Month   rank: 1 | 2 | 3  (rank 2 and 3 are weekly only)
+PUT {{host}}/api/prize-assignments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "scope": "Week",
+  "rank": 1,
+  "emoji": "🍦",
+  "label": "Ice cream"
+}
+
+###
+
+### Set 2nd place weekly prize
+PUT {{host}}/api/prize-assignments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "scope": "Week",
+  "rank": 2,
+  "emoji": "🎬",
+  "label": "Movie night"
+}
+
+###
+
+### Set 3rd place weekly prize
+PUT {{host}}/api/prize-assignments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "scope": "Week",
+  "rank": 3,
+  "emoji": "🌙",
+  "label": "Late bedtime"
+}
+
+###
+
+### Set monthly grand prize
+PUT {{host}}/api/prize-assignments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "scope": "Month",
+  "rank": 1,
+  "emoji": "🎡",
+  "label": "Amusement park"
+}

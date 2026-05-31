@@ -1,0 +1,35 @@
+### Prize Claims — Confirm prize delivery after a winner is declared
+
+### List prize claims for a week summary
+### Requires weekSummaryId — copy from summaries/weeks response into http-client.env.json
+GET {{host}}/api/prize-claims?weekSummaryId={{weekSummaryId}}
+Authorization: Bearer {{token}}
+
+###
+
+### List prize claims for a month summary
+GET {{host}}/api/prize-claims?monthSummaryId={{monthSummaryId}}
+Authorization: Bearer {{token}}
+
+###
+
+### Create a prize claim (confirm a prize was awarded)
+POST {{host}}/api/prize-claims
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "weekSummaryId": "{{weekSummaryId}}",
+  "rank": 1
+}
+
+###
+
+### Mark prize claim as used/delivered
+PUT {{host}}/api/prize-claims/{{prizeClaimId}}/used
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "isUsed": true
+}

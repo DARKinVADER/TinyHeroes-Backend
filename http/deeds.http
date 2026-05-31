@@ -1,0 +1,36 @@
+### Deeds — Log good deeds, list, stats, AI image generation
+
+### Log a good deed
+POST {{host}}/api/deeds
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "childId": "{{childId}}",
+  "description": "Helped with dishes",
+  "imageType": "emoji",
+  "imageValue": "🍽️"
+}
+
+###
+
+### List deeds for a specific child
+GET {{host}}/api/deeds?childId={{childId}}
+Authorization: Bearer {{token}}
+
+###
+
+### Get weekly + total deed stats for all children
+GET {{host}}/api/deeds/stats
+Authorization: Bearer {{token}}
+
+###
+
+### Generate AI image for a deed description
+POST {{host}}/api/deeds/generate-image
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "prompt": "a child helping with dishes, cartoon style"
+}

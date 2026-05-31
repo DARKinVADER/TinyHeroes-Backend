@@ -1,0 +1,17 @@
+### Summaries — Weekly podium, monthly champion, live standings
+
+### Get all week summaries (podium history)
+GET {{host}}/api/summaries/weeks
+Authorization: Bearer {{token}}
+
+###
+
+### Get all month summaries (monthly champion history)
+GET {{host}}/api/summaries/months
+Authorization: Bearer {{token}}
+
+###
+
+### Get current month live standings (in-progress rankings)
+GET {{host}}/api/summaries/current-month
+Authorization: Bearer {{token}}

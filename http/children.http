@@ -1,0 +1,46 @@
+### Children — CRUD for child profiles and avatar upload
+
+### Create a child — copy id from response into http-client.env.json as childId
+### gender: Boy | Girl
+POST {{host}}/api/children
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Emma",
+  "age": 8,
+  "gender": "Girl",
+  "avatarEmoji": "👧"
+}
+
+###
+
+### List all children in my family
+GET {{host}}/api/children
+Authorization: Bearer {{token}}
+
+###
+
+### Get a specific child
+GET {{host}}/api/children/{{childId}}
+Authorization: Bearer {{token}}
+
+###
+
+### Update a child
+PUT {{host}}/api/children/{{childId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Emma",
+  "age": 9,
+  "gender": "Girl",
+  "avatarEmoji": "👧"
+}
+
+###
+
+### Delete a child
+DELETE {{host}}/api/children/{{childId}}
+Authorization: Bearer {{token}}

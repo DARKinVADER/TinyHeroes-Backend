@@ -52,37 +52,27 @@ public class FamilyController(AppDbContext db) : ApiControllerBase
     [HttpPatch("mine")]
     public async Task<ActionResult<FamilyResponse>> UpdateMine(UpdateFamilyRequest req)
     {
-        var userId = GetUserId();
-        var member = await db.FamilyMembers.FirstOrDefaultAsync(m => m.UserId == userId);
-        if (member is null) return BadRequest("User does not belong to a family.");
-        if (member.Role != FamilyRole.Admin) return Forbid();
+        var result = await GetAdminFamily();
+        if (result.Error is not null) return result.Error;
 
-        var family = await db.Families.FindAsync(member.FamilyId);
-        if (family is null) return NotFound();
-
-        family.Name = req.Name;
-        family.WeekStartDay = req.WeekStartDay;
+        result.Family!.Name = req.Name;
+        result.Family.WeekStartDay = req.WeekStartDay;
         await db.SaveChangesAsync();
 
-        return Ok(new FamilyResponse(family.Id, family.Name, family.WeekStartDay, family.WeeklyMinDeeds, family.MonthlyMinDeeds));
+        return Ok(new FamilyResponse(result.Family.Id, result.Family.Name, result.Family.WeekStartDay, result.Family.WeeklyMinDeeds, result.Family.MonthlyMinDeeds));
     }
 
     [HttpPatch("mine/prize-rules")]
     public async Task<ActionResult<FamilyResponse>> UpdatePrizeRules(SetPrizeRulesRequest req)
     {
-        var userId = GetUserId();
-        var member = await db.FamilyMembers.FirstOrDefaultAsync(m => m.UserId == userId);
-        if (member is null) return BadRequest("User does not belong to a family.");
-        if (member.Role != FamilyRole.Admin) return Forbid();
+        var result = await GetAdminFamily();
+        if (result.Error is not null) return result.Error;
 
-        var family = await db.Families.FindAsync(member.FamilyId);
-        if (family is null) return NotFound();
-
-        family.WeeklyMinDeeds = req.WeeklyMinDeeds;
-        family.MonthlyMinDeeds = req.MonthlyMinDeeds;
+        result.Family!.WeeklyMinDeeds = req.WeeklyMinDeeds;
+        result.Family.MonthlyMinDeeds = req.MonthlyMinDeeds;
         await db.SaveChangesAsync();
 
-        return Ok(new FamilyResponse(family.Id, family.Name, family.WeekStartDay, family.WeeklyMinDeeds, family.MonthlyMinDeeds));
+        return Ok(new FamilyResponse(result.Family.Id, result.Family.Name, result.Family.WeekStartDay, result.Family.WeeklyMinDeeds, result.Family.MonthlyMinDeeds));
     }
 
     [HttpDelete("mine/members/{memberId:guid}")]
@@ -117,5 +107,16 @@ public class FamilyController(AppDbContext db) : ApiControllerBase
         db.Families.Remove(family);
         await db.SaveChangesAsync();
         return NoContent();
+    }
+
+    private async Task<(Family? Family, ActionResult? Error)> GetAdminFamily()
+    {
+        var userId = GetUserId();
+        var member = await db.FamilyMembers.FirstOrDefaultAsync(m => m.UserId == userId);
+        if (member is null) return (null, BadRequest("User does not belong to a family."));
+        if (member.Role != FamilyRole.Admin) return (null, Forbid());
+        var family = await db.Families.FindAsync(member.FamilyId);
+        if (family is null) return (null, NotFound());
+        return (family, null);
     }
 }

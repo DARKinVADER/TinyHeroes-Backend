@@ -5,6 +5,8 @@ public class Family
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public DayOfWeek WeekStartDay { get; set; } = DayOfWeek.Monday;
+    public int? WeeklyMinDeeds { get; set; }
+    public int? MonthlyMinDeeds { get; set; }
     public Guid CreatedByUserId { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

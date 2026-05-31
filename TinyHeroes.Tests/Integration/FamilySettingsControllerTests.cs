@@ -123,4 +123,63 @@ public class FamilySettingsControllerTests(TestWebApplicationFactory<Program> fa
         var response = await coParentClient.DeleteAsync("/api/families/mine");
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
+
+    [Fact]
+    public async Task SetPrizeRules_AsAdmin_Succeeds()
+    {
+        var client = await TestAuthHelper.RegisterWithFamily(factory);
+
+        var response = await client.PatchAsJsonAsync("/api/families/mine/prize-rules",
+            new SetPrizeRulesRequest(5, 20));
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var family = await response.Content.ReadFromJsonAsync<FamilyResponse>(TestWebApplicationFactory<Program>.JsonOptions);
+        family!.WeeklyMinDeeds.Should().Be(5);
+        family.MonthlyMinDeeds.Should().Be(20);
+    }
+
+    [Fact]
+    public async Task SetPrizeRules_ZeroDisablesMinimum()
+    {
+        var client = await TestAuthHelper.RegisterWithFamily(factory);
+
+        await client.PatchAsJsonAsync("/api/families/mine/prize-rules", new SetPrizeRulesRequest(5, 20));
+
+        var response = await client.PatchAsJsonAsync("/api/families/mine/prize-rules",
+            new SetPrizeRulesRequest(0, 0));
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var family = await response.Content.ReadFromJsonAsync<FamilyResponse>(TestWebApplicationFactory<Program>.JsonOptions);
+        family!.WeeklyMinDeeds.Should().Be(0);
+        family.MonthlyMinDeeds.Should().Be(0);
+    }
+
+    [Fact]
+    public async Task SetPrizeRules_AsCoParent_Returns403()
+    {
+        var adminClient = await TestAuthHelper.RegisterWithFamily(factory);
+        var inviteResponse = await adminClient.PostAsJsonAsync("/api/invites", new CreateInviteRequest(null));
+        var invite = await inviteResponse.Content.ReadFromJsonAsync<InviteResponse>(TestWebApplicationFactory<Program>.JsonOptions);
+
+        var coParentClient = await TestAuthHelper.RegisterOnly(factory);
+        await coParentClient.PostAsync($"/api/invites/{invite!.Token}/accept", null);
+
+        var response = await coParentClient.PatchAsJsonAsync("/api/families/mine/prize-rules",
+            new SetPrizeRulesRequest(5, 20));
+
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+    }
+
+    [Fact]
+    public async Task GetFamily_IncludesPrizeRulesFields()
+    {
+        var client = await TestAuthHelper.RegisterWithFamily(factory);
+        await client.PatchAsJsonAsync("/api/families/mine/prize-rules", new SetPrizeRulesRequest(3, 15));
+
+        var response = await client.GetAsync("/api/families/mine");
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var family = await response.Content.ReadFromJsonAsync<FamilyDetailResponse>(TestWebApplicationFactory<Program>.JsonOptions);
+        family!.WeeklyMinDeeds.Should().Be(3);
+        family.MonthlyMinDeeds.Should().Be(15);
+    }
 }

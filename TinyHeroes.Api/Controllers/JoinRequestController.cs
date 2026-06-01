@@ -25,7 +25,6 @@ public class JoinRequestController(AppDbContext db) : ApiControllerBase
             return BadRequest("User already has a pending join request.");
 
         var family = await db.Families
-            .Include(f => f.JoinRequests)
             .FirstOrDefaultAsync(f => f.JoinCode == req.JoinCode);
         if (family is null) return NotFound("No family found with that code.");
 

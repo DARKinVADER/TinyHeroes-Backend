@@ -9,8 +9,10 @@ public class Family
     public int? MonthlyMinDeeds { get; set; }
     public Guid CreatedByUserId { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public string JoinCode { get; set; } = string.Empty;
 
     public ICollection<FamilyMember> Members { get; set; } = [];
     public ICollection<Child> Children { get; set; } = [];
     public ICollection<FamilyInvite> Invites { get; set; } = [];
+    public ICollection<FamilyJoinRequest> JoinRequests { get; set; } = [];
 }

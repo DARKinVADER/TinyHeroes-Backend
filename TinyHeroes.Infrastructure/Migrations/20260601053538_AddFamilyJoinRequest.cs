@@ -19,6 +19,14 @@ namespace TinyHeroes.Infrastructure.Migrations
                 nullable: false,
                 defaultValue: "");
 
+            // Backfill unique codes before creating the unique index.
+            // Existing rows all have JoinCode = "" which would violate the constraint.
+            migrationBuilder.Sql(@"
+                UPDATE ""Families""
+                SET ""JoinCode"" = upper(substring(md5(""Id""::text || random()::text), 1, 8))
+                WHERE ""JoinCode"" = '';
+            ");
+
             migrationBuilder.CreateTable(
                 name: "FamilyJoinRequests",
                 columns: table => new

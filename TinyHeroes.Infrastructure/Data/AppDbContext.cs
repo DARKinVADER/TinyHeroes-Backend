@@ -20,6 +20,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<PrizeAssignment> PrizeAssignments => Set<PrizeAssignment>();
     public DbSet<PrizeClaim> PrizeClaims => Set<PrizeClaim>();
     public DbSet<PrizeComment> PrizeComments => Set<PrizeComment>();
+    public DbSet<FamilyJoinRequest> FamilyJoinRequests => Set<FamilyJoinRequest>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

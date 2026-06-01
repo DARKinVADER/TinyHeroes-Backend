@@ -1,3 +1,5 @@
+using TinyHeroes.Domain.Enums;
+
 namespace TinyHeroes.Domain.Entities;
 
 public class FamilyJoinRequest
@@ -5,7 +7,7 @@ public class FamilyJoinRequest
     public Guid Id { get; set; }
     public Guid FamilyId { get; set; }
     public Guid RequestedById { get; set; }
-    public Enums.JoinRequestStatus Status { get; set; } = Enums.JoinRequestStatus.Pending;
+    public JoinRequestStatus Status { get; set; } = JoinRequestStatus.Pending;
     public DateTime RequestedAt { get; set; } = DateTime.UtcNow;
     public DateTime? ResolvedAt { get; set; }
     public Guid? ResolvedById { get; set; }

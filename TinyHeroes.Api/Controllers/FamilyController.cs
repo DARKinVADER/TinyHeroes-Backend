@@ -41,7 +41,7 @@ public class FamilyController(AppDbContext db) : ApiControllerBase
         db.FamilyMembers.Add(member);
         await db.SaveChangesAsync();
 
-        return Ok(new FamilyResponse(family.Id, family.Name, family.WeekStartDay, family.WeeklyMinDeeds, family.MonthlyMinDeeds));
+        return Ok(new FamilyResponse(family.Id, family.Name, family.WeekStartDay, family.WeeklyMinDeeds, family.MonthlyMinDeeds, family.JoinCode));
     }
 
     [HttpGet("mine")]
@@ -81,7 +81,7 @@ public class FamilyController(AppDbContext db) : ApiControllerBase
         result.Family.WeekStartDay = req.WeekStartDay;
         await db.SaveChangesAsync();
 
-        return Ok(new FamilyResponse(result.Family.Id, result.Family.Name, result.Family.WeekStartDay, result.Family.WeeklyMinDeeds, result.Family.MonthlyMinDeeds));
+        return Ok(new FamilyResponse(result.Family.Id, result.Family.Name, result.Family.WeekStartDay, result.Family.WeeklyMinDeeds, result.Family.MonthlyMinDeeds, result.Family.JoinCode));
     }
 
     [HttpPatch("mine/prize-rules")]
@@ -94,7 +94,7 @@ public class FamilyController(AppDbContext db) : ApiControllerBase
         result.Family.MonthlyMinDeeds = req.MonthlyMinDeeds;
         await db.SaveChangesAsync();
 
-        return Ok(new FamilyResponse(result.Family.Id, result.Family.Name, result.Family.WeekStartDay, result.Family.WeeklyMinDeeds, result.Family.MonthlyMinDeeds));
+        return Ok(new FamilyResponse(result.Family.Id, result.Family.Name, result.Family.WeekStartDay, result.Family.WeeklyMinDeeds, result.Family.MonthlyMinDeeds, result.Family.JoinCode));
     }
 
     [HttpDelete("mine/members/{memberId:guid}")]

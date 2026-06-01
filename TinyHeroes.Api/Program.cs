@@ -156,10 +156,19 @@ app.UseForwardedHeaders();
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    if (dbContext.Database.IsRelational())
+    if (app.Environment.IsEnvironment("Integration"))
+    {
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+        await DatabaseSeeder.SeedAsync(dbContext, userManager);
+    }
+    else if (dbContext.Database.IsRelational())
+    {
         dbContext.Database.Migrate();
+    }
     else
+    {
         dbContext.Database.EnsureCreated();
+    }
 }
 
 if (app.Environment.IsDevelopment())

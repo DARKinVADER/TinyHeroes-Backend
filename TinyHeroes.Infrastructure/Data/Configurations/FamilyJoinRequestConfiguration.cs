@@ -18,6 +18,12 @@ public class FamilyJoinRequestConfiguration : IEntityTypeConfiguration<FamilyJoi
             .HasForeignKey(r => r.RequestedById)
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder.HasOne(r => r.ResolvedBy)
+            .WithMany()
+            .HasForeignKey(r => r.ResolvedById)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.HasIndex(r => new { r.RequestedById, r.Status });
         builder.Property(r => r.Status).HasConversion<string>();
     }

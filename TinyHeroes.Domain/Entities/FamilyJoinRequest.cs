@@ -13,4 +13,5 @@ public class FamilyJoinRequest
     public Guid? ResolvedById { get; set; }
     public Family Family { get; set; } = null!;
     public User RequestedBy { get; set; } = null!;
+    public User? ResolvedBy { get; set; }
 }

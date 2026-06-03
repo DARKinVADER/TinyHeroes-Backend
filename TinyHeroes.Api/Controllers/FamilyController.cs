@@ -41,7 +41,7 @@ public class FamilyController(AppDbContext db) : ApiControllerBase
         db.FamilyMembers.Add(member);
         await db.SaveChangesAsync();
 
-        return Ok(new FamilyResponse(family.Id, family.Name, family.WeekStartDay, family.WeeklyMinDeeds, family.MonthlyMinDeeds, family.JoinCode));
+        return CreatedAtAction(nameof(GetMine), new FamilyResponse(family.Id, family.Name, family.WeekStartDay, family.WeeklyMinDeeds, family.MonthlyMinDeeds, family.JoinCode));
     }
 
     [HttpGet("mine")]

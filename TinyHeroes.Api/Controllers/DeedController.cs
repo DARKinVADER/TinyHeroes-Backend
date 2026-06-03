@@ -38,7 +38,7 @@ public class DeedController(AppDbContext db, IAiImageService aiImageService) : A
         db.GoodDeeds.Add(deed);
         await db.SaveChangesAsync();
 
-        return Ok(new DeedResponse(deed.Id, deed.ChildId, deed.Description, deed.ImageType, deed.ImageValue, user!.DisplayName, deed.CreatedAt));
+        return CreatedAtAction(null, null, new DeedResponse(deed.Id, deed.ChildId, deed.Description, deed.ImageType, deed.ImageValue, user!.DisplayName, deed.CreatedAt));
     }
 
     [HttpGet]

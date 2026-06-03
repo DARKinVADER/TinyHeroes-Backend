@@ -83,7 +83,7 @@ public class PrizeClaimControllerTests(TestWebApplicationFactory<Program> factor
         var createResponse = await client.PostAsJsonAsync("/api/prize-claims", createReq);
         var claim = await createResponse.Content.ReadFromJsonAsync<PrizeClaimDto>(TestWebApplicationFactory<Program>.JsonOptions);
 
-        var response = await client.PutAsJsonAsync($"/api/prize-claims/{claim!.Id}/used", new UpdateUsedRequest(true));
+        var response = await client.PatchAsJsonAsync($"/api/prize-claims/{claim!.Id}/used", new UpdateUsedRequest(true));
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var updated = await response.Content.ReadFromJsonAsync<PrizeClaimDto>(TestWebApplicationFactory<Program>.JsonOptions);
@@ -100,9 +100,9 @@ public class PrizeClaimControllerTests(TestWebApplicationFactory<Program> factor
         var createReq = new CreatePrizeClaimRequest("weekly", summaryId, null, 1, childId, "Alice", "🍕", "Pizza night");
         var createResponse = await client.PostAsJsonAsync("/api/prize-claims", createReq);
         var claim = await createResponse.Content.ReadFromJsonAsync<PrizeClaimDto>(TestWebApplicationFactory<Program>.JsonOptions);
-        await client.PutAsJsonAsync($"/api/prize-claims/{claim!.Id}/used", new UpdateUsedRequest(true));
+        await client.PatchAsJsonAsync($"/api/prize-claims/{claim!.Id}/used", new UpdateUsedRequest(true));
 
-        var response = await client.PutAsJsonAsync($"/api/prize-claims/{claim.Id}/used", new UpdateUsedRequest(false));
+        var response = await client.PatchAsJsonAsync($"/api/prize-claims/{claim.Id}/used", new UpdateUsedRequest(false));
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var updated = await response.Content.ReadFromJsonAsync<PrizeClaimDto>(TestWebApplicationFactory<Program>.JsonOptions);
@@ -156,7 +156,7 @@ public class PrizeClaimControllerTests(TestWebApplicationFactory<Program> factor
 
         (await client.GetAsync($"/api/prize-claims?weekSummaryId={id}")).StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         (await client.PostAsJsonAsync("/api/prize-claims", new { })).StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-        (await client.PutAsJsonAsync($"/api/prize-claims/{id}/used", new { })).StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        (await client.PatchAsJsonAsync($"/api/prize-claims/{id}/used", new { })).StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         (await client.PostAsJsonAsync($"/api/prize-claims/{id}/comments", new { })).StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         (await client.DeleteAsync($"/api/prize-claims/{id}/comments/{id}")).StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
@@ -179,7 +179,7 @@ public class PrizeClaimControllerTests(TestWebApplicationFactory<Program> factor
         createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
         var claim = await createResponse.Content.ReadFromJsonAsync<PrizeClaimDto>(TestWebApplicationFactory<Program>.JsonOptions);
 
-        var usedResponse = await coParentClient.PutAsJsonAsync($"/api/prize-claims/{claim!.Id}/used", new UpdateUsedRequest(true));
+        var usedResponse = await coParentClient.PatchAsJsonAsync($"/api/prize-claims/{claim!.Id}/used", new UpdateUsedRequest(true));
         usedResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var commentResponse = await coParentClient.PostAsJsonAsync($"/api/prize-claims/{claim.Id}/comments", new AddCommentRequest("Co-parent note"));
@@ -199,7 +199,7 @@ public class PrizeClaimControllerTests(TestWebApplicationFactory<Program> factor
         createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
         var claim = await createResponse.Content.ReadFromJsonAsync<PrizeClaimDto>(TestWebApplicationFactory<Program>.JsonOptions);
 
-        var response = await client2.PutAsJsonAsync($"/api/prize-claims/{claim!.Id}/used", new UpdateUsedRequest(true));
+        var response = await client2.PatchAsJsonAsync($"/api/prize-claims/{claim!.Id}/used", new UpdateUsedRequest(true));
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 

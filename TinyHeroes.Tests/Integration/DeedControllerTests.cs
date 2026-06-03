@@ -12,14 +12,14 @@ public class DeedControllerTests(TestWebApplicationFactory<Program> factory)
     : IClassFixture<TestWebApplicationFactory<Program>>
 {
     [Fact]
-    public async Task Create_WithValidChild_Returns200()
+    public async Task Create_WithValidChild_Returns201()
     {
         var client = await TestAuthHelper.RegisterWithFamily(factory);
         var childResp = await client.PostAsJsonAsync("/api/children", new CreateChildRequest("Emma", 7, Gender.Girl, "🦄"));
         var child = await childResp.Content.ReadFromJsonAsync<ChildResponse>(TestWebApplicationFactory<Program>.JsonOptions);
 
         var response = await client.PostAsJsonAsync("/api/deeds", new CreateDeedRequest(child!.Id, "Helped with dishes", "🍽️"));
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
 
         var deed = await response.Content.ReadFromJsonAsync<DeedResponse>(TestWebApplicationFactory<Program>.JsonOptions);
         deed!.Description.Should().Be("Helped with dishes");
@@ -142,7 +142,7 @@ public class DeedControllerTests(TestWebApplicationFactory<Program> factory)
         var childId = children![0].Id;
 
         var resp = await client.PostAsJsonAsync("/api/deeds", new CreateDeedRequest(childId, "Did homework", "📚", "library"));
-        resp.StatusCode.Should().Be(HttpStatusCode.OK);
+        resp.StatusCode.Should().Be(HttpStatusCode.Created);
         var deed = await resp.Content.ReadFromJsonAsync<DeedResponse>(TestWebApplicationFactory<Program>.JsonOptions);
         deed!.ImageType.Should().Be("library");
         deed.ImageValue.Should().Be("📚");
@@ -160,7 +160,7 @@ public class DeedControllerTests(TestWebApplicationFactory<Program> factory)
         var childId = children![0].Id;
 
         var resp = await client.PostAsJsonAsync("/api/deeds", new CreateDeedRequest(childId, "Drew a picture", "data:image/jpeg;base64,FAKE", "ai"));
-        resp.StatusCode.Should().Be(HttpStatusCode.OK);
+        resp.StatusCode.Should().Be(HttpStatusCode.Created);
         var deed = await resp.Content.ReadFromJsonAsync<DeedResponse>(TestWebApplicationFactory<Program>.JsonOptions);
         deed!.ImageType.Should().Be("ai");
     }

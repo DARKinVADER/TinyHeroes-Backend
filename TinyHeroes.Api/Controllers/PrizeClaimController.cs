@@ -82,7 +82,7 @@ public class PrizeClaimController(AppDbContext db) : ApiControllerBase
         return CreatedAtAction(nameof(List), new { weekSummaryId = claim.WeekSummaryId }, ToDto(claim));
     }
 
-    [HttpPut("{id}/used")]
+    [HttpPatch("{id:guid}/used")]
     public async Task<ActionResult<PrizeClaimDto>> SetUsed(Guid id, UpdateUsedRequest req)
     {
         var userId = GetUserId();
@@ -100,7 +100,7 @@ public class PrizeClaimController(AppDbContext db) : ApiControllerBase
         return Ok(ToDto(claim));
     }
 
-    [HttpPost("{id}/comments")]
+    [HttpPost("{id:guid}/comments")]
     public async Task<ActionResult<PrizeCommentDto>> AddComment(Guid id, AddCommentRequest req)
     {
         var userId = GetUserId();
@@ -124,7 +124,7 @@ public class PrizeClaimController(AppDbContext db) : ApiControllerBase
         return CreatedAtAction(nameof(List), new { }, new PrizeCommentDto(comment.Id, comment.Text, comment.CreatedAt));
     }
 
-    [HttpDelete("{id}/comments/{commentId}")]
+    [HttpDelete("{id:guid}/comments/{commentId:guid}")]
     public async Task<IActionResult> DeleteComment(Guid id, Guid commentId)
     {
         var userId = GetUserId();

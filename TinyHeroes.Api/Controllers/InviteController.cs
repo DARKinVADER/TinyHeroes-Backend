@@ -35,7 +35,7 @@ public class InviteController(AppDbContext db) : ApiControllerBase
         db.FamilyInvites.Add(invite);
         await db.SaveChangesAsync();
 
-        return Ok(new InviteResponse(invite.Id, invite.Token, invite.Email, invite.ExpiresAt));
+        return CreatedAtAction(null, null, new InviteResponse(invite.Id, invite.Token, invite.Email, invite.ExpiresAt));
     }
 
     [HttpPost("{token}/accept")]

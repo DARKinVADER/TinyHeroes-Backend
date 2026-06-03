@@ -11,11 +11,11 @@ public class ChildControllerTests(TestWebApplicationFactory<Program> factory)
     : IClassFixture<TestWebApplicationFactory<Program>>
 {
     [Fact]
-    public async Task Create_WithValidData_Returns200()
+    public async Task Create_WithValidData_Returns201()
     {
         var client = await TestAuthHelper.RegisterWithFamily(factory);
         var response = await client.PostAsJsonAsync("/api/children", new CreateChildRequest("Emma", 7, Gender.Girl, "🦄"));
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
         var child = await response.Content.ReadFromJsonAsync<ChildResponse>(TestWebApplicationFactory<Program>.JsonOptions);
         child!.Name.Should().Be("Emma");
         child.Age.Should().Be(7);

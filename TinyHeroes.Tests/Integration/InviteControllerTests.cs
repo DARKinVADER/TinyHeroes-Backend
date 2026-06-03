@@ -40,7 +40,7 @@ public class InviteControllerTests(TestWebApplicationFactory<Program> factory)
         var client = await TestAuthHelper.RegisterWithFamily(factory);
 
         var response = await client.PostAsJsonAsync("/api/invites", new CreateInviteRequest("friend@test.com"));
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
 
         var invite = await response.Content.ReadFromJsonAsync<InviteResponse>(TestWebApplicationFactory<Program>.JsonOptions);
         invite!.Token.Should().NotBeNullOrEmpty();

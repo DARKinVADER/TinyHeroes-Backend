@@ -35,7 +35,7 @@ public class ChildController(AppDbContext db, IFileStorageService fileStorage) :
         db.Children.Add(child);
         await db.SaveChangesAsync();
 
-        return Ok(new ChildResponse(child.Id, child.Name, child.Age, child.Gender, child.AvatarEmoji, child.AvatarUrl));
+        return CreatedAtAction(nameof(Get), new { id = child.Id }, new ChildResponse(child.Id, child.Name, child.Age, child.Gender, child.AvatarEmoji, child.AvatarUrl));
     }
 
     [HttpGet]

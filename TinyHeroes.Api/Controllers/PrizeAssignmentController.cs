@@ -31,7 +31,7 @@ public class PrizeAssignmentController(AppDbContext db) : ApiControllerBase
         return Ok(assignments);
     }
 
-    [HttpPut]
+    [HttpPatch]
     public async Task<ActionResult<PrizeAssignmentResponse>> Set(SetPrizeRequest req)
     {
         var userId = GetUserId();

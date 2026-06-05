@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
+using System.Security.Claims;
 using AspNet.Security.OAuth.Apple;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Authentication.Facebook;
@@ -13,12 +14,34 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore;
+using Serilog;
+using Serilog.Core;
+using Serilog.Events;
 using TinyHeroes.Api.Middleware;
 using TinyHeroes.Domain.Entities;
 using TinyHeroes.Infrastructure;
 using TinyHeroes.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Enable Serilog SelfLog to stderr so sink errors appear in container stdout
+Serilog.Debugging.SelfLog.Enable(msg => Console.Error.WriteLine($"[SERILOG] {msg}"));
+
+var initialLevel = Enum.TryParse<LogEventLevel>(
+    builder.Configuration["Serilog:InitialMinimumLevel"], out var parsedLevel)
+    ? parsedLevel
+    : LogEventLevel.Warning;
+var levelSwitch = new LoggingLevelSwitch(initialLevel);
+builder.Services.AddSingleton(levelSwitch);
+
+builder.Host.UseSerilog((ctx, cfg) =>
+    cfg.MinimumLevel.ControlledBy(levelSwitch)
+       .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+       .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
+       .Enrich.FromLogContext()
+       .Enrich.WithMachineName()
+       .Enrich.WithThreadId()
+       .ReadFrom.Configuration(ctx.Configuration));
 
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
@@ -152,6 +175,17 @@ builder.Services.AddRateLimiter(opt =>
 var app = builder.Build();
 
 app.UseForwardedHeaders();
+
+app.UseSerilogRequestLogging(opts =>
+{
+    opts.EnrichDiagnosticContext = (diagCtx, httpCtx) =>
+    {
+        diagCtx.Set("RequestId", httpCtx.TraceIdentifier);
+        diagCtx.Set("UserId",
+            httpCtx.User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier) ?? "anon");
+        diagCtx.Set("UserAgent", httpCtx.Request.Headers.UserAgent.ToString());
+    };
+});
 
 using (var scope = app.Services.CreateScope())
 {

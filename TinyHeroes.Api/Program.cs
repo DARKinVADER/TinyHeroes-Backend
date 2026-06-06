@@ -14,6 +14,9 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore;
+using Azure.Monitor.OpenTelemetry.AspNetCore;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
@@ -33,6 +36,20 @@ var initialLevel = Enum.TryParse<LogEventLevel>(
     : LogEventLevel.Warning;
 var levelSwitch = new LoggingLevelSwitch(initialLevel);
 builder.Services.AddSingleton(levelSwitch);
+
+var otelBuilder = builder.Services.AddOpenTelemetry()
+    .WithMetrics(metrics => metrics
+        .AddAspNetCoreInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddRuntimeInstrumentation())
+    .WithTracing(tracing => tracing
+        .AddAspNetCoreInstrumentation()
+        .AddHttpClientInstrumentation()
+        // SetDbQueryParameters defaults to false in this version — SQL text is not captured
+        .AddEntityFrameworkCoreInstrumentation());
+
+if (!string.IsNullOrEmpty(builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]))
+    otelBuilder.UseAzureMonitor();
 
 builder.Host.UseSerilog((ctx, cfg) =>
     cfg.MinimumLevel.ControlledBy(levelSwitch)
@@ -226,6 +243,8 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapHealthChecks("/health");
+app.MapHealthChecks("/ready");
 app.MapControllers();
 
 app.Run();

@@ -24,6 +24,9 @@ public static class DependencyInjection
         else
             services.AddScoped<IFileStorageService, LocalFileStorageService>();
 
+        services.AddHealthChecks()
+            .AddDbContextCheck<AppDbContext>("database");
+
         return services;
     }
 }

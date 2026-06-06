@@ -6,10 +6,12 @@ public record UserProfileResponse(
     string Email,
     string PreferredLanguage,
     bool PushNotificationsEnabled,
-    bool WeeklyEmailEnabled);
+    bool WeeklyEmailEnabled,
+    string PreferredTheme);
 
 public record UpdateUserProfileRequest(
     string? DisplayName,
     string? PreferredLanguage,
     bool? PushNotificationsEnabled,
-    bool? WeeklyEmailEnabled);
+    bool? WeeklyEmailEnabled,
+    string? PreferredTheme);

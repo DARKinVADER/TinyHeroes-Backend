@@ -30,7 +30,7 @@ public class UserControllerTests(TestWebApplicationFactory<Program> factory)
         var client = await TestAuthHelper.RegisterWithFamily(factory);
 
         var response = await client.PatchAsJsonAsync("/api/users/me",
-            new UpdateUserProfileRequest("New Name", null, null, null));
+            new UpdateUserProfileRequest("New Name", null, null, null, null));
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var profile = await response.Content.ReadFromJsonAsync<UserProfileResponse>(TestWebApplicationFactory<Program>.JsonOptions);
@@ -43,12 +43,37 @@ public class UserControllerTests(TestWebApplicationFactory<Program> factory)
         var client = await TestAuthHelper.RegisterWithFamily(factory);
 
         var response = await client.PatchAsJsonAsync("/api/users/me",
-            new UpdateUserProfileRequest(null, "hu", false, true));
+            new UpdateUserProfileRequest(null, "hu", false, true, null));
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var profile = await response.Content.ReadFromJsonAsync<UserProfileResponse>(TestWebApplicationFactory<Program>.JsonOptions);
         profile!.PreferredLanguage.Should().Be("hu");
         profile.PushNotificationsEnabled.Should().BeFalse();
         profile.WeeklyEmailEnabled.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task UpdateProfile_ChangesPreferredTheme()
+    {
+        var client = await TestAuthHelper.RegisterWithFamily(factory);
+
+        var response = await client.PatchAsJsonAsync("/api/users/me",
+            new UpdateUserProfileRequest(null, null, null, null, "ocean"));
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var profile = await response.Content.ReadFromJsonAsync<UserProfileResponse>(TestWebApplicationFactory<Program>.JsonOptions);
+        profile!.PreferredTheme.Should().Be("ocean");
+    }
+
+    [Fact]
+    public async Task GetProfile_ReturnsDefaultTheme()
+    {
+        var client = await TestAuthHelper.RegisterWithFamily(factory);
+
+        var response = await client.GetAsync("/api/users/me");
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var profile = await response.Content.ReadFromJsonAsync<UserProfileResponse>(TestWebApplicationFactory<Program>.JsonOptions);
+        profile!.PreferredTheme.Should().Be("sunny");
     }
 }

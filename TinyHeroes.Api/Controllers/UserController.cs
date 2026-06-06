@@ -24,7 +24,8 @@ public class UserController(UserManager<User> userManager) : ApiControllerBase
             user.Email!,
             user.PreferredLanguage,
             user.PushNotificationsEnabled,
-            user.WeeklyEmailEnabled));
+            user.WeeklyEmailEnabled,
+            user.PreferredTheme));
     }
 
     [HttpPatch("me")]
@@ -37,6 +38,7 @@ public class UserController(UserManager<User> userManager) : ApiControllerBase
         if (req.PreferredLanguage is not null) user.PreferredLanguage = req.PreferredLanguage;
         if (req.PushNotificationsEnabled.HasValue) user.PushNotificationsEnabled = req.PushNotificationsEnabled.Value;
         if (req.WeeklyEmailEnabled.HasValue) user.WeeklyEmailEnabled = req.WeeklyEmailEnabled.Value;
+        if (req.PreferredTheme is not null) user.PreferredTheme = req.PreferredTheme;
 
         await userManager.UpdateAsync(user);
 
@@ -46,6 +48,7 @@ public class UserController(UserManager<User> userManager) : ApiControllerBase
             user.Email!,
             user.PreferredLanguage,
             user.PushNotificationsEnabled,
-            user.WeeklyEmailEnabled));
+            user.WeeklyEmailEnabled,
+            user.PreferredTheme));
     }
 }

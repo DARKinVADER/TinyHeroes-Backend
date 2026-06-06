@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Caching.Memory;
+using TinyHeroes.Api.Services;
 using TinyHeroes.Application.DTOs.Auth;
 using TinyHeroes.Application.Interfaces;
 using TinyHeroes.Domain.Entities;
@@ -18,12 +19,16 @@ public class AuthController(
     ITokenService tokenService,
     AppDbContext db,
     IConfiguration config,
-    IMemoryCache cache) : ControllerBase
+    IMemoryCache cache,
+    ICaptchaService captchaService) : ControllerBase
 {
     [HttpPost("register")]
     [EnableRateLimiting("auth")]
     public async Task<ActionResult<AuthResponse>> Register(RegisterRequest req)
     {
+        if (!await captchaService.ValidateAsync(req.CaptchaToken))
+            return BadRequest(new { error = "captcha_failed" });
+
         var user = new User { DisplayName = req.DisplayName, Email = req.Email, UserName = req.Email };
         var result = await userManager.CreateAsync(user, req.Password);
         if (!result.Succeeded)
@@ -37,6 +42,9 @@ public class AuthController(
     [EnableRateLimiting("auth")]
     public async Task<ActionResult<AuthResponse>> Login(LoginRequest req)
     {
+        if (!await captchaService.ValidateAsync(req.CaptchaToken))
+            return BadRequest(new { error = "captcha_failed" });
+
         var user = await userManager.FindByEmailAsync(req.Email);
         if (user is null)
         {

@@ -21,6 +21,7 @@ using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 using TinyHeroes.Api.Middleware;
+using TinyHeroes.Api.Services;
 using TinyHeroes.Domain.Entities;
 using TinyHeroes.Infrastructure;
 using TinyHeroes.Infrastructure.Data;
@@ -176,6 +177,14 @@ builder.Services.AddCors(opt =>
         .WithOrigins(builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() ?? ["http://localhost:4200"])
         .AllowAnyMethod()
         .AllowAnyHeader()));
+
+if (builder.Environment.IsEnvironment("Testing"))
+    builder.Services.AddSingleton<ICaptchaService, BypassCaptchaService>();
+else
+{
+    builder.Services.AddHttpClient<TurnstileCaptchaService>();
+    builder.Services.AddScoped<ICaptchaService, TurnstileCaptchaService>();
+}
 
 builder.Services.AddRateLimiter(opt =>
 {

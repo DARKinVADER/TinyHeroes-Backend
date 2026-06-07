@@ -53,6 +53,11 @@ public class TestWebApplicationFactory<TProgram> : WebApplicationFactory<TProgra
             var fsDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IFileStorageService));
             if (fsDescriptor != null) services.Remove(fsDescriptor);
             services.AddScoped<IFileStorageService>(_ => new FakeFileStorageService());
+
+            // Replace the real email service with a no-op for tests.
+            var emailDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IEmailService));
+            if (emailDescriptor != null) services.Remove(emailDescriptor);
+            services.AddScoped<IEmailService>(_ => new FakeEmailService());
         });
     }
 
@@ -67,5 +72,11 @@ public class TestWebApplicationFactory<TProgram> : WebApplicationFactory<TProgra
         public Task<string> SaveAsync(Stream content, string subPath, string fileName, CancellationToken ct = default)
             => Task.FromResult($"/uploads/{subPath}/{fileName}");
         public void Delete(string subPath, string fileName) { }
+    }
+
+    private class FakeEmailService : IEmailService
+    {
+        public Task SendFeedbackAsync(string category, string message, string? senderEmail, CancellationToken ct = default)
+            => Task.CompletedTask;
     }
 }

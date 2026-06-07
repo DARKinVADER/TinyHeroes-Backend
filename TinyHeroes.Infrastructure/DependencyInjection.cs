@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TinyHeroes.Application.Interfaces;
+using TinyHeroes.Application.Settings;
 using TinyHeroes.Infrastructure.Data;
 using TinyHeroes.Infrastructure.Services;
 
@@ -18,6 +19,8 @@ public static class DependencyInjection
         services.AddScoped<ITokenService, JwtTokenService>();
         services.AddScoped<ISummaryService, SummaryService>();
         services.AddScoped<IAiImageService, HuggingFaceImageService>();
+        services.AddScoped<IEmailService, EmailService>();
+        services.Configure<EmailSettings>(config.GetSection("Email"));
         var storageConn = config["Storage:ConnectionString"] ?? "";
         if (storageConn.StartsWith("azureblob://", StringComparison.OrdinalIgnoreCase))
             services.AddScoped<IFileStorageService, AzureBlobStorageService>();

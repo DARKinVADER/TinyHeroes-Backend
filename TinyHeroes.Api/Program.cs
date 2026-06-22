@@ -72,9 +72,8 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddMemoryCache();
 
-// Password hashing: ASP.NET Identity default PBKDF2-SHA256, 10 000 iterations.
-// OWASP 2024 recommends 600 000+ iterations for PBKDF2-SHA256.
-// See issue #108 -- a follow-up issue (#114) has been raised to increase iterations or switch to BCrypt.
+// Password hashing: PBKDF2-SHA256, 600 000 iterations (OWASP 2024 recommendation).
+// Resolved via issue #108.
 builder.Services.AddIdentity<User, IdentityRole<Guid>>(opt =>
 {
     opt.Password.RequireDigit = true;
@@ -84,6 +83,11 @@ builder.Services.AddIdentity<User, IdentityRole<Guid>>(opt =>
 })
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
+
+builder.Services.Configure<PasswordHasherOptions>(opt =>
+{
+    opt.IterationCount = 600000;
+});
 
 var authBuilder = builder.Services.AddAuthentication(opt =>
 {

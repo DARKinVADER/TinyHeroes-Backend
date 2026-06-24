@@ -8,13 +8,13 @@ public static class RankingHelper
     {
         var sorted = items.OrderByDescending(x => x.DeedCount).ToList();
         int rank = 0;
-        int previousCount = -1;
+        int? previousCount = null;
         var result = new List<RankedEntry>();
         for (int i = 0; i < sorted.Count; i++)
         {
-            if (sorted[i].DeedCount != previousCount)
+            if (previousCount == null || sorted[i].DeedCount != previousCount.Value)
             {
-                rank = i + 1;
+                rank++;
                 previousCount = sorted[i].DeedCount;
             }
             result.Add(new RankedEntry(sorted[i].Id, sorted[i].Name, sorted[i].DeedCount, rank));

@@ -57,7 +57,8 @@ public class PrizeClaimController(AppDbContext db) : ApiControllerBase
                 c.Scope == req.Scope &&
                 c.WeekSummaryId == req.WeekSummaryId &&
                 c.MonthSummaryId == req.MonthSummaryId &&
-                c.Rank == req.Rank);
+                c.Rank == req.Rank &&
+                c.ChildId == req.ChildId);
 
         if (existing is not null)
             return Ok(ToDto(existing));

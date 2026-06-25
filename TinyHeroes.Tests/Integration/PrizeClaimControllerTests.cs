@@ -282,6 +282,31 @@ public class PrizeClaimControllerTests(TestWebApplicationFactory<Program> factor
     }
 
     [Fact]
+    public async Task CreateClaim_WithTiedRank_CreatesSeparateClaims()
+    {
+        var client = await TestAuthHelper.RegisterWithFamily(factory);
+        var summaryId = Guid.NewGuid();
+        var child1Id = Guid.NewGuid();
+        var child2Id = Guid.NewGuid();
+
+        var req1 = new CreatePrizeClaimRequest("weekly", summaryId, null, 1, child1Id, "Alice", "🍕", "Pizza night");
+        var req2 = new CreatePrizeClaimRequest("weekly", summaryId, null, 1, child2Id, "Bob", "🍕", "Pizza night");
+
+        var first = await client.PostAsJsonAsync("/api/prize-claims", req1);
+        var second = await client.PostAsJsonAsync("/api/prize-claims", req2);
+
+        first.StatusCode.Should().Be(HttpStatusCode.Created);
+        second.StatusCode.Should().Be(HttpStatusCode.Created);
+
+        var getResponse = await client.GetAsync($"/api/prize-claims?weekSummaryId={summaryId}");
+        getResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var claims = await getResponse.Content.ReadFromJsonAsync<List<PrizeClaimDto>>(TestWebApplicationFactory<Program>.JsonOptions);
+        claims.Should().HaveCount(2);
+        claims.Should().ContainSingle(c => c.ChildId == child1Id);
+        claims.Should().ContainSingle(c => c.ChildId == child2Id);
+    }
+
+    [Fact]
     public async Task GetList_WithoutQueryParam_Returns400()
     {
         var client = await TestAuthHelper.RegisterWithFamily(factory);
@@ -291,3 +316,4 @@ public class PrizeClaimControllerTests(TestWebApplicationFactory<Program> factor
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 }
+

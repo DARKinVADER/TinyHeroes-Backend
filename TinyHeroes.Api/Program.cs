@@ -86,7 +86,7 @@ builder.Services.AddIdentity<User, IdentityRole<Guid>>(opt =>
 
 builder.Services.Configure<PasswordHasherOptions>(opt =>
 {
-    opt.IterationCount = 600000;
+    opt.IterationCount = builder.Environment.IsEnvironment("Integration") ? 10000 : 600000;
 });
 
 var authBuilder = builder.Services.AddAuthentication(opt =>
@@ -197,7 +197,7 @@ builder.Services.AddRateLimiter(opt =>
 {
     opt.AddFixedWindowLimiter("auth", limiter =>
     {
-        limiter.PermitLimit = 10;
+        limiter.PermitLimit = builder.Environment.IsEnvironment("Integration") ? 200 : 10;
         limiter.Window = TimeSpan.FromMinutes(1);
         limiter.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
         limiter.QueueLimit = 0;
@@ -252,7 +252,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
-if (!app.Environment.IsEnvironment("Testing"))
+if (!app.Environment.IsEnvironment("Testing") && !app.Environment.IsEnvironment("Integration"))
     app.UseRateLimiter();
 
 var uploadsPath = ParseUploadsPath(app.Configuration["Storage:ConnectionString"]);

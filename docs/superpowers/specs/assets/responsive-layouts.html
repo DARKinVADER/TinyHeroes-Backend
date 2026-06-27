@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Responsive layouts</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #111827; color: #f9fafb; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 24px 16px; }
+  h2 { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+  .subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 28px; }
+  .frame-label { font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .device-row { display: flex; gap: 24px; align-items: flex-start; margin-bottom: 40px; flex-wrap: wrap; }
+
+  /* ─── PRIZE RULES PAGE ─── */
+  .prize-rules { background: white; border-radius: 16px; overflow: hidden; }
+  .pr-nav { display: flex; align-items: center; gap: 8px; padding: 14px 16px; border-bottom: 1px solid #f3f4f6; }
+  .pr-nav-title { font-size: 15px; font-weight: 700; color: #111; }
+  .admin-badge { background: #7c3aed; color: white; font-size: 9px; padding: 2px 8px; border-radius: 10px; font-weight: 700; margin-left: auto; }
+  .pr-desc { font-size: 12px; color: #6b7280; padding: 12px 16px; line-height: 1.5; }
+  .pr-rows { background: #f9fafb; margin: 0 12px 12px; border-radius: 12px; overflow: hidden; }
+  .pr-row { padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; }
+  .pr-row + .pr-row { border-top: 1px solid #e5e7eb; }
+  .pr-row-label { font-size: 13px; font-weight: 600; color: #111; }
+  .pr-row-sub { font-size: 11px; color: #888; margin-top: 2px; }
+  .pr-spinner { display: flex; align-items: center; gap: 8px; }
+  .pr-btn { width: 30px; height: 30px; border: 1.5px solid #d1d5db; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; color: #555; background: white; cursor: pointer; }
+  .pr-val { font-size: 20px; font-weight: 800; color: #7c3aed; min-width: 28px; text-align: center; }
+  .pr-save { background: linear-gradient(90deg, #7c3aed, #f97316); color: white; margin: 0 12px 14px; border-radius: 12px; padding: 13px; text-align: center; font-size: 13px; font-weight: 700; }
+
+  /* TABLET — side by side rows */
+  .tablet .pr-rows { display: grid; grid-template-columns: 1fr 1fr; margin: 0 16px 16px; }
+  .tablet .pr-row + .pr-row { border-top: none; border-left: 1px solid #e5e7eb; }
+  .tablet .pr-save { margin: 0 16px 16px; }
+
+  /* DESKTOP — compact, max-width container */
+  .desktop-wrap { max-width: 680px; }
+  .desktop .pr-nav { padding: 16px 24px; }
+  .desktop .pr-desc { padding: 14px 24px; font-size: 13px; }
+  .desktop .pr-rows { margin: 0 24px 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  .desktop .pr-row + .pr-row { border-top: none; border-left: 1px solid #e5e7eb; }
+  .desktop .pr-save { margin: 0 24px 20px; max-width: 240px; }
+</style>
+</head>
+<body>
+
+<h2>Responsive layouts — Prize Rules page</h2>
+<p class="subtitle">Same data, adapted layout at mobile · tablet · desktop</p>
+
+<div class="device-row">
+
+  <!-- MOBILE (375px) -->
+  <div>
+    <div class="frame-label">📱 Mobile (375px)</div>
+    <div style="width: 320px;">
+      <div class="prize-rules">
+        <div class="pr-nav">
+          <span style="color:#6b7280;font-size:16px;">←</span>
+          <span class="pr-nav-title">🎯 Prize Rules</span>
+          <span class="admin-badge">ADMIN</span>
+        </div>
+        <div class="pr-desc">Children must complete at least this many deeds to qualify. Set to <strong>0</strong> to let everyone qualify.</div>
+        <div class="pr-rows">
+          <div class="pr-row">
+            <div><div class="pr-row-label">🏅 Weekly prize</div><div class="pr-row-sub">Per-week minimum</div></div>
+            <div class="pr-spinner">
+              <div class="pr-btn">−</div>
+              <div class="pr-val">5</div>
+              <div class="pr-btn">+</div>
+            </div>
+          </div>
+          <div class="pr-row">
+            <div><div class="pr-row-label">🏆 Monthly prize</div><div class="pr-row-sub">Per-month minimum</div></div>
+            <div class="pr-spinner">
+              <div class="pr-btn">−</div>
+              <div class="pr-val">20</div>
+              <div class="pr-btn">+</div>
+            </div>
+          </div>
+        </div>
+        <div class="pr-save">Save changes</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLET (768px) -->
+  <div>
+    <div class="frame-label">📲 Tablet (768px)</div>
+    <div style="width: 520px;">
+      <div class="prize-rules tablet">
+        <div class="pr-nav">
+          <span style="color:#6b7280;font-size:16px;">←</span>
+          <span class="pr-nav-title">🎯 Prize Rules</span>
+          <span class="admin-badge">ADMIN</span>
+        </div>
+        <div class="pr-desc">Children must complete at least this many deeds to qualify. Set to <strong>0</strong> to let everyone qualify.</div>
+        <div class="pr-rows">
+          <div class="pr-row">
+            <div><div class="pr-row-label">🏅 Weekly prize</div><div class="pr-row-sub">Per-week minimum</div></div>
+            <div class="pr-spinner">
+              <div class="pr-btn">−</div>
+              <div class="pr-val">5</div>
+              <div class="pr-btn">+</div>
+            </div>
+          </div>
+          <div class="pr-row">
+            <div><div class="pr-row-label">🏆 Monthly prize</div><div class="pr-row-sub">Per-month minimum</div></div>
+            <div class="pr-spinner">
+              <div class="pr-btn">−</div>
+              <div class="pr-val">20</div>
+              <div class="pr-btn">+</div>
+            </div>
+          </div>
+        </div>
+        <div class="pr-save">Save changes</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- DESKTOP row -->
+<div style="margin-bottom: 40px;">
+  <div class="frame-label">🖥️ Desktop (1200px+)</div>
+  <div class="desktop-wrap">
+    <div class="prize-rules desktop">
+      <div class="pr-nav">
+        <span style="color:#6b7280;font-size:16px;">←</span>
+        <span class="pr-nav-title">🎯 Prize Rules</span>
+        <span class="admin-badge">ADMIN</span>
+      </div>
+      <div class="pr-desc">Children must complete at least this many deeds to qualify. Set to <strong>0</strong> to let everyone qualify.</div>
+      <div class="pr-rows">
+        <div class="pr-row">
+          <div><div class="pr-row-label">🏅 Weekly prize</div><div class="pr-row-sub">Per-week minimum</div></div>
+          <div class="pr-spinner">
+            <div class="pr-btn">−</div>
+            <div class="pr-val">5</div>
+            <div class="pr-btn">+</div>
+          </div>
+        </div>
+        <div class="pr-row">
+          <div><div class="pr-row-label">🏆 Monthly prize</div><div class="pr-row-sub">Per-month minimum</div></div>
+          <div class="pr-spinner">
+            <div class="pr-btn">−</div>
+            <div class="pr-val">20</div>
+            <div class="pr-btn">+</div>
+          </div>
+        </div>
+      </div>
+      <div class="pr-save">Save changes</div>
+    </div>
+  </div>
+</div>
+
+<h2 style="margin-bottom:6px;">Responsive layouts — Weekly Podium (ineligibility treatment)</h2>
+<p class="subtitle">Banner and dimming scale naturally — no layout shift needed across sizes</p>
+
+<div class="device-row">
+
+  <!-- MOBILE podium -->
+  <div>
+    <div class="frame-label">📱 Mobile (375px)</div>
+    <div style="width: 320px; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.3);">
+      <div style="background: linear-gradient(135deg,#7c3aed,#f97316); padding: 14px; text-align:center; color:white;">
+        <div style="font-size:10px;opacity:.7;font-weight:600;text-transform:uppercase;letter-spacing:1px;">THIS WEEK</div>
+        <div style="font-size:13px;font-weight:700;margin-top:2px;">Mon 26 – Sun 1 Jun</div>
+      </div>
+      <div style="background:#1a1a2e;padding:16px;">
+        <div style="display:flex;justify-content:center;align-items:flex-end;gap:8px;margin-bottom:12px;">
+          <div style="text-align:center;opacity:.35;">
+            <div style="width:38px;height:38px;border-radius:50%;background:#374151;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:17px;border:2px dashed #4b5563;">😊</div>
+            <div style="font-size:10px;color:#9ca3af;font-weight:600;">Bob</div>
+            <div style="font-size:9px;color:#6b7280;">3 deeds</div>
+            <div style="background:#374151;height:38px;width:46px;border-radius:4px 4px 0 0;margin-top:5px;display:flex;align-items:center;justify-content:center;"><span style="font-size:15px;filter:grayscale(1);">🥈</span></div>
+          </div>
+          <div style="text-align:center;">
+            <div style="width:46px;height:46px;border-radius:50%;background:#fbbf24;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:22px;border:3px solid #f59e0b;">🦸</div>
+            <div style="font-size:11px;color:white;font-weight:700;">Alice</div>
+            <div style="font-size:9px;color:#fbbf24;font-weight:600;">7 deeds ✓</div>
+            <div style="background:linear-gradient(180deg,#fbbf24,#d97706);height:52px;width:54px;border-radius:4px 4px 0 0;margin-top:5px;display:flex;align-items:center;justify-content:center;"><span style="font-size:20px;">🥇</span></div>
+          </div>
+          <div style="text-align:center;opacity:.35;">
+            <div style="width:34px;height:34px;border-radius:50%;background:#374151;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:15px;border:2px dashed #4b5563;">😄</div>
+            <div style="font-size:10px;color:#9ca3af;font-weight:600;">Charlie</div>
+            <div style="font-size:9px;color:#6b7280;">2 deeds</div>
+            <div style="background:#374151;height:30px;width:42px;border-radius:4px 4px 0 0;margin-top:5px;display:flex;align-items:center;justify-content:center;"><span style="font-size:13px;filter:grayscale(1);">🥉</span></div>
+          </div>
+        </div>
+        <div style="background:rgba(239,68,68,.13);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:9px 12px;text-align:center;margin-bottom:10px;font-size:11px;color:#fca5a5;line-height:1.5;">⚠️ <strong>Bob</strong> and <strong>Charlie</strong> need at least <strong>5 deeds</strong> to qualify.</div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <div style="background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.25);border-radius:9px;padding:9px 12px;display:flex;align-items:center;gap:9px;"><span style="font-size:16px;">🥇</span><div style="flex:1;"><div style="font-size:11px;color:white;font-weight:600;">Alice — 1st</div><div style="font-size:10px;color:#fbbf24;">🍦 Ice cream</div></div><span style="font-size:10px;color:#6ee7b7;font-weight:600;">✓</span></div>
+          <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:9px;padding:9px 12px;display:flex;align-items:center;gap:9px;opacity:.4;"><span style="font-size:16px;filter:grayscale(1);">🥈</span><div style="flex:1;font-size:11px;color:#9ca3af;">2nd — no eligible child</div><span style="font-size:10px;color:#6b7280;">🔒</span></div>
+          <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:9px;padding:9px 12px;display:flex;align-items:center;gap:9px;opacity:.4;"><span style="font-size:16px;filter:grayscale(1);">🥉</span><div style="flex:1;font-size:11px;color:#9ca3af;">3rd — no eligible child</div><span style="font-size:10px;color:#6b7280;">🔒</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLET podium -->
+  <div>
+    <div class="frame-label">📲 Tablet / Desktop (768px+)</div>
+    <div style="width: 460px; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.3);">
+      <div style="background: linear-gradient(135deg,#7c3aed,#f97316); padding: 18px 24px; color:white; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-size:10px;opacity:.7;font-weight:600;text-transform:uppercase;letter-spacing:1px;">THIS WEEK</div>
+          <div style="font-size:15px;font-weight:800;margin-top:2px;">Mon 26 May – Sun 1 Jun</div>
+        </div>
+        <div style="font-size:11px;opacity:.75;">3 children</div>
+      </div>
+      <div style="background:#1a1a2e;padding:24px;">
+        <!-- Wider: podium + prize list side by side -->
+        <div style="display:flex;gap:20px;align-items:flex-start;margin-bottom:14px;">
+          <!-- Podium -->
+          <div style="display:flex;align-items:flex-end;gap:8px;">
+            <div style="text-align:center;opacity:.35;">
+              <div style="width:40px;height:40px;border-radius:50%;background:#374151;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:18px;border:2px dashed #4b5563;">😊</div>
+              <div style="font-size:10px;color:#9ca3af;font-weight:600;">Bob</div>
+              <div style="font-size:9px;color:#6b7280;">3</div>
+              <div style="background:#374151;height:36px;width:48px;border-radius:4px 4px 0 0;margin-top:5px;display:flex;align-items:center;justify-content:center;"><span style="font-size:15px;filter:grayscale(1);">🥈</span></div>
+            </div>
+            <div style="text-align:center;">
+              <div style="width:52px;height:52px;border-radius:50%;background:#fbbf24;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:26px;border:3px solid #f59e0b;box-shadow:0 0 14px rgba(251,191,36,.4);">🦸</div>
+              <div style="font-size:12px;color:white;font-weight:700;">Alice</div>
+              <div style="font-size:9px;color:#fbbf24;font-weight:600;">7 ✓</div>
+              <div style="background:linear-gradient(180deg,#fbbf24,#d97706);height:56px;width:58px;border-radius:4px 4px 0 0;margin-top:5px;display:flex;align-items:center;justify-content:center;"><span style="font-size:22px;">🥇</span></div>
+            </div>
+            <div style="text-align:center;opacity:.35;">
+              <div style="width:36px;height:36px;border-radius:50%;background:#374151;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:16px;border:2px dashed #4b5563;">😄</div>
+              <div style="font-size:10px;color:#9ca3af;font-weight:600;">Charlie</div>
+              <div style="font-size:9px;color:#6b7280;">2</div>
+              <div style="background:#374151;height:28px;width:44px;border-radius:4px 4px 0 0;margin-top:5px;display:flex;align-items:center;justify-content:center;"><span style="font-size:13px;filter:grayscale(1);">🥉</span></div>
+            </div>
+          </div>
+          <!-- Prize list alongside -->
+          <div style="flex:1;display:flex;flex-direction:column;gap:6px;padding-top:4px;">
+            <div style="background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.25);border-radius:9px;padding:9px 12px;display:flex;align-items:center;gap:8px;"><span style="font-size:16px;">🥇</span><div style="flex:1;"><div style="font-size:11px;color:white;font-weight:600;">Alice</div><div style="font-size:10px;color:#fbbf24;">🍦 Ice cream</div></div><span style="font-size:9px;color:#6ee7b7;font-weight:700;">✓ PRIZE</span></div>
+            <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:9px;padding:9px 12px;display:flex;align-items:center;gap:8px;opacity:.4;"><span style="font-size:15px;filter:grayscale(1);">🥈</span><div style="flex:1;font-size:11px;color:#9ca3af;">2nd — unclaimed</div><span style="font-size:9px;color:#6b7280;">🔒</span></div>
+            <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:9px;padding:9px 12px;display:flex;align-items:center;gap:8px;opacity:.4;"><span style="font-size:15px;filter:grayscale(1);">🥉</span><div style="flex:1;font-size:11px;color:#9ca3af;">3rd — unclaimed</div><span style="font-size:9px;color:#6b7280;">🔒</span></div>
+          </div>
+        </div>
+        <div style="background:rgba(239,68,68,.13);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:9px 14px;font-size:11px;color:#fca5a5;line-height:1.5;">⚠️ <strong>Bob</strong> and <strong>Charlie</strong> need at least <strong>5 deeds</strong> to qualify for a weekly prize.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

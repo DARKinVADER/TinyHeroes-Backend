@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TinyHeroes — Architecture</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #FFF8F0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #3D2B1F; padding: 32px 24px 64px; }
+  h1 { font-size: 28px; font-weight: 900; color: #F97316; margin-bottom: 6px; }
+  h2 { font-size: 18px; font-weight: 800; color: #3D2B1F; margin: 40px 0 16px; border-left: 4px solid #F97316; padding-left: 12px; }
+  h3 { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: #a8714a; margin-bottom: 10px; }
+  .subtitle { font-size: 14px; color: #a8714a; margin-bottom: 32px; }
+  .section { background: white; border-radius: 18px; border: 1.5px solid #F0E4D4; padding: 24px; margin-bottom: 28px; box-shadow: 0 2px 12px rgba(249,115,22,0.06); }
+  .note { font-size: 11px; color: #a8714a; background: #FFF3E8; border-radius: 10px; padding: 10px 14px; margin-top: 12px; border: 1px solid #fcd9b0; }
+  .note strong { color: #c2410c; }
+  code { background: #f3f4f6; border-radius: 4px; padding: 1px 5px; font-size: 11px; font-family: 'Courier New', monospace; }
+
+  /* layers */
+  .layers { display: flex; flex-direction: column; gap: 8px; }
+  .layer { border-radius: 11px; padding: 12px 16px; }
+  .layer-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { border-radius: 8px; padding: 4px 10px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+  .layer-controller { background: #FFF3E8; border: 1.5px solid #fcd9b0; }
+  .layer-controller .layer-label { color: #c2410c; }
+  .chip-controller { background: #F97316; color: white; }
+  .layer-service { background: #f0fdf4; border: 1.5px solid #bbf7d0; }
+  .layer-service .layer-label { color: #166534; }
+  .chip-service { background: #22C55E; color: white; }
+  .layer-data { background: #eff6ff; border: 1.5px solid #bfdbfe; }
+  .layer-data .layer-label { color: #1d4ed8; }
+  .chip-data { background: #3b82f6; color: white; }
+  .layer-infra { background: #fefce8; border: 1.5px solid #fde68a; }
+  .layer-infra .layer-label { color: #92400e; }
+  .chip-infra { background: #f59e0b; color: white; }
+
+  /* frontend modules */
+  .fe-grid { display: grid; grid-template-columns: 200px 1fr; gap: 12px; align-items: start; }
+  .fe-core { background: #FFF3E8; border: 1.5px solid #fcd9b0; border-radius: 12px; padding: 14px; }
+  .fe-features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .fe-module { background: white; border: 1.5px solid #F0E4D4; border-radius: 11px; padding: 11px; }
+  .fe-module .mod-icon { font-size: 20px; margin-bottom: 6px; }
+  .fe-module .mod-name { font-size: 12px; font-weight: 800; color: #3D2B1F; margin-bottom: 4px; }
+  .fe-module .mod-items { font-size: 10px; color: #a8714a; line-height: 1.6; }
+
+  /* data model */
+  .entity-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .entity { background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 11px; padding: 12px; }
+  .entity-name { font-size: 13px; font-weight: 800; color: #1d4ed8; margin-bottom: 7px; }
+  .entity-field { font-size: 10px; color: #374151; line-height: 1.7; font-family: 'Courier New', monospace; }
+  .entity-field .fk { color: #7e22ce; }
+  .entity-field .pk { color: #c2410c; font-weight: 700; }
+
+  /* auth flow */
+  .flow-steps { display: flex; gap: 0; align-items: center; overflow-x: auto; padding-bottom: 8px; }
+  .flow-step { background: white; border: 1.5px solid #F0E4D4; border-radius: 11px; padding: 10px 12px; min-width: 130px; text-align: center; flex-shrink: 0; }
+  .flow-step .fs-actor { font-size: 10px; color: #a8714a; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
+  .flow-step .fs-action { font-size: 11px; font-weight: 700; color: #3D2B1F; }
+  .flow-note { font-size: 10px; color: #a8714a; margin-top: 4px; font-style: italic; }
+  .flow-arrow { font-size: 20px; color: #F97316; flex-shrink: 0; margin: 0 6px; }
+
+  /* storage table */
+  .storage-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .storage-table th { background: #FFF3E8; color: #a8714a; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; padding: 8px 12px; text-align: left; border-bottom: 2px solid #F0E4D4; }
+  .storage-table td { padding: 9px 12px; border-bottom: 1px solid #F0E4D4; vertical-align: top; }
+  .storage-table tr:last-child td { border-bottom: none; }
+  .storage-table tr.rec td { background: #f0fdf4; }
+  .tag { display: inline-block; border-radius: 5px; padding: 2px 7px; font-size: 10px; font-weight: 700; }
+
+  /* api routes */
+  .routes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .route-box { border-radius: 10px; padding: 12px; font-family: 'Courier New', monospace; font-size: 11px; line-height: 1.8; }
+  .route-box .r-title { font-family: sans-serif; font-weight: 800; font-size: 12px; margin-bottom: 8px; }
+
+  /* ext services */
+  .ext-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .ext-box { border-radius: 11px; padding: 12px; text-align: center; }
+  .ext-box .ext-icon { font-size: 26px; margin-bottom: 6px; }
+  .ext-box .ext-name { font-size: 12px; font-weight: 800; margin-bottom: 3px; }
+  .ext-box .ext-desc { font-size: 10px; color: #6b7280; line-height: 1.5; }
+
+  /* clean architecture */
+  .onion { position: relative; display: flex; flex-direction: column; align-items: center; gap: 0; }
+  .onion-ring { border-radius: 16px; padding: 14px 18px; width: 100%; }
+  .onion-ring-4 { background: #FFF3E8; border: 2px solid #fcd9b0; }
+  .onion-ring-3 { background: #fefce8; border: 2px solid #fde68a; margin: 10px 20px 0; }
+  .onion-ring-2 { background: #f0fdf4; border: 2px solid #bbf7d0; margin: 10px 20px 0; }
+  .onion-ring-1 { background: #eff6ff; border: 2px solid #bfdbfe; margin: 10px 20px 0; }
+  .onion-label { font-size: 12px; font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .onion-label .proj { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 6px; background: rgba(0,0,0,0.08); }
+  .onion-contents { font-size: 11px; color: #374151; line-height: 1.7; }
+  .dep-arrow { text-align: center; font-size: 12px; color: #a8714a; margin: 6px 0 2px; font-weight: 700; }
+  .solid-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 14px; }
+  .solid-table th { background: #FFF3E8; color: #a8714a; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; padding: 7px 10px; text-align: left; border-bottom: 2px solid #F0E4D4; }
+  .solid-table td { padding: 8px 10px; border-bottom: 1px solid #F0E4D4; vertical-align: top; }
+  .solid-table .principle { font-weight: 800; color: #c2410c; white-space: nowrap; }
+
+  /* frontend smart/dumb */
+  .fe-arch { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .fe-section { border-radius: 12px; padding: 14px; }
+  .fe-section-title { font-size: 12px; font-weight: 800; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .fe-feature-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .fe-feature-card { background: white; border: 1.5px solid #F0E4D4; border-radius: 10px; padding: 10px; }
+  .fe-feature-card .ffc-name { font-size: 11px; font-weight: 800; color: #3D2B1F; margin-bottom: 4px; }
+  .fe-feature-card .ffc-items { font-size: 10px; color: #a8714a; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<h1>🦸 TinyHeroes — Architecture</h1>
+<p class="subtitle">Tech stack: Angular 21 · ASP.NET Core 10 · EF Core 10 · PostgreSQL 16 · FluentStorage · Hugging Face AI · Docker (3 containers)</p>
+
+<!-- ══════════════════════════════════════════════════════════
+     1. SYSTEM DIAGRAM
+════════════════════════════════════════════════════════════ -->
+<h2>1. System Architecture Diagram</h2>
+<div class="section">
+  <div style="overflow-x:auto;padding-bottom:8px;">
+  <svg width="860" height="460" viewBox="0 0 860 460" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arr"        markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#F97316"/></marker>
+      <marker id="arr-blue"   markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#3b82f6"/></marker>
+      <marker id="arr-purple" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#A855F7"/></marker>
+      <marker id="arr-green"  markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#22C55E"/></marker>
+      <marker id="arr-amber"  markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#f59e0b"/></marker>
+    </defs>
+
+    <!-- outer bg -->
+    <rect x="10" y="10" width="840" height="440" rx="18" fill="#FFF8F0" stroke="#F0E4D4" stroke-width="1.5"/>
+
+    <!-- ── BROWSER ── -->
+    <rect x="28" y="30" width="130" height="90" rx="12" fill="white" stroke="#F0E4D4" stroke-width="1.5"/>
+    <text x="93" y="58"  text-anchor="middle" font-size="24">🌐</text>
+    <text x="93" y="78"  text-anchor="middle" font-size="12" font-weight="800" fill="#3D2B1F">Browser</text>
+    <text x="93" y="94"  text-anchor="middle" font-size="10" fill="#a8714a">mobile / desktop</text>
+    <text x="93" y="108" text-anchor="middle" font-size="10" fill="#a8714a">Angular 20 SPA</text>
+
+    <!-- ── DOCKER COMPOSE boundary ── -->
+    <rect x="200" y="20" width="480" height="320" rx="14" fill="none" stroke="#fcd9b0" stroke-width="2" stroke-dasharray="6,4"/>
+    <text x="440" y="42" text-anchor="middle" font-size="11" font-weight="700" fill="#a8714a">🐳  Docker Compose  (3 services)</text>
+
+    <!-- nginx / frontend box -->
+    <rect x="218" y="55" width="135" height="88" rx="12" fill="#FFF3E8" stroke="#F97316" stroke-width="2"/>
+    <text x="285" y="82"  text-anchor="middle" font-size="18">🌐</text>
+    <text x="285" y="100" text-anchor="middle" font-size="12" font-weight="800" fill="#3D2B1F">frontend</text>
+    <text x="285" y="115" text-anchor="middle" font-size="10" fill="#a8714a">nginx + Angular 20</text>
+    <text x="285" y="129" text-anchor="middle" font-size="10" fill="#F97316">port 80</text>
+
+    <!-- api box -->
+    <rect x="390" y="55" width="140" height="88" rx="12" fill="#f0fdf4" stroke="#22C55E" stroke-width="2"/>
+    <text x="460" y="82"  text-anchor="middle" font-size="18">⚙️</text>
+    <text x="460" y="100" text-anchor="middle" font-size="12" font-weight="800" fill="#3D2B1F">api</text>
+    <text x="460" y="115" text-anchor="middle" font-size="10" fill="#a8714a">ASP.NET Core 10</text>
+    <text x="460" y="129" text-anchor="middle" font-size="10" fill="#22C55E">port 8080</text>
+
+    <!-- postgres box -->
+    <rect x="218" y="185" width="135" height="88" rx="12" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+    <text x="285" y="212" text-anchor="middle" font-size="18">🗄️</text>
+    <text x="285" y="230" text-anchor="middle" font-size="12" font-weight="800" fill="#3D2B1F">postgres</text>
+    <text x="285" y="245" text-anchor="middle" font-size="10" fill="#a8714a">PostgreSQL 16</text>
+    <text x="285" y="259" text-anchor="middle" font-size="10" fill="#3b82f6">port 5432</text>
+
+    <!-- uploads volume box -->
+    <rect x="390" y="185" width="140" height="88" rx="12" fill="#fdf4ff" stroke="#A855F7" stroke-width="2" stroke-dasharray="5,3"/>
+    <text x="460" y="212" text-anchor="middle" font-size="18">📁</text>
+    <text x="460" y="230" text-anchor="middle" font-size="12" font-weight="800" fill="#3D2B1F">uploads_data</text>
+    <text x="460" y="245" text-anchor="middle" font-size="10" fill="#a8714a">Docker volume</text>
+    <text x="460" y="259" text-anchor="middle" font-size="10" fill="#A855F7">FluentStorage local</text>
+
+    <!-- ── EXTERNAL SERVICES ── -->
+    <rect x="700" y="30" width="148" height="295" rx="12" fill="white" stroke="#F0E4D4" stroke-width="1.5"/>
+    <text x="774" y="52" text-anchor="middle" font-size="11" font-weight="700" fill="#a8714a">External</text>
+    <!-- Google -->
+    <rect x="713" y="62"  width="122" height="38" rx="8" fill="#fef9c3" stroke="#fde047" stroke-width="1.5"/>
+    <text x="726" y="82"  font-size="14">🔵</text>
+    <text x="748" y="79"  font-size="10" font-weight="700" fill="#3D2B1F">Google OAuth2</text>
+    <text x="748" y="93"  font-size="9"  fill="#a8714a">Social sign-in</text>
+    <!-- Apple -->
+    <rect x="713" y="108" width="122" height="38" rx="8" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5"/>
+    <text x="726" y="128" font-size="14">🍎</text>
+    <text x="748" y="125" font-size="10" font-weight="700" fill="#3D2B1F">Apple Sign-In</text>
+    <text x="748" y="139" font-size="9"  fill="#a8714a">OIDC</text>
+    <!-- Facebook -->
+    <rect x="713" y="154" width="122" height="38" rx="8" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
+    <text x="726" y="174" font-size="14">📘</text>
+    <text x="748" y="171" font-size="10" font-weight="700" fill="#3D2B1F">Facebook Login</text>
+    <text x="748" y="185" font-size="9"  fill="#a8714a">OAuth2</text>
+    <!-- Hugging Face -->
+    <rect x="713" y="200" width="122" height="38" rx="8" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5"/>
+    <text x="726" y="220" font-size="14">🤖</text>
+    <text x="748" y="217" font-size="10" font-weight="700" fill="#3D2B1F">Hugging Face API</text>
+    <text x="748" y="231" font-size="9"  fill="#a8714a">AI image gen (FLUX.1)</text>
+    <!-- Cloud storage options -->
+    <rect x="713" y="246" width="122" height="68" rx="8" fill="#FFF3E8" stroke="#fcd9b0" stroke-width="1.5" stroke-dasharray="4,3"/>
+    <text x="774" y="264" text-anchor="middle" font-size="9"  font-weight="700" fill="#a8714a">Cloud storage (opt)</text>
+    <text x="774" y="278" text-anchor="middle" font-size="9"  fill="#3D2B1F">AWS S3</text>
+    <text x="774" y="291" text-anchor="middle" font-size="9"  fill="#3D2B1F">Azure Blob</text>
+    <text x="774" y="304" text-anchor="middle" font-size="9"  fill="#3D2B1F">GCS</text>
+
+    <!-- ── ARROWS ── -->
+    <!-- Browser → nginx -->
+    <line x1="158" y1="82" x2="216" y2="90" stroke="#F97316" stroke-width="2" marker-end="url(#arr)"/>
+    <text x="183" y="78" text-anchor="middle" font-size="9" fill="#F97316" font-weight="700">HTTPS</text>
+
+    <!-- nginx → api (/api/* proxy) -->
+    <line x1="353" y1="99" x2="388" y2="99" stroke="#F97316" stroke-width="2" marker-end="url(#arr)"/>
+    <text x="370" y="94" text-anchor="middle" font-size="9" fill="#F97316" font-weight="700">/api/*</text>
+
+    <!-- api → postgres -->
+    <line x1="438" y1="143" x2="340" y2="185" stroke="#3b82f6" stroke-width="2" marker-end="url(#arr-blue)"/>
+    <text x="375" y="162" text-anchor="middle" font-size="9" fill="#3b82f6" font-weight="700">EF Core</text>
+
+    <!-- api → uploads volume -->
+    <line x1="460" y1="143" x2="460" y2="183" stroke="#A855F7" stroke-width="2" marker-end="url(#arr-purple)"/>
+    <text x="490" y="168" text-anchor="middle" font-size="9" fill="#A855F7" font-weight="700">disk://</text>
+
+    <!-- api → external social -->
+    <line x1="530" y1="88" x2="698" y2="122" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr-amber)"/>
+    <text x="612" y="97" text-anchor="middle" font-size="9" fill="#f59e0b" font-weight="700">OAuth2</text>
+
+    <!-- api → Hugging Face -->
+    <line x1="530" y1="120" x2="698" y2="218" stroke="#22C55E" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr-green)"/>
+    <text x="628" y="175" text-anchor="middle" font-size="9" fill="#22C55E" font-weight="700">REST</text>
+
+    <!-- api → cloud storage (dashed, optional) -->
+    <line x1="530" y1="130" x2="698" y2="272" stroke="#F97316" stroke-width="1.5" stroke-dasharray="3,4" marker-end="url(#arr)"/>
+    <text x="630" y="215" text-anchor="middle" font-size="9" fill="#F97316" font-weight="700">config swap</text>
+
+    <!-- volumes note -->
+    <rect x="218" y="298" width="312" height="32" rx="8" fill="white" stroke="#F0E4D4" stroke-width="1.5"/>
+    <text x="374" y="314" text-anchor="middle" font-size="10" fill="#a8714a">📁  Persistent volumes: <tspan font-weight="700" fill="#3D2B1F">postgres_data</tspan>  ·  <tspan font-weight="700" fill="#3D2B1F">uploads_data</tspan></text>
+    <text x="374" y="325" text-anchor="middle" font-size="9" fill="#a8714a">swap uploads_data for AWS S3 / Azure Blob / GCS via env var — no code change</text>
+
+    <!-- ── LEGEND ── -->
+    <rect x="28" y="360" width="560" height="80" rx="10" fill="white" stroke="#F0E4D4" stroke-width="1.5"/>
+    <text x="48" y="378" font-size="10" font-weight="800" fill="#a8714a">LEGEND</text>
+    <line x1="48"  y1="396" x2="78"  y2="396" stroke="#F97316" stroke-width="2" marker-end="url(#arr)"/>
+    <text x="86"   y="400" font-size="10" fill="#3D2B1F">HTTP / HTTPS</text>
+    <line x1="48"  y1="416" x2="78"  y2="416" stroke="#3b82f6" stroke-width="2" marker-end="url(#arr-blue)"/>
+    <text x="86"   y="420" font-size="10" fill="#3D2B1F">EF Core database</text>
+    <line x1="48"  y1="432" x2="78"  y2="432" stroke="#A855F7" stroke-width="2" marker-end="url(#arr-purple)"/>
+    <text x="86"   y="436" font-size="10" fill="#3D2B1F">FluentStorage (local disk)</text>
+    <line x1="220" y1="396" x2="250" y2="396" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr-amber)"/>
+    <text x="258"  y="400" font-size="10" fill="#3D2B1F">OAuth2 (external)</text>
+    <line x1="220" y1="416" x2="250" y2="416" stroke="#22C55E" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr-green)"/>
+    <text x="258"  y="420" font-size="10" fill="#3D2B1F">AI Image REST (Hugging Face)</text>
+    <line x1="220" y1="432" x2="250" y2="432" stroke="#F97316" stroke-width="1.5" stroke-dasharray="3,4" marker-end="url(#arr)"/>
+    <text x="258"  y="436" font-size="10" fill="#3D2B1F">Cloud storage swap (config only)</text>
+  </svg>
+  </div>
+  <div class="note">
+    🔒 <strong>nginx</strong> routes all <code>/api/*</code> calls to the API container and serves the Angular SPA for everything else. In production, add TLS in front of nginx. The <strong>uploads_data</strong> volume is mounted into the API at <code>/app/uploads</code> and served via <code>/api/images/url/{key}</code> — no separate storage sidecar needed.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     2. OBJECT STORAGE — FLUENTSTORAGE
+════════════════════════════════════════════════════════════ -->
+<h2>2. Object Storage — FluentStorage</h2>
+<div class="section">
+  <h3 style="margin-bottom:14px;">Single interface, provider chosen by connection string — zero code changes to switch clouds</h3>
+
+  <table class="storage-table">
+    <thead>
+      <tr>
+        <th>Environment</th>
+        <th>Provider</th>
+        <th>NuGet package</th>
+        <th><code>STORAGE_CONNECTION_STRING</code></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="rec">
+        <td><span class="tag" style="background:#22C55E;color:white;">Local / dev</span></td>
+        <td>Local disk<br><em style="font-size:10px;color:#6b7280;">no extra container</em></td>
+        <td><code>FluentStorage</code></td>
+        <td><code>disk://path=/app/uploads</code></td>
+      </tr>
+      <tr>
+        <td><span class="tag" style="background:#F97316;color:white;">AWS</span></td>
+        <td>Amazon S3</td>
+        <td><code>FluentStorage.AWS</code></td>
+        <td><code>aws.s3://keyId=...;key=...;bucket=tinyheroes;region=eu-central-1</code></td>
+      </tr>
+      <tr>
+        <td><span class="tag" style="background:#3b82f6;color:white;">Azure</span></td>
+        <td>Azure Blob Storage</td>
+        <td><code>FluentStorage.Azure.Blobs</code></td>
+        <td><code>azure.blob://account=...;key=...</code></td>
+      </tr>
+      <tr>
+        <td><span class="tag" style="background:#22C55E;color:white;">GCP</span></td>
+        <td>Google Cloud Storage</td>
+        <td><code>FluentStorage.GCP.CloudStorage</code></td>
+        <td><code>google.storage://bucket=tinyheroes;cred=&lt;base64&gt;</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="margin-top:16px;background:#fefce8;border-radius:10px;padding:13px 15px;border:1.5px solid #fde68a;font-size:11px;line-height:1.8;">
+    <strong style="color:#92400e;">Registration in Program.cs</strong>
+    <pre style="margin-top:8px;font-size:11px;color:#374151;background:#fffbeb;padding:10px;border-radius:8px;overflow-x:auto;">// Register all provider modules at startup (only used when the connection string matches)
+StorageFactory.Modules.UseAwsStorage();
+StorageFactory.Modules.UseAzureBlobStorage();
+StorageFactory.Modules.UseGoogleCloudStorage();
+
+// Inject as singleton — connection string from config
+builder.Services.AddSingleton&lt;IBlobStorage&gt;(_ =>
+    StorageFactory.Blobs.FromConnectionString(
+        builder.Configuration["Storage:ConnectionString"]!));</pre>
+    The <code>IBlobStorage</code> interface is injected into <code>ImageService</code>. No other layer knows which provider is active.
+  </div>
+
+  <div class="note" style="margin-top:12px;">
+    📦 <strong>Local development:</strong> docker-compose has <strong>3 containers</strong> (postgres, api, frontend) — no storage sidecar. The <code>uploads_data</code> Docker volume is mounted at <code>/app/uploads</code> and images are served via the API. Switching to any cloud provider is a one-line change to <code>STORAGE_CONNECTION_STRING</code> in <code>.env</code>.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     3. DEPLOYMENT — DOCKER COMPOSE (3 containers)
+════════════════════════════════════════════════════════════ -->
+<h2>3. Deployment — Docker Compose (3 containers)</h2>
+<div class="section">
+  <h3>Three containers — fully self-hosted, no vendor lock-in</h3>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px;">
+    <div style="border-radius:14px;padding:16px 14px;display:flex;flex-direction:column;align-items:center;gap:8px;background:#FFF3E8;border:2px solid #F97316;position:relative;">
+      <span style="position:absolute;top:8px;right:10px;font-size:10px;font-weight:700;background:rgba(0,0,0,0.08);border-radius:5px;padding:2px 5px;">:80</span>
+      <span style="font-size:30px;">🌐</span><span style="font-size:13px;font-weight:800;">frontend</span>
+      <span style="font-size:11px;color:#6b7280;text-align:center;">nginx<br>Angular 20 SPA<br>TailwindCSS</span>
+    </div>
+    <div style="border-radius:14px;padding:16px 14px;display:flex;flex-direction:column;align-items:center;gap:8px;background:#f0fdf4;border:2px solid #22C55E;position:relative;">
+      <span style="position:absolute;top:8px;right:10px;font-size:10px;font-weight:700;background:rgba(0,0,0,0.08);border-radius:5px;padding:2px 5px;">:8080</span>
+      <span style="font-size:30px;">⚙️</span><span style="font-size:13px;font-weight:800;">api</span>
+      <span style="font-size:11px;color:#6b7280;text-align:center;">ASP.NET Core 10<br>EF Core 10<br>FluentStorage</span>
+    </div>
+    <div style="border-radius:14px;padding:16px 14px;display:flex;flex-direction:column;align-items:center;gap:8px;background:#eff6ff;border:2px solid #3b82f6;position:relative;">
+      <span style="position:absolute;top:8px;right:10px;font-size:10px;font-weight:700;background:rgba(0,0,0,0.08);border-radius:5px;padding:2px 5px;">:5432</span>
+      <span style="font-size:30px;">🗄️</span><span style="font-size:13px;font-weight:800;">postgres</span>
+      <span style="font-size:11px;color:#6b7280;text-align:center;">PostgreSQL 16<br>persistent volume<br>health-checked</span>
+    </div>
+  </div>
+  <div class="note">One command to start: <code>docker compose up --build</code>. Switch any service to a cloud equivalent by env var only.</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     4. BACKEND ARCHITECTURE
+════════════════════════════════════════════════════════════ -->
+<h2>4. Backend Architecture — Clean Architecture (ASP.NET Core 10)</h2>
+<div class="section">
+  <h3>Dependencies point inward — Domain has ZERO external references</h3>
+
+  <div class="onion">
+    <div class="onion-ring onion-ring-4">
+      <div class="onion-label" style="color:#c2410c;">🌐 API Layer <span class="proj">TinyHeroes.Api</span></div>
+      <div class="chip-row">
+        <span class="chip chip-controller">AuthController</span>
+        <span class="chip chip-controller">FamiliesController</span>
+        <span class="chip chip-controller">ChildrenController</span>
+        <span class="chip chip-controller">DeedsController</span>
+        <span class="chip chip-controller">PresetsController</span>
+        <span class="chip chip-controller">RankingsController</span>
+        <span class="chip chip-controller">PrizesController</span>
+        <span class="chip chip-controller">ImagesController</span>
+        <span class="chip chip-controller">ProfileController</span>
+      </div>
+      <div class="onion-contents" style="margin-top:6px;">Middleware (ExceptionHandling) · Program.cs · DI wiring · Dockerfile</div>
+
+      <div class="dep-arrow">⬇ depends on ⬇</div>
+
+      <div class="onion-ring onion-ring-3">
+        <div class="onion-label" style="color:#92400e;">⚙️ Infrastructure Layer <span class="proj">TinyHeroes.Infrastructure</span></div>
+        <div class="chip-row">
+          <span class="chip chip-infra">AppDbContext</span>
+          <span class="chip chip-infra">EF Configurations</span>
+          <span class="chip chip-infra">EF Migrations</span>
+          <span class="chip chip-infra">Npgsql 10</span>
+          <span class="chip chip-infra">ASP.NET Identity</span>
+          <span class="chip chip-infra">JWT Bearer</span>
+          <span class="chip chip-infra">OAuth2 (Google/Apple/FB)</span>
+          <span class="chip chip-infra">FluentStorage</span>
+          <span class="chip chip-infra">Hugging Face HTTP</span>
+        </div>
+        <div class="onion-contents" style="margin-top:6px;">
+          Repositories: EfFamilyRepository · EfChildRepository · EfDeedRepository · EfDeedPresetRepository · EfWeekSummaryRepository · EfMonthSummaryRepository · EfPrizePresetRepository · EfFamilyInviteRepository<br>
+          Services: JwtTokenService · FluentImageStorage · HuggingFaceImageService · CurrentUserService
+        </div>
+
+        <div class="dep-arrow">⬇ depends on ⬇</div>
+
+        <div class="onion-ring onion-ring-2">
+          <div class="onion-label" style="color:#166534;">📋 Application Layer <span class="proj">TinyHeroes.Application</span></div>
+          <div class="chip-row">
+            <span class="chip chip-service">AuthService</span>
+            <span class="chip chip-service">FamilyService</span>
+            <span class="chip chip-service">ChildService</span>
+            <span class="chip chip-service">DeedService</span>
+            <span class="chip chip-service">DeedPresetService</span>
+            <span class="chip chip-service">RankingService</span>
+            <span class="chip chip-service">PrizePresetService</span>
+            <span class="chip chip-service">InviteService</span>
+            <span class="chip chip-service">ImageService</span>
+            <span class="chip chip-service">ProfileService</span>
+          </div>
+          <div class="onion-contents" style="margin-top:6px;">
+            Interfaces: ITokenService · IImageStorage · IAiImageService · ICurrentUserService<br>
+            DTOs: Auth/ · Family/ · Child/ · Deed/ · Preset/ · Ranking/ · Prize/ · Image/ · Profile/<br>
+            Exceptions: NotFoundException · ForbiddenException · ConflictException · ValidationException
+          </div>
+
+          <div class="dep-arrow">⬇ depends on ⬇</div>
+
+          <div class="onion-ring onion-ring-1">
+            <div class="onion-label" style="color:#1d4ed8;">🏛️ Domain Layer <span class="proj">TinyHeroes.Domain</span> — zero dependencies</div>
+            <div class="chip-row">
+              <span class="chip chip-data">User</span>
+              <span class="chip chip-data">Family</span>
+              <span class="chip chip-data">FamilyMember</span>
+              <span class="chip chip-data">Child</span>
+              <span class="chip chip-data">GoodDeed</span>
+              <span class="chip chip-data">DeedPreset</span>
+              <span class="chip chip-data">WeekSummary</span>
+              <span class="chip chip-data">MonthSummary</span>
+              <span class="chip chip-data">PrizePreset</span>
+              <span class="chip chip-data">FamilyInvite</span>
+            </div>
+            <div class="onion-contents" style="margin-top:6px;">
+              Enums: FamilyRole · Gender · ImageType · PrizeScope<br>
+              Repository Interfaces: IFamilyRepository · IChildRepository · IDeedRepository · IDeedPresetRepository · IWeekSummaryRepository · IMonthSummaryRepository · IPrizePresetRepository · IFamilyInviteRepository
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="margin-top:20px;">SOLID Principles — Backend</h3>
+  <table class="solid-table">
+    <thead><tr><th>Principle</th><th>Application</th></tr></thead>
+    <tbody>
+      <tr><td class="principle">S — Single Responsibility</td><td>Each service handles one aggregate. Each repository encapsulates queries for one entity. Controllers do HTTP plumbing only.</td></tr>
+      <tr><td class="principle">O — Open/Closed</td><td>New features = new services + repos + controllers. ExceptionHandlingMiddleware handles all typed exceptions via pattern matching.</td></tr>
+      <tr><td class="principle">L — Liskov Substitution</td><td>All repository implementations are interchangeable (EF Core today, Dapper tomorrow). <code>IImageStorage</code> → FluentImageStorage can be swapped.</td></tr>
+      <tr><td class="principle">I — Interface Segregation</td><td><code>IImageStorage</code> (store/get/delete) is separate from <code>IAiImageService</code> (generate). Repositories expose only what consumers need.</td></tr>
+      <tr><td class="principle">D — Dependency Inversion</td><td>Domain defines repository interfaces — Infrastructure implements. Application defines service interfaces — Infrastructure implements. Controllers depend on Application only.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note" style="margin-top:12px;">🏗️ <strong>Key decisions:</strong> Repository per aggregate (not generic <code>IRepository&lt;T&gt;</code>). No AutoMapper — manual mapping in services. DTOs live in Application. One <code>DependencyInjection.cs</code> per project for clean DI registration.</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     5. FRONTEND ARCHITECTURE (Angular 21)
+════════════════════════════════════════════════════════════ -->
+<h2>5. Frontend Architecture — Smart/Dumb Components (Angular 21)</h2>
+<div class="section">
+  <h3>Standalone by default · Signals state · Feature-scoped services · Lazy-loaded routes</h3>
+
+  <div class="fe-arch">
+    <!-- Left: Core + Shared -->
+    <div>
+      <div class="fe-section" style="background:#FFF3E8;border:1.5px solid #fcd9b0;margin-bottom:12px;">
+        <div class="fe-section-title" style="color:#c2410c;">🔧 Core (singleton, global)</div>
+        <div class="chip-row" style="flex-direction:column;gap:5px;">
+          <span class="chip chip-controller" style="text-align:center;">auth.service.ts — JWT state (signal), login/register/logout</span>
+          <span class="chip chip-controller" style="text-align:center;">auth.guard.ts — CanActivate → redirect to /login</span>
+          <span class="chip chip-controller" style="text-align:center;">auth.interceptor.ts — Attaches Bearer token</span>
+          <span class="chip chip-infra" style="text-align:center;">error.interceptor.ts — 401→logout, 5xx→toast</span>
+          <span class="chip chip-data" style="text-align:center;">models/ — user, family, child, deed, ranking, prize interfaces</span>
+        </div>
+      </div>
+      <div class="fe-section" style="background:#fdf4ff;border:1.5px solid #e9d5ff;">
+        <div class="fe-section-title" style="color:#7e22ce;">🧩 Shared (reusable presentational)</div>
+        <div class="chip-row" style="flex-direction:column;gap:5px;">
+          <span class="chip" style="background:#A855F7;color:white;text-align:center;">bottom-nav.component.ts</span>
+          <span class="chip" style="background:#A855F7;color:white;text-align:center;">emoji-picker.component.ts</span>
+          <span class="chip" style="background:#A855F7;color:white;text-align:center;">avatar.component.ts</span>
+          <span class="chip" style="background:#A855F7;color:white;text-align:center;">medal-badge.component.ts</span>
+          <span class="chip" style="background:#A855F7;color:white;text-align:center;">relative-time.pipe.ts</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Features -->
+    <div>
+      <div class="fe-section" style="background:#f0fdf4;border:1.5px solid #bbf7d0;">
+        <div class="fe-section-title" style="color:#166534;">📦 Features (lazy-loaded, each with pages/ · components/ · services/)</div>
+        <div class="fe-feature-list">
+          <div class="fe-feature-card">
+            <div class="ffc-name">🔐 Auth</div>
+            <div class="ffc-items"><strong>Pages:</strong> welcome · login · signup · callback · create-family<br><strong>Dumb:</strong> social-buttons · email-form</div>
+          </div>
+          <div class="fe-feature-card">
+            <div class="ffc-name">🏠 Dashboard</div>
+            <div class="ffc-items"><strong>Pages:</strong> home<br><strong>Dumb:</strong> week-strip · child-card · invite-coparent<br><strong>Service:</strong> dashboard.service</div>
+          </div>
+          <div class="fe-feature-card">
+            <div class="ffc-name">👦 Children</div>
+            <div class="ffc-items"><strong>Pages:</strong> add-child · child-profile<br><strong>Dumb:</strong> avatar-picker · deed-list-item<br><strong>Service:</strong> children.service</div>
+          </div>
+          <div class="fe-feature-card">
+            <div class="ffc-name">⭐ Deeds</div>
+            <div class="ffc-items"><strong>Pages:</strong> add-deed · manage-presets<br><strong>Dumb:</strong> preset-grid · image-picker · ai-generate<br><strong>Service:</strong> deeds.service</div>
+          </div>
+          <div class="fe-feature-card">
+            <div class="ffc-name">🏆 Rankings</div>
+            <div class="ffc-items"><strong>Pages:</strong> weekly-podium · monthly-champion · history<br><strong>Dumb:</strong> podium-step<br><strong>Service:</strong> rankings.service</div>
+          </div>
+          <div class="fe-feature-card">
+            <div class="ffc-name">🎁 Prizes</div>
+            <div class="ffc-items"><strong>Pages:</strong> prizes-board · prize-editor · custom-prizes<br><strong>Dumb:</strong> suggestion-chip<br><strong>Service:</strong> prizes.service</div>
+          </div>
+          <div class="fe-feature-card">
+            <div class="ffc-name">⚙️ Settings</div>
+            <div class="ffc-items"><strong>Pages:</strong> family-settings · my-profile<br><strong>Dumb:</strong> language-picker · notifications-toggle<br><strong>Service:</strong> settings.service</div>
+          </div>
+          <div class="fe-feature-card" style="border-color:#22C55E;">
+            <div class="ffc-name">🌍 i18n</div>
+            <div class="ffc-items">en · hu · de · fr · es<br>@ngx-translate/core</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="margin-top:20px;">Smart vs Dumb Component Pattern</h3>
+  <table class="solid-table">
+    <thead><tr><th>Type</th><th>Location</th><th>Responsibilities</th></tr></thead>
+    <tbody>
+      <tr><td class="principle">Smart (Pages)</td><td><code>features/*/pages/</code></td><td>Inject services · manage signal state · fetch data · pass data down via @Input · handle @Output events</td></tr>
+      <tr><td class="principle">Dumb (Components)</td><td><code>features/*/components/</code></td><td>Receive @Input() · emit @Output() · zero service injection · pure rendering</td></tr>
+      <tr><td class="principle">Feature Services</td><td><code>features/*/services/</code></td><td>HTTP calls · signal-based state · feature-scoped (not providedIn: 'root')</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="margin-top:16px;">SOLID Principles — Frontend</h3>
+  <table class="solid-table">
+    <thead><tr><th>Principle</th><th>Application</th></tr></thead>
+    <tbody>
+      <tr><td class="principle">S — Single Responsibility</td><td>Pages orchestrate. Components render. Services communicate with API + hold state. Never mixed.</td></tr>
+      <tr><td class="principle">O — Open/Closed</td><td>New features = new lazy-loaded route. Shared components extended via composition, not modification.</td></tr>
+      <tr><td class="principle">L — Liskov Substitution</td><td>Any component accepting a <code>Child</code> model works regardless of data source. Consistent model shapes.</td></tr>
+      <tr><td class="principle">I — Interface Segregation</td><td>Feature services expose only what their feature needs. Shared components have minimal input contracts.</td></tr>
+      <tr><td class="principle">D — Dependency Inversion</td><td>Pages depend on injected service abstractions. Components depend on @Input/@Output contracts only.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note" style="margin-top:12px;">📡 <strong>Angular 21:</strong> <code>standalone: true</code> is the default — not written in decorators. Signals (<code>signal()</code>, <code>computed()</code>) for all reactive state. No RxJS Subjects for component state (reserved for HTTP streams). Lazy-loaded feature routes via <code>loadChildren</code>.</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     6. DATA MODEL
+════════════════════════════════════════════════════════════ -->
+<h2>6. Data Model (PostgreSQL 16)</h2>
+<div class="section">
+
+  <h3 style="margin-bottom:12px;">Entity-Relationship Diagram</h3>
+  <div style="background:white;border-radius:12px;border:1.5px solid #F0E4D4;padding:16px 12px;overflow-x:auto;">
+    <div class="mermaid">
+erDiagram
+    User {
+        Guid id PK "Primary key, inherits from IdentityUser"
+        string displayName "Parent name shown in greetings and deed entries"
+        string email "Login email and notification address"
+        string passwordHash "Bcrypt hash; empty for social-only accounts"
+        string provider "OAuth provider: google apple facebook or null for email login"
+        string avatarValue "Emoji character or FluentStorage image key for avatar"
+        string preferredLanguage "BCP-47 locale code: en hu de fr es"
+        bool pushNotificationsEnabled "Whether the user receives push notifications"
+        bool weeklyEmailEnabled "Whether the user receives the weekly summary email"
+    }
+    Family {
+        Guid id PK "Unique family identifier"
+        string name "Display name shown in the top bar e.g. The Smith Family"
+        int weekStartDay "0=Sunday through 6=Saturday; defines start of each competition week"
+        Guid createdByUserId FK "The user who created and administers this family"
+        datetime createdAt "Timestamp when the family was first created"
+    }
+    FamilyMember {
+        Guid familyId FK "References the family; forms composite PK with userId"
+        Guid userId FK "References the user; forms composite PK with familyId"
+        string role "Permission level: Admin manages settings and prizes; CoParent adds deeds only"
+        string relation "Human label for the parent role e.g. Dad Mom Grandma Uncle"
+        datetime joinedAt "Timestamp when the user joined this family"
+    }
+    Child {
+        Guid id PK "Unique child identifier"
+        Guid familyId FK "The family this child belongs to"
+        string name "Child first name shown on cards and the podium"
+        int age "Age in years displayed on the child profile and dashboard cards"
+        string gender "Boy or Girl; used for avatar suggestions"
+        string avatarType "emoji for built-in avatars or photo for uploaded image"
+        string avatarValue "Emoji character or FluentStorage image key for the avatar"
+    }
+    GoodDeed {
+        Guid id PK "Unique deed identifier"
+        Guid childId FK "The child who performed this deed"
+        Guid addedByUserId FK "The parent who logged this deed"
+        string description "Short text describing the deed e.g. Did homework without reminders"
+        string imageType "Library for a preset icon or AI for an AI-generated image"
+        string imageKey "FluentStorage blob key; resolved to a URL via GET /api/images/url/{key}"
+        datetime createdAt "Timestamp used to group deeds by day and aggregate counts by week"
+    }
+    DeedPreset {
+        Guid id PK "Unique preset identifier"
+        Guid familyId FK "Owning family; null marks this as a built-in system preset"
+        string label "Preset name shown in the quick-pick grid e.g. Did homework"
+        string imageType "Icon type associated with this preset"
+        string imageValue "Icon identifier or image key shown on the preset tile"
+        bool enabled "Controls visibility in quick-pick; families toggle this for system presets"
+    }
+    WeekSummary {
+        Guid id PK "Unique week snapshot identifier"
+        Guid familyId FK "The family this weekly snapshot belongs to"
+        date weekStart "First day of the week per the family weekStartDay setting"
+        date weekEnd "Last day of the week; always weekStart plus 6 days"
+        json rankings "Immutable array: [{childId, deeds, rank, prizeLabel}] written at week close"
+        json prizesAwarded "Immutable map: {1: prizeText, 2: prizeText, 3: prizeText}"
+    }
+    MonthSummary {
+        Guid id PK "Unique month snapshot identifier"
+        Guid familyId FK "The family this monthly snapshot belongs to"
+        date month "DateOnly set to the 1st of the month"
+        Guid championChildId FK "The child with the most deeds across the full calendar month"
+        int totalDeeds "Champion total deed count across all weeks in the month"
+        string prizeAwarded "Monthly grand prize text awarded to the champion"
+    }
+    PrizePreset {
+        Guid id PK "Unique prize preset identifier"
+        Guid familyId FK "Owning family; null marks this as a built-in system suggestion"
+        string label "Prize description e.g. Pizza night or Extra screen time"
+        string emoji "Emoji displayed next to the prize label in all views"
+        string scope "Weekly or Monthly for active prizes; null for library and suggestion entries"
+        int rank "1 2 or 3 for active prizes; null for library entries and suggestions"
+        bool enabled "Controls whether this system suggestion appears in the Prize Editor"
+    }
+    FamilyInvite {
+        Guid id PK "Unique invite identifier"
+        Guid familyId FK "The family the invitee will join on accepting"
+        string email "Target email address; null for shareable-link-only invites"
+        string token "Unique URL-safe token embedded in the invite link"
+        datetime expiresAt "Invite becomes invalid after this timestamp"
+        bool accepted "Set to true once the token has been used to join the family"
+    }
+
+    User ||--o{ FamilyMember : "member of"
+    Family ||--o{ FamilyMember : "has"
+    User ||--o{ Family : "creates"
+    Family ||--o{ Child : "has"
+    Child ||--o{ GoodDeed : "receives"
+    User ||--o{ GoodDeed : "adds"
+    Family ||--o{ DeedPreset : "owns"
+    Family ||--o{ WeekSummary : "has"
+    Family ||--o{ MonthSummary : "has"
+    Child ||--o{ MonthSummary : "champions"
+    Family ||--o{ PrizePreset : "owns"
+    Family ||--o{ FamilyInvite : "generates"
+    </div>
+  </div>
+
+  <h3 style="margin-top:26px;margin-bottom:10px;">Relationships</h3>
+  <table class="storage-table">
+    <thead>
+      <tr><th>Entity A</th><th style="text-align:center;">Cardinality</th><th>Entity B</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>User</code></td><td style="text-align:center;font-family:monospace;">1 ──▶ N</td><td><code>FamilyMember</code></td><td>A user can be a member of multiple families (invited as co-parent)</td></tr>
+      <tr><td><code>Family</code></td><td style="text-align:center;font-family:monospace;">1 ──▶ N</td><td><code>FamilyMember</code></td><td>A family has 1+ members; composite PK <code>(familyId, userId)</code></td></tr>
+      <tr><td><code>User</code></td><td style="text-align:center;font-family:monospace;">1 ──▶ N</td><td><code>Family</code></td><td>Creator link — <code>Family.createdByUserId</code>; typically 1 family per user</td></tr>
+      <tr><td><code>Family</code></td><td style="text-align:center;font-family:monospace;">1 ──▶ N</td><td><code>Child</code></td><td>All children belong to exactly one family</td></tr>
+      <tr><td><code>Child</code></td><td style="text-align:center;font-family:monospace;">1 ──▶ N</td><td><code>GoodDeed</code></td><td>A child accumulates many deeds over time</td></tr>
+      <tr><td><code>User</code></td><td style="text-align:center;font-family:monospace;">1 ──▶ N</td><td><code>GoodDeed</code></td><td>Tracks which parent logged each deed (<code>addedByUserId</code>)</td></tr>
+      <tr><td><code>Family</code></td><td style="text-align:center;font-family:monospace;">1 ──▶ N</td><td><code>DeedPreset</code></td><td>Custom presets scoped to a family; system presets have <code>familyId = null</code></td></tr>
+      <tr><td><code>Family</code></td><td style="text-align:center;font-family:monospace;">1 ──▶ N</td><td><code>WeekSummary</code></td><td>One snapshot per completed week; written once, never mutated</td></tr>
+      <tr><td><code>Family</code></td><td style="text-align:center;font-family:monospace;">1 ──▶ N</td><td><code>MonthSummary</code></td><td>One snapshot per completed month per family</td></tr>
+      <tr><td><code>Child</code></td><td style="text-align:center;font-family:monospace;">1 ──▶ N</td><td><code>MonthSummary</code></td><td><code>championChildId</code> — the winning child for that month</td></tr>
+      <tr><td><code>Family</code></td><td style="text-align:center;font-family:monospace;">1 ──▶ N</td><td><code>PrizePreset</code></td><td>Unified prize table: system suggestions (familyId=null) + family library entries + active rank prizes — mirrors the DeedPreset pattern</td></tr>
+      <tr><td><code>Family</code></td><td style="text-align:center;font-family:monospace;">1 ──▶ N</td><td><code>FamilyInvite</code></td><td>Email or shareable-link invite tokens; expire on acceptance or timeout</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="margin-top:26px;margin-bottom:10px;">Entity Field Reference</h3>
+  <div class="entity-grid" style="grid-template-columns:repeat(auto-fill,minmax(210px,1fr));">
+    <div class="entity"><div class="entity-name">👤 User</div><div class="entity-field"><span class="pk">id</span> Guid PK<br>displayName string<br>email string<br>passwordHash string<br>provider string?<br>avatarValue string?<br>preferredLanguage string<br>pushNotificationsEnabled bool<br>weeklyEmailEnabled bool<br><em style="color:#6b7280">extends IdentityUser&lt;Guid&gt;</em></div></div>
+    <div class="entity"><div class="entity-name">👨‍👩‍👧 Family</div><div class="entity-field"><span class="pk">id</span> Guid PK<br>name string<br>weekStartDay DayOfWeek<br><span class="fk">createdByUserId</span> → User<br>createdAt datetime</div></div>
+    <div class="entity"><div class="entity-name">🤝 FamilyMember</div><div class="entity-field"><span class="fk">familyId</span> Guid PK,FK → Family<br><span class="fk">userId</span> Guid PK,FK → User<br>role FamilyRole (Admin|CoParent)<br>relation string? (Dad|Mom|Grandma…)<br>joinedAt datetime<br><em style="color:#6b7280">composite PK (familyId, userId)</em></div></div>
+    <div class="entity"><div class="entity-name">🧒 Child</div><div class="entity-field"><span class="pk">id</span> Guid PK<br><span class="fk">familyId</span> Guid FK → Family<br>name string<br>age int<br>gender Gender (Boy|Girl)<br>avatarType string<br>avatarValue string</div></div>
+    <div class="entity"><div class="entity-name">⭐ GoodDeed</div><div class="entity-field"><span class="pk">id</span> Guid PK<br><span class="fk">childId</span> Guid FK → Child<br><span class="fk">addedByUserId</span> Guid FK → User<br>description string<br>imageType ImageType (Library|AI)<br>imageKey string (storage key)<br>createdAt datetime</div></div>
+    <div class="entity"><div class="entity-name">📋 DeedPreset</div><div class="entity-field"><span class="pk">id</span> Guid PK<br><span class="fk">familyId</span> Guid? FK → Family<br>label string<br>imageType ImageType<br>imageValue string<br>enabled bool<br><em style="color:#6b7280">familyId null = system preset</em></div></div>
+    <div class="entity"><div class="entity-name">📅 WeekSummary</div><div class="entity-field"><span class="pk">id</span> Guid PK<br><span class="fk">familyId</span> Guid FK → Family<br>weekStart DateOnly<br>weekEnd DateOnly<br>rankings jsonb<br>prizesAwarded jsonb</div></div>
+    <div class="entity"><div class="entity-name">🏆 MonthSummary</div><div class="entity-field"><span class="pk">id</span> Guid PK<br><span class="fk">familyId</span> Guid FK → Family<br>month DateOnly (1st of month)<br><span class="fk">championChildId</span> Guid FK → Child<br>totalDeeds int<br>prizeAwarded string</div></div>
+    <div class="entity" style="background:#fefce8;border-color:#fde68a;"><div class="entity-name" style="color:#92400e;">🎁 PrizePreset</div><div class="entity-field"><span class="pk">id</span> Guid PK<br><span class="fk">familyId</span> Guid? FK → Family<br>label string<br>emoji string<br>scope PrizeScope? (Weekly|Monthly)<br>rank int? (1|2|3)<br>enabled bool<br><em style="color:#6b7280">familyId null = system suggestion<br>scope+rank null = library entry<br>scope+rank set = active prize</em></div></div>
+    <div class="entity" style="background:#f0fdf4;border-color:#bbf7d0;"><div class="entity-name" style="color:#166534;">✉️ FamilyInvite</div><div class="entity-field"><span class="pk">id</span> Guid PK<br><span class="fk">familyId</span> Guid FK → Family<br>email string? (null = link invite)<br>token string (unique)<br>expiresAt datetime<br>accepted bool</div></div>
+  </div>
+
+  <div class="note" style="margin-top:14px;">
+    💡 <strong>JSON columns:</strong> <code>WeekSummary.rankings</code> stores <code>[{childId, deeds, rank, prizeLabel}]</code> · <code>prizesAwarded</code> stores <code>{"1":"prize text","2":"...","3":"..."}</code>. Snapshots are written once when the week/month closes — never mutated.<br><br>
+    🔑 <strong>imageKey:</strong> <code>GoodDeed.imageKey</code> is a FluentStorage blob key (e.g. <code>deeds/2024/abc123.png</code>) — not a URL. Resolved to a served URL via <code>GET /api/images/url/{key}</code>.<br><br>
+    🏠 <strong>familyId = null pattern</strong> is used consistently for both <code>DeedPreset</code> and <code>PrizePreset</code>: null = built-in entry visible to all families; familyId set = owned by that family. For <code>PrizePreset</code> specifically: <code>scope + rank = null</code> → reusable library entry; <code>scope + rank set</code> → active configured prize for that slot. No redundant <code>isSystem</code> flag — <code>familyId</code> is the discriminator.<br><br>
+    👥 <strong>FamilyMember.relation</strong> is a free-text label set in My Profile (e.g. "Dad", "Mom", "Grandma") — distinct from <code>role</code> which is the permission level (Admin/CoParent).
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     7. AUTH FLOWS
+════════════════════════════════════════════════════════════ -->
+<h2>7. Authentication Flows</h2>
+<div class="section">
+  <h3 style="margin-bottom:12px;">Email / Password</h3>
+  <div class="flow-steps">
+    <div class="flow-step"><div class="fs-actor">Angular</div><div class="fs-action">POST /api/auth/register</div><div class="flow-note">name, email, password</div></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step"><div class="fs-actor">API</div><div class="fs-action">UserManager.CreateAsync</div><div class="flow-note">ASP.NET Identity</div></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step"><div class="fs-actor">API</div><div class="fs-action">TokenService.Generate</div><div class="flow-note">HS256 JWT, 60 min</div></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step"><div class="fs-actor">Angular</div><div class="fs-action">Store token</div><div class="flow-note">localStorage + signal</div></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step"><div class="fs-actor">Router</div><div class="fs-action">→ /family/create<br>or /home</div></div>
+  </div>
+  <h3 style="margin-top:20px;margin-bottom:12px;">Social Login (Google / Apple / Facebook)</h3>
+  <div class="flow-steps">
+    <div class="flow-step"><div class="fs-actor">Angular</div><div class="fs-action">Redirect to<br>/api/auth/social/google</div></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step"><div class="fs-actor">ASP.NET</div><div class="fs-action">OAuth2 challenge<br>→ provider</div></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step"><div class="fs-actor">Provider</div><div class="fs-action">User consents<br>→ callback</div></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step"><div class="fs-actor">API</div><div class="fs-action">Upsert user<br>Issue JWT</div></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step"><div class="fs-actor">Angular</div><div class="fs-action">/auth/callback<br>?token=...&hasFamily=...</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     8. API ROUTE MAP
+════════════════════════════════════════════════════════════ -->
+<h2>8. API Route Map</h2>
+<div class="section">
+  <div class="routes-grid">
+    <div class="route-box" style="background:#FFF3E8;border:1.5px solid #fcd9b0;"><div class="r-title" style="color:#c2410c;">Auth</div>POST /api/auth/register<br>POST /api/auth/login<br>GET  /api/auth/social/{provider}<br>GET  /api/auth/social/callback</div>
+    <div class="route-box" style="background:#f0fdf4;border:1.5px solid #bbf7d0;"><div class="r-title" style="color:#166534;">Family</div>POST /api/families<br>GET  /api/families/me<br>PUT  /api/families/{id}<br>POST /api/families/{id}/invite<br>GET  /api/families/join/{token}<br>DELETE /api/families/{id}</div>
+    <div class="route-box" style="background:#eff6ff;border:1.5px solid #bfdbfe;"><div class="r-title" style="color:#1d4ed8;">Children</div>GET  /api/children<br>POST /api/children<br>GET  /api/children/{id}<br>PUT  /api/children/{id}<br>DELETE /api/children/{id}</div>
+    <div class="route-box" style="background:#fdf4ff;border:1.5px solid #e9d5ff;"><div class="r-title" style="color:#7e22ce;">Good Deeds</div>GET  /api/deeds?childId=&amp;from=&amp;to=<br>POST /api/deeds<br>DELETE /api/deeds/{id}<br>GET  /api/deeds/presets<br>POST /api/deeds/presets<br>PUT  /api/deeds/presets/{id}<br>DELETE /api/deeds/presets/{id}</div>
+    <div class="route-box" style="background:#fefce8;border:1.5px solid #fde68a;"><div class="r-title" style="color:#92400e;">Rankings</div>GET  /api/rankings/weekly/current<br>GET  /api/rankings/weekly/{weekStart}<br>GET  /api/rankings/monthly/current<br>GET  /api/rankings/monthly/{month}<br>GET  /api/rankings/history</div>
+    <div class="route-box" style="background:#FFF3E8;border:1.5px solid #fcd9b0;"><div class="r-title" style="color:#c2410c;">Prizes</div>GET  /api/prizes<br>PUT  /api/prizes/{id}<br>GET  /api/prizes/custom<br>POST /api/prizes/custom<br>PUT  /api/prizes/custom/{id}<br>DELETE /api/prizes/custom/{id}<br>GET  /api/prizes/suggestions</div>
+    <div class="route-box" style="background:#f0fdf4;border:1.5px solid #bbf7d0;"><div class="r-title" style="color:#166534;">Images</div>GET  /api/images/library<br>POST /api/images/ai-generate<br>GET  /api/images/url/{key}</div>
+    <div class="route-box" style="background:#eff6ff;border:1.5px solid #bfdbfe;"><div class="r-title" style="color:#1d4ed8;">Profile</div>GET  /api/profile<br>PUT  /api/profile<br>PUT  /api/profile/password<br>PUT  /api/profile/language</div>
+  </div>
+</div>
+
+<p style="text-align:center;font-size:11px;color:#a8714a;margin-top:24px;">TinyHeroes Architecture · Angular 20 · ASP.NET Core 10 · EF Core 10 · PostgreSQL 16 · FluentStorage · 2026-05-16</p>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({
+  startOnLoad: true,
+  theme: 'base',
+  themeVariables: {
+    background: '#FFF8F0',
+    primaryColor: '#FFF3E8',
+    primaryTextColor: '#3D2B1F',
+    primaryBorderColor: '#F97316',
+    lineColor: '#a8714a',
+    attributeBackgroundColorEven: '#FFF8F0',
+    attributeBackgroundColorOdd: '#fffaf5',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    fontSize: '11px'
+  }
+});
+</script>
+</body>
+</html>

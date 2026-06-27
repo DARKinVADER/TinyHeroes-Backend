@@ -26,11 +26,11 @@ jobs:
         run: |
           # Added "|| true" to prevent API rate limits or auth errors from crashing the job
           STATUS=$(gh api repos/${{ github.repository }}/actions/runners \
-            --jq '.runners[] | select(.labels[].name == "m5-pro-local") | .status' 2>/dev/null | head -n 1 || true)
+            --jq '.runners[] | select(.labels[].name == "m5-TinyHeroes-Backend") | .status' 2>/dev/null | head -n 1 || true)
 
           if [ "$STATUS" = "online" ]; then
-            echo "Local runner is online. Routing to m5-pro-local."
-            echo 'labels=["self-hosted", "m5-pro-local"]' >> $GITHUB_OUTPUT
+            echo "Local runner is online. Routing to m5-TinyHeroes-Backend."
+            echo 'labels=["self-hosted", "m5-TinyHeroes-Backend"]' >> $GITHUB_OUTPUT
           else
             echo "Local runner is offline or check failed. Falling back to GitHub Cloud."
             echo 'labels=["ubuntu-latest"]' >> $GITHUB_OUTPUT

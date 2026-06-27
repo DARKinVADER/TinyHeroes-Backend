@@ -1,0 +1,182 @@
+<h2>Complete UI Design — Prize Eligibility Feature</h2>
+<p class="subtitle">Three screens involved. Scroll down to see the full flow.</p>
+
+<div class="section">
+  <h3>Screen 1 — Settings Hub (updated)</h3>
+  <p class="subtitle">New "Prize Rules" card added alongside existing cards</p>
+  <div style="max-width: 340px; margin: 0 auto; background: #f9fafb; border-radius: 16px; padding: 16px; font-family: sans-serif;">
+    <div style="font-size: 14px; font-weight: 700; color: #111; margin-bottom: 14px;">⚙️ Settings</div>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <div style="background: white; border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.07);">
+        <div style="font-size: 22px;">📨</div>
+        <div><div style="font-size: 13px; font-weight: 600; color: #111;">Invite co-parent</div><div style="font-size: 11px; color: #888;">Share family access</div></div>
+        <div style="margin-left: auto; color: #9ca3af; font-size: 14px;">›</div>
+      </div>
+      <div style="background: white; border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.07);">
+        <div style="font-size: 22px;">👤</div>
+        <div><div style="font-size: 13px; font-weight: 600; color: #111;">My profile</div><div style="font-size: 11px; color: #888;">Name, email</div></div>
+        <div style="margin-left: auto; color: #9ca3af; font-size: 14px;">›</div>
+      </div>
+      <div style="background: white; border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.07);">
+        <div style="font-size: 22px;">👨‍👩‍👧</div>
+        <div><div style="font-size: 13px; font-weight: 600; color: #111;">Family settings</div><div style="font-size: 11px; color: #888;">Name, week start day</div></div>
+        <div style="margin-left: auto; color: #9ca3af; font-size: 14px;">›</div>
+      </div>
+      <!-- NEW CARD -->
+      <div style="background: white; border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.07); border: 2px solid #f97316;">
+        <div style="font-size: 22px;">🎯</div>
+        <div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <div style="font-size: 13px; font-weight: 600; color: #111;">Prize rules</div>
+            <div style="background: #7c3aed; color: white; font-size: 9px; padding: 1px 6px; border-radius: 8px; font-weight: 600;">ADMIN</div>
+          </div>
+          <div style="font-size: 11px; color: #888;">Minimum deeds to qualify</div>
+        </div>
+        <div style="margin-left: auto; color: #9ca3af; font-size: 14px;">›</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 32px;">
+  <h3>Screen 2 — Prize Rules page (new)</h3>
+  <p class="subtitle">Admin-only. Set to 0 to disable the minimum.</p>
+  <div style="max-width: 340px; margin: 0 auto; background: white; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); padding: 16px; font-family: sans-serif;">
+    <!-- Nav bar -->
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 18px;">
+      <div style="font-size: 16px; color: #6b7280;">←</div>
+      <div style="font-size: 15px; font-weight: 700; color: #111;">🎯 Prize Rules</div>
+      <div style="margin-left: auto; background: #7c3aed; color: white; font-size: 9px; padding: 2px 8px; border-radius: 10px; font-weight: 700;">ADMIN</div>
+    </div>
+    <!-- Description -->
+    <div style="font-size: 11px; color: #6b7280; margin-bottom: 16px; line-height: 1.5;">Children must complete at least this many deeds to qualify for a prize. Set to <strong>0</strong> to let everyone qualify.</div>
+    <!-- Two rows -->
+    <div style="background: #f9fafb; border-radius: 12px; overflow: hidden; margin-bottom: 16px;">
+      <!-- Weekly row -->
+      <div style="padding: 14px 16px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <div style="font-size: 13px; font-weight: 600; color: #111; margin-bottom: 2px;">🏅 Weekly prize</div>
+          <div style="font-size: 11px; color: #888;">Per-week minimum</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 30px; height: 30px; border: 1.5px solid #d1d5db; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; color: #555; background: white;">−</div>
+          <div style="font-size: 20px; font-weight: 800; color: #7c3aed; min-width: 28px; text-align: center;">5</div>
+          <div style="width: 30px; height: 30px; border: 1.5px solid #d1d5db; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; color: #555; background: white;">+</div>
+        </div>
+      </div>
+      <!-- Monthly row -->
+      <div style="padding: 14px 16px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <div style="font-size: 13px; font-weight: 600; color: #111; margin-bottom: 2px;">🏆 Monthly prize</div>
+          <div style="font-size: 11px; color: #888;">Per-month minimum</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 30px; height: 30px; border: 1.5px solid #d1d5db; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; color: #555; background: white;">−</div>
+          <div style="font-size: 20px; font-weight: 800; color: #7c3aed; min-width: 28px; text-align: center;">20</div>
+          <div style="width: 30px; height: 30px; border: 1.5px solid #d1d5db; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; color: #555; background: white;">+</div>
+        </div>
+      </div>
+    </div>
+    <!-- Save button -->
+    <div style="background: linear-gradient(90deg, #7c3aed, #f97316); color: white; border-radius: 12px; padding: 13px; text-align: center; font-size: 13px; font-weight: 700;">Save changes</div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 32px;">
+  <h3>Screen 3 — Weekly Podium (updated)</h3>
+  <p class="subtitle">Alice qualifies (7 deeds ≥ 5 min). Bob & Charlie don't (under 5). Alice wins 🥇 prize. 🥈 and 🥉 are unclaimed.</p>
+  <div style="max-width: 340px; margin: 0 auto; border-radius: 16px; overflow: hidden; font-family: sans-serif; box-shadow: 0 2px 12px rgba(0,0,0,0.15);">
+    <!-- Header -->
+    <div style="background: linear-gradient(135deg, #7c3aed, #f97316); padding: 16px; text-align: center; color: white;">
+      <div style="font-size: 11px; font-weight: 600; opacity: 0.8; margin-bottom: 4px;">THIS WEEK</div>
+      <div style="font-size: 13px; font-weight: 700;">Mon 26 May – Sun 1 Jun</div>
+    </div>
+    <!-- Podium area -->
+    <div style="background: #1a1a2e; padding: 20px 16px 16px;">
+      <div style="display: flex; justify-content: center; align-items: flex-end; gap: 10px; margin-bottom: 16px;">
+        <!-- 2nd place — dimmed -->
+        <div style="text-align: center; opacity: 0.35;">
+          <div style="width: 40px; height: 40px; border-radius: 50%; background: #374151; margin: 0 auto 4px; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 2px dashed #4b5563;">😊</div>
+          <div style="font-size: 10px; color: #9ca3af; font-weight: 600;">Bob</div>
+          <div style="font-size: 9px; color: #6b7280;">3 deeds</div>
+          <div style="background: #374151; height: 40px; width: 50px; border-radius: 4px 4px 0 0; margin-top: 6px; display: flex; align-items: center; justify-content: center;">
+            <span style="font-size: 16px; filter: grayscale(1);">🥈</span>
+          </div>
+        </div>
+        <!-- 1st place — full color -->
+        <div style="text-align: center;">
+          <div style="width: 50px; height: 50px; border-radius: 50%; background: #fbbf24; margin: 0 auto 4px; display: flex; align-items: center; justify-content: center; font-size: 24px; border: 3px solid #f59e0b; box-shadow: 0 0 12px rgba(251,191,36,0.4);">🦸</div>
+          <div style="font-size: 11px; color: white; font-weight: 700;">Alice</div>
+          <div style="font-size: 9px; color: #fbbf24; font-weight: 600;">7 deeds ✓</div>
+          <div style="background: linear-gradient(180deg, #fbbf24, #d97706); height: 56px; width: 58px; border-radius: 4px 4px 0 0; margin-top: 6px; display: flex; align-items: center; justify-content: center;">
+            <span style="font-size: 22px;">🥇</span>
+          </div>
+        </div>
+        <!-- 3rd place — dimmed -->
+        <div style="text-align: center; opacity: 0.35;">
+          <div style="width: 36px; height: 36px; border-radius: 50%; background: #374151; margin: 0 auto 4px; display: flex; align-items: center; justify-content: center; font-size: 16px; border: 2px dashed #4b5563;">😄</div>
+          <div style="font-size: 10px; color: #9ca3af; font-weight: 600;">Charlie</div>
+          <div style="font-size: 9px; color: #6b7280;">2 deeds</div>
+          <div style="background: #374151; height: 32px; width: 44px; border-radius: 4px 4px 0 0; margin-top: 6px; display: flex; align-items: center; justify-content: center;">
+            <span style="font-size: 14px; filter: grayscale(1);">🥉</span>
+          </div>
+        </div>
+      </div>
+      <!-- Ineligibility banner -->
+      <div style="background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.35); border-radius: 10px; padding: 9px 12px; text-align: center; margin-bottom: 12px;">
+        <div style="font-size: 11px; color: #fca5a5; line-height: 1.5;">⚠️ <strong>Bob</strong> and <strong>Charlie</strong> need at least <strong>5 deeds</strong> to qualify for a prize this week.</div>
+      </div>
+      <!-- Prize display — Alice's prize shown, others locked -->
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <div style="background: rgba(251,191,36,0.15); border: 1px solid rgba(251,191,36,0.3); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 18px;">🥇</span>
+          <div style="flex: 1;">
+            <div style="font-size: 11px; color: white; font-weight: 600;">Alice — 1st place</div>
+            <div style="font-size: 11px; color: #fbbf24;">🍦 Ice cream</div>
+          </div>
+          <div style="font-size: 10px; color: #6ee7b7; font-weight: 600;">✓ Prize</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; opacity: 0.45;">
+          <span style="font-size: 18px; filter: grayscale(1);">🥈</span>
+          <div style="flex: 1;">
+            <div style="font-size: 11px; color: #9ca3af;">2nd place — no eligible child</div>
+          </div>
+          <div style="font-size: 10px; color: #6b7280;">🔒 Unclaimed</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; opacity: 0.45;">
+          <span style="font-size: 18px; filter: grayscale(1);">🥉</span>
+          <div style="flex: 1;">
+            <div style="font-size: 11px; color: #9ca3af;">3rd place — no eligible child</div>
+          </div>
+          <div style="font-size: 10px; color: #6b7280;">🔒 Unclaimed</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 32px; padding-bottom: 24px;">
+  <h3>Summary of decisions</h3>
+  <table style="width: 100%; border-collapse: collapse; font-family: sans-serif; font-size: 12px;">
+    <tr style="background: #f3f4f6;">
+      <td style="padding: 8px 12px; font-weight: 600; color: #374151; border-radius: 6px 0 0 0;">Setting location</td>
+      <td style="padding: 8px 12px; color: #111;">Dedicated "Prize Rules" card in Settings hub</td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 12px; font-weight: 600; color: #374151;">UI control</td>
+      <td style="padding: 8px 12px; color: #111;">+/− spinners, 0 = disabled</td>
+    </tr>
+    <tr style="background: #f3f4f6;">
+      <td style="padding: 8px 12px; font-weight: 600; color: #374151;">Ineligible on podium</td>
+      <td style="padding: 8px 12px; color: #111;">Dimmed, greyscale medals, red banner</td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 12px; font-weight: 600; color: #374151;">Prize slots</td>
+      <td style="padding: 8px 12px; color: #111;">Ranks compress — eligible child wins their prize, ineligible slots show "Unclaimed"</td>
+    </tr>
+    <tr style="background: #f3f4f6;">
+      <td style="padding: 8px 12px; font-weight: 600; color: #374151; border-radius: 0 0 0 6px;">Access</td>
+      <td style="padding: 8px 12px; color: #111; border-radius: 0 0 6px 0;">Admin-only to configure; all family members see the podium treatment</td>
+    </tr>
+  </table>
+</div>

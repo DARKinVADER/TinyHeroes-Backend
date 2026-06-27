@@ -1,0 +1,107 @@
+<style>
+  body { background: #FFF3E8; }
+  .screens-row { display: flex; gap: 24px; overflow-x: auto; padding: 8px 4px 16px; align-items: flex-start; justify-content: center; }
+  .phone { width: 295px; min-width: 295px; background: white; border-radius: 32px; box-shadow: 0 8px 32px rgba(0,0,0,0.13); overflow: hidden; border: 3px solid #e5d5c5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  .phone-bar { background: #3D2B1F; height: 28px; display: flex; align-items: center; justify-content: center; }
+  .phone-notch { width: 60px; height: 8px; background: rgba(255,255,255,0.15); border-radius: 4px; }
+  .phone-body { background: #FFF8F0; padding: 15px 15px 22px; }
+  .screen-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af; text-align: center; margin-bottom: 10px; }
+  .section-label { font-size: 11px; font-weight: 700; color: #a8714a; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 7px; margin-top: 14px; }
+  .suggestion-chip { background: white; border: 1.5px solid #e9d5c3; border-radius: 10px; padding: 7px 9px; display: flex; align-items: center; gap: 6px; cursor: pointer; flex-shrink: 0; }
+  .suggestion-chip.selected { background: #FFF3E8; border-color: #F97316; }
+  .suggestion-chip.custom { border-color: #d8b4fe; background: #fdf4ff; }
+</style>
+
+<h2>Prize Editor — Updated</h2>
+<p class="subtitle">Type a custom prize and optionally save it to your library for later reuse</p>
+
+<div class="screens-row">
+  <div>
+    <div class="screen-label">Prize Editor (updated)</div>
+    <div class="phone">
+      <div class="phone-bar"><div class="phone-notch"></div></div>
+      <div class="phone-body">
+
+        <!-- Header -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+          <span style="font-size:18px;color:#a8714a;">←</span>
+          <div>
+            <div style="font-size:16px;font-weight:800;color:#3D2B1F;">Edit Prize</div>
+            <div style="font-size:10px;color:#a8714a;">🥇 Weekly · 1st place</div>
+          </div>
+        </div>
+
+        <!-- Current prize preview -->
+        <div style="background:linear-gradient(135deg,#fffbeb,#fef3c7);border-radius:14px;padding:11px 13px;border:2px solid #fbbf24;display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+          <div style="font-size:30px;">🍿</div>
+          <div style="flex:1;">
+            <div style="font-size:10px;font-weight:700;color:#a8714a;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:2px;">Current prize</div>
+            <div style="font-size:13px;font-weight:800;color:#3D2B1F;">Movie night of their choice</div>
+          </div>
+        </div>
+
+        <!-- Custom input with save toggle -->
+        <div class="section-label" style="margin-top:0;">Write your own</div>
+        <div style="display:flex;gap:7px;margin-bottom:7px;">
+          <div style="background:#FFF3E8;border:1.5px solid #fcd9b0;border-radius:11px;padding:7px 9px;font-size:20px;cursor:pointer;flex-shrink:0;">🎁</div>
+          <input style="flex:1;background:white;border:2px solid #F97316;border-radius:11px;padding:9px 12px;font-size:13px;color:#3D2B1F;box-sizing:border-box;" value="Trampoline park visit" />
+        </div>
+
+        <!-- Save to library toggle -->
+        <div style="background:white;border-radius:11px;padding:9px 12px;border:1.5px solid #e9d5ff;display:flex;align-items:center;gap:9px;margin-bottom:14px;cursor:pointer;">
+          <div style="width:20px;height:20px;border-radius:5px;background:#a855f7;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <span style="color:white;font-size:13px;font-weight:800;">✓</span>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:12px;font-weight:700;color:#3D2B1F;">Save to my prizes library</div>
+            <div style="font-size:10px;color:#a8714a;margin-top:1px;">Reuse it anytime in future prize editing</div>
+          </div>
+          <div style="font-size:10px;color:#a855f7;font-weight:600;">⭐ Saved</div>
+        </div>
+
+        <!-- My custom prizes row -->
+        <div class="section-label" style="margin-top:0;display:flex;justify-content:space-between;align-items:center;">
+          <span>⭐ My prizes</span>
+          <span style="font-size:10px;color:#a855f7;font-weight:700;text-transform:none;letter-spacing:0;cursor:pointer;">Manage all →</span>
+        </div>
+        <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px;">
+          <div class="suggestion-chip custom"><span style="font-size:16px;">🎳</span><span style="font-size:11px;font-weight:600;color:#7e22ce;">Bowling</span></div>
+          <div class="suggestion-chip custom"><span style="font-size:16px;">🧇</span><span style="font-size:11px;font-weight:600;color:#7e22ce;">Pancakes</span></div>
+          <div class="suggestion-chip custom"><span style="font-size:16px;">🛴</span><span style="font-size:11px;font-weight:600;color:#7e22ce;">Scooter ride</span></div>
+          <div class="suggestion-chip custom" style="border-style:dashed;"><span style="font-size:14px;color:#a855f7;font-weight:700;">+</span><span style="font-size:11px;font-weight:600;color:#a855f7;">New</span></div>
+        </div>
+
+        <!-- Built-in suggestions -->
+        <div class="section-label" style="margin-top:0;">📋 Built-in suggestions</div>
+
+        <div style="font-size:10px;font-weight:700;color:#a8714a;margin-bottom:5px;">🍕 Food & Treats</div>
+        <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px;">
+          <div class="suggestion-chip"><span style="font-size:16px;">🍕</span><span style="font-size:11px;font-weight:600;color:#3D2B1F;">Pizza night</span></div>
+          <div class="suggestion-chip"><span style="font-size:16px;">🍦</span><span style="font-size:11px;font-weight:600;color:#3D2B1F;">Ice cream</span></div>
+          <div class="suggestion-chip"><span style="font-size:16px;">🧁</span><span style="font-size:11px;font-weight:600;color:#3D2B1F;">Cupcake</span></div>
+          <div class="suggestion-chip"><span style="font-size:16px;">🍰</span><span style="font-size:11px;font-weight:600;color:#3D2B1F;">Cake slice</span></div>
+        </div>
+
+        <div style="font-size:10px;font-weight:700;color:#a8714a;margin-bottom:5px;">🎬 Activities</div>
+        <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px;">
+          <div class="suggestion-chip selected"><span style="font-size:16px;">🍿</span><span style="font-size:11px;font-weight:700;color:#F97316;">Movie night</span></div>
+          <div class="suggestion-chip"><span style="font-size:16px;">🎮</span><span style="font-size:11px;font-weight:600;color:#3D2B1F;">Extra screen time</span></div>
+          <div class="suggestion-chip"><span style="font-size:16px;">🎲</span><span style="font-size:11px;font-weight:600;color:#3D2B1F;">Game night</span></div>
+        </div>
+
+        <div style="font-size:10px;font-weight:700;color:#a8714a;margin-bottom:5px;">🌙 Special treats</div>
+        <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:14px;">
+          <div class="suggestion-chip"><span style="font-size:16px;">🌙</span><span style="font-size:11px;font-weight:600;color:#3D2B1F;">Late bedtime</span></div>
+          <div class="suggestion-chip"><span style="font-size:16px;">🛁</span><span style="font-size:11px;font-weight:600;color:#3D2B1F;">Bubble bath</span></div>
+          <div class="suggestion-chip"><span style="font-size:16px;">📖</span><span style="font-size:11px;font-weight:600;color:#3D2B1F;">Story choice</span></div>
+          <div class="suggestion-chip"><span style="font-size:16px;">🧹</span><span style="font-size:11px;font-weight:600;color:#3D2B1F;">Skip a chore</span></div>
+        </div>
+
+        <button style="width:100%;box-sizing:border-box;background:linear-gradient(135deg,#F97316,#fb923c);color:white;border:none;border-radius:14px;padding:13px;font-size:14px;font-weight:700;">Save Prize</button>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="subtitle">Purple checkbox saves the typed prize to your library instantly. "My prizes" row at the top of suggestions, with "Manage all →" linking to the full custom prizes screen. All 18 screens done!</p>

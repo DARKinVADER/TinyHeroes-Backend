@@ -1,0 +1,174 @@
+<style>
+  body { background: #FFF3E8; }
+  .screens-row { display: flex; gap: 20px; overflow-x: auto; padding: 8px 4px 16px; align-items: flex-start; }
+  .phone { width: 280px; min-width: 280px; background: white; border-radius: 32px; box-shadow: 0 8px 32px rgba(0,0,0,0.13); overflow: hidden; border: 3px solid #e5d5c5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  .phone-bar { background: #3D2B1F; height: 28px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .phone-bar-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.3); }
+  .phone-notch { width: 60px; height: 8px; background: rgba(255,255,255,0.15); border-radius: 4px; }
+  .phone-body { padding: 20px 18px 24px; background: #FFF8F0; min-height: 520px; }
+  .screen-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af; text-align: center; margin-bottom: 10px; }
+
+  /* Shared components */
+  .app-logo { text-align: center; margin-bottom: 6px; }
+  .logo-icon { font-size: 44px; display: block; }
+  .logo-text { font-size: 22px; font-weight: 900; color: #F97316; letter-spacing: -0.5px; }
+  .logo-sub { font-size: 11px; color: #a8714a; }
+  .inp { width: 100%; box-sizing: border-box; background: white; border: 1.5px solid #e9d5c3; border-radius: 12px; padding: 9px 12px; font-size: 13px; color: #3D2B1F; margin-bottom: 8px; }
+  .inp::placeholder { color: #c4a882; }
+  .btn-primary { width: 100%; box-sizing: border-box; background: linear-gradient(135deg, #F97316, #fb923c); color: white; border: none; border-radius: 14px; padding: 11px; font-size: 14px; font-weight: 700; cursor: pointer; margin-bottom: 8px; }
+  .btn-social { width: 100%; box-sizing: border-box; background: white; border: 1.5px solid #e5d5c5; border-radius: 12px; padding: 9px 12px; font-size: 12px; font-weight: 600; cursor: pointer; margin-bottom: 7px; display: flex; align-items: center; gap: 8px; color: #3D2B1F; }
+  .or-divider { display: flex; align-items: center; gap: 8px; margin: 10px 0; }
+  .or-line { flex: 1; height: 1px; background: #e9d5c3; }
+  .or-text { font-size: 11px; color: #c4a882; font-weight: 600; }
+  .link-text { font-size: 11px; color: #F97316; text-align: center; font-weight: 600; margin-top: 6px; }
+  .field-label { font-size: 11px; font-weight: 700; color: #a8714a; margin-bottom: 3px; margin-top: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .section-title { font-size: 16px; font-weight: 800; color: #3D2B1F; margin-bottom: 4px; }
+  .section-sub { font-size: 12px; color: #a8714a; margin-bottom: 14px; }
+</style>
+
+<h2>Screens 1–4: Auth & Onboarding</h2>
+<p class="subtitle">Welcome · Sign Up · Log In · Create Family</p>
+
+<div class="screens-row">
+
+  <!-- SCREEN 1: WELCOME -->
+  <div>
+    <div class="screen-label">1 — Welcome</div>
+    <div class="phone">
+      <div class="phone-bar"><div class="phone-notch"></div></div>
+      <div class="phone-body" style="display:flex;flex-direction:column;justify-content:space-between;">
+        <div>
+          <div style="text-align:center;margin-top:12px;margin-bottom:18px;">
+            <div style="font-size:52px;margin-bottom:4px;">🌟</div>
+            <div style="font-size:26px;font-weight:900;color:#F97316;letter-spacing:-0.5px;">TinyHeroes</div>
+            <div style="font-size:12px;color:#a8714a;margin-top:3px;">Celebrate every good deed</div>
+          </div>
+          <div style="display:flex;justify-content:center;gap:8px;margin-bottom:20px;">
+            <div style="background:#FFF3E8;border-radius:16px;padding:12px 10px;text-align:center;flex:1;border:1.5px solid #fcd9b0;">
+              <div style="font-size:24px;margin-bottom:4px;">🏆</div>
+              <div style="font-size:10px;font-weight:700;color:#a8714a;">Weekly<br>Podium</div>
+            </div>
+            <div style="background:#f0fdf4;border-radius:16px;padding:12px 10px;text-align:center;flex:1;border:1.5px solid #bbf7d0;">
+              <div style="font-size:24px;margin-bottom:4px;">⭐</div>
+              <div style="font-size:10px;font-weight:700;color:#166534;">Track<br>Deeds</div>
+            </div>
+            <div style="background:#fdf4ff;border-radius:16px;padding:12px 10px;text-align:center;flex:1;border:1.5px solid #e9d5ff;">
+              <div style="font-size:24px;margin-bottom:4px;">🎁</div>
+              <div style="font-size:10px;font-weight:700;color:#7e22ce;">Win<br>Prizes</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <button class="btn-primary" style="font-size:15px;padding:13px;">Get Started ✨</button>
+          <div class="link-text">Already have an account? Log in</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: SIGN UP -->
+  <div>
+    <div class="screen-label">2 — Sign Up</div>
+    <div class="phone">
+      <div class="phone-bar"><div class="phone-notch"></div></div>
+      <div class="phone-body">
+        <div class="app-logo"><span class="logo-icon" style="font-size:28px;">🌟</span><span class="logo-text" style="font-size:16px;">TinyHeroes</span></div>
+        <div style="margin-top:10px;">
+          <div class="section-title">Create account</div>
+          <div class="section-sub">Join and start celebrating good deeds</div>
+        </div>
+        <button class="btn-social">
+          <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Continue with Google
+        </button>
+        <button class="btn-social">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#000"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.7 9.05 7.4c1.28.06 2.16.66 2.93.66.94 0 2.7-.82 4.55-.7 1.78.14 3.12.84 3.95 2.17-3.58 2.12-2.99 6.77.57 8.75zM12.03 7.3C11.8 4.95 13.84 3 16 2.85c.27 2.37-2.1 4.56-3.97 4.45z"/></svg>
+          Continue with Apple
+        </button>
+        <button class="btn-social">
+          <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          Continue with Facebook
+        </button>
+        <div class="or-divider"><div class="or-line"></div><div class="or-text">or</div><div class="or-line"></div></div>
+        <div class="field-label">Your name</div>
+        <input class="inp" placeholder="e.g. Sarah Johnson" />
+        <div class="field-label">Email</div>
+        <input class="inp" placeholder="sarah@email.com" />
+        <div class="field-label">Password</div>
+        <input class="inp" placeholder="At least 8 characters" type="password"/>
+        <button class="btn-primary" style="margin-top:4px;">Create Account</button>
+        <div class="link-text">Already have an account? Log in</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: LOG IN -->
+  <div>
+    <div class="screen-label">3 — Log In</div>
+    <div class="phone">
+      <div class="phone-bar"><div class="phone-notch"></div></div>
+      <div class="phone-body">
+        <div class="app-logo"><span class="logo-icon" style="font-size:28px;">🌟</span><span class="logo-text" style="font-size:16px;">TinyHeroes</span></div>
+        <div style="margin-top:10px;">
+          <div class="section-title">Welcome back! 👋</div>
+          <div class="section-sub">Log in to see your family's deeds</div>
+        </div>
+        <button class="btn-social">
+          <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Continue with Google
+        </button>
+        <button class="btn-social">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#000"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.7 9.05 7.4c1.28.06 2.16.66 2.93.66.94 0 2.7-.82 4.55-.7 1.78.14 3.12.84 3.95 2.17-3.58 2.12-2.99 6.77.57 8.75zM12.03 7.3C11.8 4.95 13.84 3 16 2.85c.27 2.37-2.1 4.56-3.97 4.45z"/></svg>
+          Continue with Apple
+        </button>
+        <button class="btn-social">
+          <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          Continue with Facebook
+        </button>
+        <div class="or-divider"><div class="or-line"></div><div class="or-text">or</div><div class="or-line"></div></div>
+        <div class="field-label">Email</div>
+        <input class="inp" placeholder="sarah@email.com" />
+        <div class="field-label">Password</div>
+        <input class="inp" placeholder="Your password" type="password"/>
+        <div style="text-align:right;margin-bottom:8px;"><span style="font-size:11px;color:#F97316;font-weight:600;">Forgot password?</span></div>
+        <button class="btn-primary">Log In</button>
+        <div class="link-text">Don't have an account? Sign up</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 4: CREATE FAMILY -->
+  <div>
+    <div class="screen-label">4 — Create Family</div>
+    <div class="phone">
+      <div class="phone-bar"><div class="phone-notch"></div></div>
+      <div class="phone-body">
+        <div style="text-align:center;margin-bottom:16px;margin-top:8px;">
+          <div style="font-size:44px;margin-bottom:6px;">🏡</div>
+          <div class="section-title">Set up your family</div>
+          <div class="section-sub">You can always change this later</div>
+        </div>
+        <div class="field-label">Family name</div>
+        <input class="inp" placeholder='e.g. "The Johnsons"'/>
+        <div class="field-label" style="margin-top:12px;">Week starts on</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+          <div style="background:#FFF3E8;border:2px solid #F97316;border-radius:10px;padding:6px 10px;font-size:12px;font-weight:700;color:#F97316;">Mon</div>
+          <div style="background:white;border:1.5px solid #e9d5c3;border-radius:10px;padding:6px 10px;font-size:12px;font-weight:600;color:#a8714a;">Tue</div>
+          <div style="background:white;border:1.5px solid #e9d5c3;border-radius:10px;padding:6px 10px;font-size:12px;font-weight:600;color:#a8714a;">Wed</div>
+          <div style="background:white;border:1.5px solid #e9d5c3;border-radius:10px;padding:6px 10px;font-size:12px;font-weight:600;color:#a8714a;">Thu</div>
+          <div style="background:white;border:1.5px solid #e9d5c3;border-radius:10px;padding:6px 10px;font-size:12px;font-weight:600;color:#a8714a;">Fri</div>
+          <div style="background:white;border:1.5px solid #e9d5c3;border-radius:10px;padding:6px 10px;font-size:12px;font-weight:600;color:#a8714a;">Sat</div>
+          <div style="background:white;border:1.5px solid #e9d5c3;border-radius:10px;padding:6px 10px;font-size:12px;font-weight:600;color:#a8714a;">Sun</div>
+        </div>
+        <div style="background:#FFF3E8;border-radius:12px;padding:12px;margin-bottom:16px;border:1.5px solid #fcd9b0;">
+          <div style="font-size:11px;font-weight:700;color:#a8714a;margin-bottom:4px;">💡 Good to know</div>
+          <div style="font-size:11px;color:#7c5a3e;">The weekly podium is shown at the end of each week. The monthly champion is declared on the last day of the month.</div>
+        </div>
+        <button class="btn-primary" style="font-size:15px;">Create My Family 🏡</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle">Next up: screens 5–6 — Home Dashboard & Invite Co-Parent. Ready?</p>

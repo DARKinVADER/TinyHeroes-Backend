@@ -1,0 +1,120 @@
+<style>
+  body { background: #FFF3E8; }
+  .screens-row { display: flex; gap: 24px; overflow-x: auto; padding: 8px 4px 16px; align-items: flex-start; justify-content: center; }
+  .phone { width: 295px; min-width: 295px; background: white; border-radius: 32px; box-shadow: 0 8px 32px rgba(0,0,0,0.13); overflow: hidden; border: 3px solid #e5d5c5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  .phone-bar { background: #3D2B1F; height: 28px; display: flex; align-items: center; justify-content: center; }
+  .phone-notch { width: 60px; height: 8px; background: rgba(255,255,255,0.15); border-radius: 4px; }
+  .phone-body { background: #FFF8F0; padding: 15px 15px 22px; }
+  .screen-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af; text-align: center; margin-bottom: 10px; }
+  .section-label { font-size: 11px; font-weight: 700; color: #a8714a; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 7px; margin-top: 14px; }
+  .list-card { background: white; border-radius: 14px; border: 1.5px solid #f0e4d4; overflow: hidden; }
+  .list-row { padding: 11px 13px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #fef0e4; }
+  .list-row:last-child { border-bottom: none; }
+</style>
+
+<h2>My Custom Prizes</h2>
+<p class="subtitle">Accessible from Prizes Board and Prize Editor</p>
+
+<div class="screens-row">
+  <div>
+    <div class="screen-label">My Custom Prizes</div>
+    <div class="phone">
+      <div class="phone-bar"><div class="phone-notch"></div></div>
+      <div class="phone-body">
+
+        <!-- Header -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+          <span style="font-size:18px;color:#a8714a;">←</span>
+          <span style="font-size:16px;font-weight:800;color:#3D2B1F;">My Custom Prizes</span>
+        </div>
+
+        <!-- Add new -->
+        <button style="width:100%;box-sizing:border-box;background:linear-gradient(135deg,#F97316,#fb923c);color:white;border:none;border-radius:14px;padding:12px;font-size:13px;font-weight:700;margin-bottom:16px;">+ Add new custom prize</button>
+
+        <!-- Inline add form (shown when button tapped) -->
+        <div style="background:white;border-radius:14px;border:2px solid #F97316;padding:12px 13px;margin-bottom:16px;">
+          <div style="font-size:11px;font-weight:700;color:#a8714a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">New prize</div>
+          <div style="display:flex;gap:7px;margin-bottom:8px;">
+            <div style="background:#FFF3E8;border:1.5px solid #fcd9b0;border-radius:11px;padding:8px 10px;font-size:22px;cursor:pointer;flex-shrink:0;">🎁</div>
+            <input style="flex:1;background:#f9f9f9;border:1.5px solid #e9d5c3;border-radius:11px;padding:9px 12px;font-size:13px;color:#3D2B1F;box-sizing:border-box;" placeholder="e.g. Trampoline park visit" />
+          </div>
+          <div style="display:flex;gap:7px;">
+            <button style="flex:1;background:linear-gradient(135deg,#F97316,#fb923c);color:white;border:none;border-radius:11px;padding:9px;font-size:13px;font-weight:700;">Save</button>
+            <button style="flex:1;background:white;border:1.5px solid #e9d5c3;color:#a8714a;border-radius:11px;padding:9px;font-size:13px;font-weight:600;">Cancel</button>
+          </div>
+        </div>
+
+        <!-- Existing custom prizes -->
+        <div class="section-label" style="margin-top:0;">⭐ Your prizes</div>
+        <div class="list-card" style="margin-bottom:16px;">
+          <div class="list-row">
+            <div style="width:38px;height:38px;border-radius:11px;background:#FFF3E8;border:1.5px solid #fcd9b0;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🎳</div>
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:700;color:#3D2B1F;">Bowling afternoon</div>
+            </div>
+            <div style="font-size:14px;color:#a8714a;margin-right:6px;cursor:pointer;">✏️</div>
+            <div style="font-size:14px;color:#ef4444;cursor:pointer;">🗑️</div>
+          </div>
+          <div class="list-row">
+            <div style="width:38px;height:38px;border-radius:11px;background:#FFF3E8;border:1.5px solid #fcd9b0;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🧇</div>
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:700;color:#3D2B1F;">Pancake breakfast</div>
+            </div>
+            <div style="font-size:14px;color:#a8714a;margin-right:6px;cursor:pointer;">✏️</div>
+            <div style="font-size:14px;color:#ef4444;cursor:pointer;">🗑️</div>
+          </div>
+          <div class="list-row">
+            <div style="width:38px;height:38px;border-radius:11px;background:#FFF3E8;border:1.5px solid #fcd9b0;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🛴</div>
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:700;color:#3D2B1F;">Scooter ride in the park</div>
+            </div>
+            <div style="font-size:14px;color:#a8714a;margin-right:6px;cursor:pointer;">✏️</div>
+            <div style="font-size:14px;color:#ef4444;cursor:pointer;">🗑️</div>
+          </div>
+          <div class="list-row">
+            <div style="width:38px;height:38px;border-radius:11px;background:#FFF3E8;border:1.5px solid #fcd9b0;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🎠</div>
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:700;color:#3D2B1F;">Merry-go-round outing</div>
+            </div>
+            <div style="font-size:14px;color:#a8714a;margin-right:6px;cursor:pointer;">✏️</div>
+            <div style="font-size:14px;color:#ef4444;cursor:pointer;">🗑️</div>
+          </div>
+        </div>
+
+        <!-- Built-in suggestions (read-only reference) -->
+        <div class="section-label" style="margin-top:0;">📋 Built-in suggestions</div>
+        <div style="font-size:11px;color:#a8714a;margin-bottom:8px;">These are always available in the Prize Editor — you can't remove them.</div>
+        <div class="list-card" style="opacity:0.75;">
+          <div class="list-row">
+            <div style="font-size:22px;flex-shrink:0;">🍕</div>
+            <div style="flex:1;font-size:12px;font-weight:600;color:#3D2B1F;">Pizza night</div>
+            <div style="font-size:10px;color:#a8714a;">Built-in</div>
+          </div>
+          <div class="list-row">
+            <div style="font-size:22px;flex-shrink:0;">🍦</div>
+            <div style="flex:1;font-size:12px;font-weight:600;color:#3D2B1F;">Ice cream</div>
+            <div style="font-size:10px;color:#a8714a;">Built-in</div>
+          </div>
+          <div class="list-row">
+            <div style="font-size:22px;flex-shrink:0;">🎮</div>
+            <div style="flex:1;font-size:12px;font-weight:600;color:#3D2B1F;">Extra screen time</div>
+            <div style="font-size:10px;color:#a8714a;">Built-in</div>
+          </div>
+          <div class="list-row">
+            <div style="font-size:22px;flex-shrink:0;">🌙</div>
+            <div style="flex:1;font-size:12px;font-weight:600;color:#3D2B1F;">Late bedtime</div>
+            <div style="font-size:10px;color:#a8714a;">Built-in</div>
+          </div>
+          <div class="list-row">
+            <div style="font-size:22px;flex-shrink:0;">🎡</div>
+            <div style="flex:1;font-size:12px;font-weight:600;color:#3D2B1F;">Amusement park</div>
+            <div style="font-size:10px;color:#a8714a;">Built-in</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="subtitle">Reachable from Prizes Board and from the Prize Editor via a "Manage my prizes" link. Custom prizes appear in the Editor alongside built-in suggestions. Happy with this?</p>

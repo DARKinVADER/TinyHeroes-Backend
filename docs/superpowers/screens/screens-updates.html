@@ -1,0 +1,319 @@
+<style>
+  body { background: #FFF3E8; }
+  .screens-row { display: flex; gap: 20px; overflow-x: auto; padding: 8px 4px 16px; align-items: flex-start; }
+  .phone { width: 290px; min-width: 290px; background: white; border-radius: 32px; box-shadow: 0 8px 32px rgba(0,0,0,0.13); overflow: hidden; border: 3px solid #e5d5c5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  .phone-bar { background: #3D2B1F; height: 28px; display: flex; align-items: center; justify-content: center; }
+  .phone-notch { width: 60px; height: 8px; background: rgba(255,255,255,0.15); border-radius: 4px; }
+  .phone-body { background: #FFF8F0; padding: 15px 14px 20px; }
+  .screen-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af; text-align: center; margin-bottom: 10px; }
+  .section-label { font-size: 11px; font-weight: 700; color: #a8714a; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 7px; margin-top: 13px; }
+  .bottom-nav { display: flex; background: white; border-top: 1px solid #f0e4d4; padding: 8px 0 10px; }
+  .nav-item { flex: 1; text-align: center; font-size: 9px; color: #c4a882; font-weight: 600; }
+  .nav-item.active { color: #F97316; }
+  .nav-icon { font-size: 18px; display: block; margin-bottom: 1px; }
+  .prize-suggestion { background: white; border: 1.5px solid #e9d5c3; border-radius: 10px; padding: 6px 9px; display: flex; align-items: center; gap: 6px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+  .prize-suggestion:hover { border-color: #F97316; }
+</style>
+
+<h2>Updated Screens: Prizes, History & Language</h2>
+<p class="subtitle">Prizes Board (with presets) · History (with prizes) · Profile (+ Hungarian)</p>
+
+<div class="screens-row">
+
+  <!-- SCREEN 13 UPDATED: PRIZES BOARD WITH PRESETS -->
+  <div>
+    <div class="screen-label">13 — Prizes Board (updated)</div>
+    <div class="phone">
+      <div class="phone-bar"><div class="phone-notch"></div></div>
+      <div class="phone-body">
+
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:13px;">
+          <span style="font-size:18px;color:#a8714a;">←</span>
+          <span style="font-size:16px;font-weight:800;color:#3D2B1F;">Prizes Board</span>
+          <div style="margin-left:auto;font-size:10px;color:#a8714a;">Admin only 🔒</div>
+        </div>
+
+        <!-- Weekly section -->
+        <div class="section-label" style="margin-top:0;">🏆 Weekly prizes</div>
+
+        <!-- 1st place with presets -->
+        <div style="background:linear-gradient(135deg,#fffbeb,#fef3c7);border-radius:14px;padding:11px 12px;border:1.5px solid #fbbf24;margin-bottom:8px;">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px;">
+            <span style="font-size:18px;">🥇</span>
+            <span style="font-size:12px;font-weight:800;color:#3D2B1F;">1st place</span>
+            <div style="margin-left:auto;background:#fbbf24;color:white;border-radius:7px;padding:2px 8px;font-size:10px;font-weight:700;">✏️ Edit</div>
+          </div>
+          <!-- Current prize -->
+          <div style="background:white;border-radius:9px;padding:7px 10px;font-size:12px;font-weight:600;color:#3D2B1F;border:1.5px solid #fcd34d;margin-bottom:7px;">🍿 Movie night of their choice</div>
+          <!-- Suggestions row -->
+          <div style="font-size:9px;font-weight:700;color:#a8714a;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px;">Quick suggestions</div>
+          <div style="display:flex;gap:5px;overflow-x:auto;padding-bottom:3px;">
+            <div class="prize-suggestion"><span style="font-size:14px;">🍕</span><span style="font-size:10px;font-weight:600;color:#3D2B1F;">Pizza night</span></div>
+            <div class="prize-suggestion"><span style="font-size:14px;">🎮</span><span style="font-size:10px;font-weight:600;color:#3D2B1F;">Extra screen time</span></div>
+            <div class="prize-suggestion"><span style="font-size:14px;">🎡</span><span style="font-size:10px;font-weight:600;color:#3D2B1F;">Fun outing</span></div>
+            <div class="prize-suggestion"><span style="font-size:14px;">🎁</span><span style="font-size:10px;font-weight:600;color:#3D2B1F;">Small gift</span></div>
+          </div>
+          <!-- Custom -->
+          <div style="margin-top:6px;display:flex;gap:6px;">
+            <input style="flex:1;background:white;border:1.5px dashed #fbbf24;border-radius:9px;padding:6px 10px;font-size:11px;color:#3D2B1F;" placeholder="Or type your own prize…"/>
+            <button style="background:#fbbf24;color:white;border:none;border-radius:9px;padding:6px 10px;font-size:11px;font-weight:700;">Set</button>
+          </div>
+        </div>
+
+        <!-- 2nd & 3rd compact with suggestions -->
+        <div style="background:white;border-radius:14px;padding:11px 12px;border:1.5px solid #f0e4d4;margin-bottom:8px;">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px;">
+            <span style="font-size:18px;">🥈</span>
+            <span style="font-size:12px;font-weight:800;color:#3D2B1F;">2nd place</span>
+            <div style="margin-left:auto;background:#f0e4d4;color:#a8714a;border-radius:7px;padding:2px 8px;font-size:10px;font-weight:700;">✏️ Edit</div>
+          </div>
+          <div style="background:#f8fafc;border-radius:9px;padding:7px 10px;font-size:12px;font-weight:600;color:#3D2B1F;border:1.5px solid #e9d5c3;margin-bottom:6px;">🍦 Pick any dessert after dinner</div>
+          <div style="display:flex;gap:5px;overflow-x:auto;padding-bottom:3px;">
+            <div class="prize-suggestion"><span style="font-size:14px;">🍦</span><span style="font-size:10px;font-weight:600;color:#3D2B1F;">Ice cream</span></div>
+            <div class="prize-suggestion"><span style="font-size:14px;">🧁</span><span style="font-size:10px;font-weight:600;color:#3D2B1F;">Cupcake</span></div>
+            <div class="prize-suggestion"><span style="font-size:14px;">📚</span><span style="font-size:10px;font-weight:600;color:#3D2B1F;">Bookstore trip</span></div>
+            <div class="prize-suggestion"><span style="font-size:14px;">🖊️</span><span style="font-size:10px;font-weight:600;color:#3D2B1F;">Custom…</span></div>
+          </div>
+        </div>
+
+        <div style="background:white;border-radius:14px;padding:11px 12px;border:1.5px solid #f0e4d4;margin-bottom:13px;">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px;">
+            <span style="font-size:18px;">🥉</span>
+            <span style="font-size:12px;font-weight:800;color:#3D2B1F;">3rd place</span>
+            <div style="margin-left:auto;background:#f0e4d4;color:#a8714a;border-radius:7px;padding:2px 8px;font-size:10px;font-weight:700;">✏️ Edit</div>
+          </div>
+          <div style="background:#f8fafc;border-radius:9px;padding:7px 10px;font-size:12px;font-weight:600;color:#3D2B1F;border:1.5px solid #e9d5c3;margin-bottom:6px;">📖 Choose bedtime story</div>
+          <div style="display:flex;gap:5px;overflow-x:auto;padding-bottom:3px;">
+            <div class="prize-suggestion"><span style="font-size:14px;">📖</span><span style="font-size:10px;font-weight:600;color:#3D2B1F;">Story choice</span></div>
+            <div class="prize-suggestion"><span style="font-size:14px;">🛁</span><span style="font-size:10px;font-weight:600;color:#3D2B1F;">Bubble bath</span></div>
+            <div class="prize-suggestion"><span style="font-size:14px;">🌙</span><span style="font-size:10px;font-weight:600;color:#3D2B1F;">Late bedtime</span></div>
+            <div class="prize-suggestion"><span style="font-size:14px;">🖊️</span><span style="font-size:10px;font-weight:600;color:#3D2B1F;">Custom…</span></div>
+          </div>
+        </div>
+
+        <!-- Monthly prize -->
+        <div class="section-label" style="margin-top:0;">🎡 Monthly grand prize</div>
+        <div style="background:linear-gradient(135deg,#fdf4ff,#ede9fe);border-radius:14px;padding:11px 12px;border:2px solid #a855f7;">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px;">
+            <span style="font-size:18px;">🏅</span>
+            <span style="font-size:12px;font-weight:800;color:#3D2B1F;">Only the best wins</span>
+            <div style="margin-left:auto;background:#a855f7;color:white;border-radius:7px;padding:2px 8px;font-size:10px;font-weight:700;">✏️ Edit</div>
+          </div>
+          <div style="background:white;border-radius:9px;padding:7px 10px;font-size:12px;font-weight:600;color:#3D2B1F;border:1.5px solid #d8b4fe;margin-bottom:6px;">🎡 Trip to the amusement park!</div>
+          <div style="display:flex;gap:5px;overflow-x:auto;padding-bottom:3px;">
+            <div class="prize-suggestion" style="border-color:#d8b4fe;"><span style="font-size:14px;">🎡</span><span style="font-size:10px;font-weight:600;color:#7e22ce;">Amusement park</span></div>
+            <div class="prize-suggestion" style="border-color:#d8b4fe;"><span style="font-size:14px;">🏖️</span><span style="font-size:10px;font-weight:600;color:#7e22ce;">Beach trip</span></div>
+            <div class="prize-suggestion" style="border-color:#d8b4fe;"><span style="font-size:14px;">🎭</span><span style="font-size:10px;font-weight:600;color:#7e22ce;">Theatre show</span></div>
+            <div class="prize-suggestion" style="border-color:#d8b4fe;"><span style="font-size:14px;">🖊️</span><span style="font-size:10px;font-weight:600;color:#7e22ce;">Custom…</span></div>
+          </div>
+        </div>
+
+      </div>
+      <div class="bottom-nav">
+        <div class="nav-item"><span class="nav-icon">🏠</span>Home</div>
+        <div class="nav-item"><span class="nav-icon">🏆</span>Podium</div>
+        <div class="nav-item active"><span class="nav-icon">🎁</span>Prizes</div>
+        <div class="nav-item"><span class="nav-icon">⚙️</span>Settings</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 12 UPDATED: HISTORY WITH PRIZES -->
+  <div>
+    <div class="screen-label">12 — History (updated)</div>
+    <div class="phone">
+      <div class="phone-bar"><div class="phone-notch"></div></div>
+      <div style="background:#FFF8F0;padding:15px 14px 0;">
+
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+          <span style="font-size:18px;color:#a8714a;">←</span>
+          <span style="font-size:16px;font-weight:800;color:#3D2B1F;">History</span>
+          <div style="margin-left:auto;display:flex;background:white;border-radius:10px;border:1.5px solid #f0e4d4;overflow:hidden;">
+            <div style="padding:5px 11px;font-size:11px;font-weight:700;background:#F97316;color:white;">Weekly</div>
+            <div style="padding:5px 11px;font-size:11px;font-weight:600;color:#a8714a;">Monthly</div>
+          </div>
+        </div>
+
+        <!-- May 2025 -->
+        <div style="font-size:11px;font-weight:700;color:#a8714a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">May 2025</div>
+
+        <!-- Week 3 expanded with prizes -->
+        <div style="background:white;border-radius:14px;padding:11px 12px;margin-bottom:8px;border:1.5px solid #fcd9b0;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;">
+            <div>
+              <div style="font-size:12px;font-weight:800;color:#3D2B1F;">Week 3 · May 12–18</div>
+            </div>
+            <div style="background:#dcfce7;color:#166534;border-radius:7px;padding:2px 8px;font-size:10px;font-weight:700;">🏁 Done</div>
+          </div>
+
+          <!-- 1st with prize -->
+          <div style="background:#fffbeb;border-radius:11px;padding:8px 10px;margin-bottom:5px;border:1.5px solid #fcd34d;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="font-size:15px;">🥇</div>
+              <div style="font-size:16px;">👧</div>
+              <div style="flex:1;">
+                <div style="font-size:12px;font-weight:800;color:#3D2B1F;">Emma</div>
+              </div>
+              <div style="font-size:13px;font-weight:900;color:#F97316;">14 ⭐</div>
+            </div>
+            <!-- Prize won -->
+            <div style="display:flex;align-items:center;gap:5px;margin-top:6px;background:white;border-radius:8px;padding:5px 8px;border:1px solid #fcd34d;">
+              <span style="font-size:13px;">🎁</span>
+              <span style="font-size:10px;font-weight:700;color:#a8714a;">Prize won:</span>
+              <span style="font-size:11px;font-weight:700;color:#3D2B1F;">🍿 Movie night</span>
+            </div>
+          </div>
+
+          <!-- 2nd with prize -->
+          <div style="background:#f8fafc;border-radius:11px;padding:8px 10px;margin-bottom:5px;border:1.5px solid #e9d5c3;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="font-size:15px;">🥈</div>
+              <div style="font-size:16px;">👦</div>
+              <div style="flex:1;">
+                <div style="font-size:12px;font-weight:800;color:#3D2B1F;">Luca</div>
+              </div>
+              <div style="font-size:13px;font-weight:900;color:#64748b;">10 ⭐</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:5px;margin-top:6px;background:white;border-radius:8px;padding:5px 8px;border:1px solid #e9d5c3;">
+              <span style="font-size:13px;">🎁</span>
+              <span style="font-size:10px;font-weight:700;color:#a8714a;">Prize won:</span>
+              <span style="font-size:11px;font-weight:700;color:#3D2B1F;">🍦 Ice cream</span>
+            </div>
+          </div>
+
+          <!-- 3rd with prize -->
+          <div style="background:#f8fafc;border-radius:11px;padding:8px 10px;border:1.5px solid #e9d5c3;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="font-size:15px;">🥉</div>
+              <div style="font-size:16px;">👧</div>
+              <div style="flex:1;">
+                <div style="font-size:12px;font-weight:800;color:#3D2B1F;">Mia</div>
+              </div>
+              <div style="font-size:13px;font-weight:900;color:#64748b;">7 ⭐</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:5px;margin-top:6px;background:white;border-radius:8px;padding:5px 8px;border:1px solid #e9d5c3;">
+              <span style="font-size:13px;">🎁</span>
+              <span style="font-size:10px;font-weight:700;color:#a8714a;">Prize won:</span>
+              <span style="font-size:11px;font-weight:700;color:#3D2B1F;">📖 Bedtime story choice</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Week 2 collapsed -->
+        <div style="background:white;border-radius:14px;padding:11px 12px;margin-bottom:8px;border:1.5px solid #f0e4d4;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-size:12px;font-weight:800;color:#3D2B1F;">Week 2 · May 5–11</div>
+              <div style="display:flex;align-items:center;gap:5px;margin-top:4px;">
+                <span style="font-size:13px;">🥇</span><span style="font-size:11px;font-weight:700;color:#22c55e;">Luca</span>
+                <span style="font-size:10px;color:#a8714a;">13 ⭐</span>
+                <span style="font-size:13px;">🍦</span>
+              </div>
+            </div>
+            <div style="font-size:18px;color:#a8714a;">›</div>
+          </div>
+        </div>
+
+        <!-- April collapsed with monthly prize note -->
+        <div style="font-size:11px;font-weight:700;color:#a8714a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:7px;">April 2025</div>
+        <div style="background:white;border-radius:14px;padding:11px 12px;margin-bottom:8px;border:1.5px solid #f0e4d4;display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <div style="font-size:12px;font-weight:800;color:#3D2B1F;">4 weeks · Monthly champion</div>
+            <div style="display:flex;align-items:center;gap:5px;margin-top:4px;">
+              <span style="font-size:13px;">🏆</span><span style="font-size:11px;font-weight:700;color:#F97316;">Emma</span>
+              <span style="font-size:10px;color:#a8714a;">won</span>
+              <span style="font-size:13px;">🎡</span><span style="font-size:10px;color:#a8714a;">Amusement park</span>
+            </div>
+          </div>
+          <div style="font-size:18px;color:#a8714a;">›</div>
+        </div>
+
+      </div>
+      <div class="bottom-nav">
+        <div class="nav-item"><span class="nav-icon">🏠</span>Home</div>
+        <div class="nav-item active"><span class="nav-icon">🏆</span>Podium</div>
+        <div class="nav-item"><span class="nav-icon">🎁</span>Prizes</div>
+        <div class="nav-item"><span class="nav-icon">⚙️</span>Settings</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 15 UPDATED: PROFILE WITH HUNGARIAN -->
+  <div>
+    <div class="screen-label">15 — My Profile (language updated)</div>
+    <div class="phone">
+      <div class="phone-bar"><div class="phone-notch"></div></div>
+      <div class="phone-body">
+
+        <div style="text-align:center;margin-bottom:14px;">
+          <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#F97316,#fb923c);display:inline-flex;align-items:center;justify-content:center;color:white;font-size:26px;font-weight:700;border:3px solid #fcd9b0;margin-bottom:7px;">S</div>
+          <div style="font-size:15px;font-weight:800;color:#3D2B1F;">Sarah Johnson</div>
+          <div style="font-size:11px;color:#a8714a;">Admin · The Johnsons</div>
+        </div>
+
+        <div style="font-size:11px;font-weight:700;color:#a8714a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:7px;">Account</div>
+        <div style="background:white;border-radius:14px;border:1.5px solid #f0e4d4;overflow:hidden;margin-bottom:12px;">
+          <div style="padding:10px 12px;display:flex;align-items:center;gap:9px;border-bottom:1px solid #fef0e4;">
+            <div style="font-size:15px;">👤</div>
+            <div style="flex:1;"><div style="font-size:10px;color:#a8714a;">Name</div><div style="font-size:12px;font-weight:700;color:#3D2B1F;">Sarah Johnson</div></div>
+            <div style="font-size:11px;color:#F97316;font-weight:600;">Edit</div>
+          </div>
+          <div style="padding:10px 12px;display:flex;align-items:center;gap:9px;border-bottom:1px solid #fef0e4;">
+            <div style="font-size:15px;">📧</div>
+            <div style="flex:1;"><div style="font-size:10px;color:#a8714a;">Email</div><div style="font-size:12px;font-weight:700;color:#3D2B1F;">sarah@email.com</div></div>
+            <div style="font-size:11px;color:#F97316;font-weight:600;">Edit</div>
+          </div>
+          <div style="padding:10px 12px;display:flex;align-items:center;gap:9px;">
+            <div style="font-size:15px;">🔒</div>
+            <div style="flex:1;"><div style="font-size:10px;color:#a8714a;">Password</div><div style="font-size:12px;font-weight:700;color:#3D2B1F;">••••••••</div></div>
+            <div style="font-size:11px;color:#F97316;font-weight:600;">Change</div>
+          </div>
+        </div>
+
+        <div style="font-size:11px;font-weight:700;color:#a8714a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:7px;">Language</div>
+        <div style="background:white;border-radius:14px;border:1.5px solid #f0e4d4;overflow:hidden;margin-bottom:12px;">
+          <div style="padding:9px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #fef0e4;">
+            <span style="font-size:12px;font-weight:700;color:#3D2B1F;">🇬🇧 English</span><span style="color:#F97316;font-size:14px;">✓</span>
+          </div>
+          <div style="padding:9px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #fef0e4;">
+            <span style="font-size:12px;color:#3D2B1F;">🇭🇺 Magyar</span><span style="font-size:10px;color:#a8714a;">Hungarian</span>
+          </div>
+          <div style="padding:9px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #fef0e4;">
+            <span style="font-size:12px;color:#3D2B1F;">🇩🇪 Deutsch</span><span style="font-size:10px;color:#a8714a;">German</span>
+          </div>
+          <div style="padding:9px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #fef0e4;">
+            <span style="font-size:12px;color:#3D2B1F;">🇫🇷 Français</span><span style="font-size:10px;color:#a8714a;">French</span>
+          </div>
+          <div style="padding:9px 12px;display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:12px;color:#3D2B1F;">🇪🇸 Español</span><span style="font-size:10px;color:#a8714a;">Spanish</span>
+          </div>
+        </div>
+
+        <div style="font-size:11px;font-weight:700;color:#a8714a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:7px;">Notifications</div>
+        <div style="background:white;border-radius:14px;border:1.5px solid #f0e4d4;overflow:hidden;margin-bottom:14px;">
+          <div style="padding:10px 12px;display:flex;align-items:center;gap:9px;border-bottom:1px solid #fef0e4;">
+            <div style="font-size:15px;">🔔</div>
+            <div style="flex:1;"><div style="font-size:12px;font-weight:700;color:#3D2B1F;">Push notifications</div><div style="font-size:10px;color:#a8714a;">Weekly summary & reminders</div></div>
+            <div style="width:36px;height:20px;background:#F97316;border-radius:10px;position:relative;flex-shrink:0;"><div style="width:16px;height:16px;background:white;border-radius:50%;position:absolute;right:2px;top:2px;"></div></div>
+          </div>
+          <div style="padding:10px 12px;display:flex;align-items:center;gap:9px;">
+            <div style="font-size:15px;">📊</div>
+            <div style="flex:1;"><div style="font-size:12px;font-weight:700;color:#3D2B1F;">Weekly email report</div><div style="font-size:10px;color:#a8714a;">Sent every Sunday</div></div>
+            <div style="width:36px;height:20px;background:#e5e7eb;border-radius:10px;position:relative;flex-shrink:0;"><div style="width:16px;height:16px;background:white;border-radius:50%;position:absolute;left:2px;top:2px;"></div></div>
+          </div>
+        </div>
+
+        <button style="width:100%;box-sizing:border-box;background:white;border:1.5px solid #e9d5c3;color:#ef4444;border-radius:14px;padding:11px;font-size:13px;font-weight:700;">Sign Out</button>
+      </div>
+      <div class="bottom-nav">
+        <div class="nav-item"><span class="nav-icon">🏠</span>Home</div>
+        <div class="nav-item"><span class="nav-icon">🏆</span>Podium</div>
+        <div class="nav-item"><span class="nav-icon">🎁</span>Prizes</div>
+        <div class="nav-item active"><span class="nav-icon">⚙️</span>Settings</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle">All screens complete and updated. Happy with everything? I'll write up the full design document.</p>

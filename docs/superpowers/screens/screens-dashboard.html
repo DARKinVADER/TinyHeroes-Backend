@@ -1,0 +1,221 @@
+<style>
+  body { background: #FFF3E8; }
+  .screens-row { display: flex; gap: 20px; overflow-x: auto; padding: 8px 4px 16px; align-items: flex-start; }
+  .phone { width: 290px; min-width: 290px; background: white; border-radius: 32px; box-shadow: 0 8px 32px rgba(0,0,0,0.13); overflow: hidden; border: 3px solid #e5d5c5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  .phone-bar { background: #3D2B1F; height: 28px; display: flex; align-items: center; justify-content: center; }
+  .phone-notch { width: 60px; height: 8px; background: rgba(255,255,255,0.15); border-radius: 4px; }
+  .phone-body { background: #FFF8F0; }
+  .screen-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af; text-align: center; margin-bottom: 10px; }
+  .bottom-nav { display: flex; background: white; border-top: 1px solid #f0e4d4; padding: 8px 0 10px; }
+  .nav-item { flex: 1; text-align: center; font-size: 9px; color: #c4a882; font-weight: 600; }
+  .nav-item.active { color: #F97316; }
+  .nav-icon { font-size: 18px; display: block; margin-bottom: 1px; }
+  .field-label { font-size: 11px; font-weight: 700; color: #a8714a; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .btn-primary { width: 100%; box-sizing: border-box; background: linear-gradient(135deg, #F97316, #fb923c); color: white; border: none; border-radius: 14px; padding: 11px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .btn-outline { width: 100%; box-sizing: border-box; background: white; border: 2px solid #F97316; color: #F97316; border-radius: 14px; padding: 10px; font-size: 13px; font-weight: 700; cursor: pointer; }
+</style>
+
+<h2>Screens 5–6: Dashboard & Invite</h2>
+<p class="subtitle">Home Dashboard (daily view) · Invite Co-Parent</p>
+
+<div class="screens-row">
+
+  <!-- SCREEN 5: HOME DASHBOARD -->
+  <div>
+    <div class="screen-label">5 — Home Dashboard</div>
+    <div class="phone">
+      <div class="phone-bar"><div class="phone-notch"></div></div>
+      <div class="phone-body">
+
+        <!-- Header -->
+        <div style="padding:16px 16px 0;display:flex;justify-content:space-between;align-items:flex-start;">
+          <div>
+            <div style="font-size:12px;color:#a8714a;font-weight:600;">Good morning, Sarah 👋</div>
+            <div style="font-size:18px;font-weight:900;color:#3D2B1F;line-height:1.2;">The Johnsons</div>
+          </div>
+          <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#F97316,#fb923c);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;font-weight:700;">S</div>
+        </div>
+
+        <!-- Week strip -->
+        <div style="padding:10px 16px;">
+          <div style="background:white;border-radius:14px;padding:10px 12px;border:1.5px solid #f0e4d4;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <div style="font-size:11px;font-weight:700;color:#a8714a;">Week 3 · May 2025</div>
+              <div style="font-size:10px;color:#F97316;font-weight:700;">3 days left ⏳</div>
+            </div>
+            <div style="display:flex;gap:4px;">
+              <div style="flex:1;text-align:center;">
+                <div style="width:100%;background:#f0e4d4;border-radius:6px;padding:5px 0;font-size:10px;font-weight:700;color:#a8714a;">M</div>
+                <div style="font-size:9px;color:#22c55e;margin-top:2px;">✓</div>
+              </div>
+              <div style="flex:1;text-align:center;">
+                <div style="width:100%;background:#f0e4d4;border-radius:6px;padding:5px 0;font-size:10px;font-weight:700;color:#a8714a;">T</div>
+                <div style="font-size:9px;color:#22c55e;margin-top:2px;">✓</div>
+              </div>
+              <div style="flex:1;text-align:center;">
+                <div style="width:100%;background:#f0e4d4;border-radius:6px;padding:5px 0;font-size:10px;font-weight:700;color:#a8714a;">W</div>
+                <div style="font-size:9px;color:#22c55e;margin-top:2px;">✓</div>
+              </div>
+              <div style="flex:1;text-align:center;">
+                <div style="width:100%;background:#f0e4d4;border-radius:6px;padding:5px 0;font-size:10px;font-weight:700;color:#a8714a;">T</div>
+                <div style="font-size:9px;color:#22c55e;margin-top:2px;">✓</div>
+              </div>
+              <div style="flex:1;text-align:center;">
+                <div style="width:100%;background:linear-gradient(135deg,#F97316,#fb923c);border-radius:6px;padding:5px 0;font-size:10px;font-weight:800;color:white;">F</div>
+                <div style="font-size:9px;color:#F97316;margin-top:2px;">●</div>
+              </div>
+              <div style="flex:1;text-align:center;">
+                <div style="width:100%;background:white;border:1.5px dashed #e9d5c3;border-radius:6px;padding:5px 0;font-size:10px;font-weight:700;color:#d1b89a;">S</div>
+                <div style="font-size:9px;margin-top:2px;"> </div>
+              </div>
+              <div style="flex:1;text-align:center;">
+                <div style="width:100%;background:white;border:1.5px dashed #e9d5c3;border-radius:6px;padding:5px 0;font-size:10px;font-weight:700;color:#d1b89a;">S</div>
+                <div style="font-size:9px;margin-top:2px;"> </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Children cards -->
+        <div style="padding:0 16px 12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <div style="font-size:13px;font-weight:800;color:#3D2B1F;">Your heroes 🦸</div>
+            <div style="font-size:11px;color:#F97316;font-weight:600;">+ Add child</div>
+          </div>
+
+          <!-- Child 1 - Emma (leading) -->
+          <div style="background:white;border-radius:16px;padding:12px;margin-bottom:8px;border:1.5px solid #fcd9b0;display:flex;align-items:center;gap:10px;">
+            <div style="position:relative;">
+              <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#f9a8d4,#ec4899);display:flex;align-items:center;justify-content:center;font-size:24px;border:2px solid #fcd9b0;">👧</div>
+              <div style="position:absolute;bottom:-2px;right:-2px;background:#fbbf24;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:9px;border:2px solid white;">🥇</div>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:14px;font-weight:800;color:#3D2B1F;">Emma</div>
+              <div style="font-size:11px;color:#a8714a;">Age 8 · 5 deeds today</div>
+              <div style="background:#f0e4d4;height:6px;border-radius:6px;margin-top:4px;overflow:hidden;">
+                <div style="background:linear-gradient(90deg,#F97316,#fb923c);width:82%;height:100%;border-radius:6px;"></div>
+              </div>
+            </div>
+            <div style="text-align:center;">
+              <div style="font-size:24px;font-weight:900;color:#F97316;">14</div>
+              <div style="font-size:9px;color:#a8714a;font-weight:600;">this week</div>
+            </div>
+            <div style="width:28px;height:28px;background:linear-gradient(135deg,#F97316,#fb923c);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:16px;font-weight:700;">+</div>
+          </div>
+
+          <!-- Child 2 - Luca -->
+          <div style="background:white;border-radius:16px;padding:12px;margin-bottom:8px;border:1.5px solid #d1fae5;display:flex;align-items:center;gap:10px;">
+            <div style="position:relative;">
+              <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#86efac,#22c55e);display:flex;align-items:center;justify-content:center;font-size:24px;border:2px solid #bbf7d0;">👦</div>
+              <div style="position:absolute;bottom:-2px;right:-2px;background:#d1d5db;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:9px;border:2px solid white;">🥈</div>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:14px;font-weight:800;color:#3D2B1F;">Luca</div>
+              <div style="font-size:11px;color:#a8714a;">Age 6 · 2 deeds today</div>
+              <div style="background:#f0e4d4;height:6px;border-radius:6px;margin-top:4px;overflow:hidden;">
+                <div style="background:linear-gradient(90deg,#22c55e,#4ade80);width:58%;height:100%;border-radius:6px;"></div>
+              </div>
+            </div>
+            <div style="text-align:center;">
+              <div style="font-size:24px;font-weight:900;color:#22c55e;">10</div>
+              <div style="font-size:9px;color:#a8714a;font-weight:600;">this week</div>
+            </div>
+            <div style="width:28px;height:28px;background:linear-gradient(135deg,#22c55e,#4ade80);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:16px;font-weight:700;">+</div>
+          </div>
+
+          <!-- Child 3 - Mia -->
+          <div style="background:white;border-radius:16px;padding:12px;border:1.5px solid #e9d5ff;display:flex;align-items:center;gap:10px;">
+            <div style="position:relative;">
+              <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#c4b5fd,#a855f7);display:flex;align-items:center;justify-content:center;font-size:24px;border:2px solid #e9d5ff;">👧</div>
+              <div style="position:absolute;bottom:-2px;right:-2px;background:#cd7c2e;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:9px;border:2px solid white;">🥉</div>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:14px;font-weight:800;color:#3D2B1F;">Mia</div>
+              <div style="font-size:11px;color:#a8714a;">Age 4 · 1 deed today</div>
+              <div style="background:#f0e4d4;height:6px;border-radius:6px;margin-top:4px;overflow:hidden;">
+                <div style="background:linear-gradient(90deg,#a855f7,#c084fc);width:40%;height:100%;border-radius:6px;"></div>
+              </div>
+            </div>
+            <div style="text-align:center;">
+              <div style="font-size:24px;font-weight:900;color:#a855f7;">7</div>
+              <div style="font-size:9px;color:#a8714a;font-weight:600;">this week</div>
+            </div>
+            <div style="width:28px;height:28px;background:linear-gradient(135deg,#a855f7,#c084fc);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:16px;font-weight:700;">+</div>
+          </div>
+        </div>
+
+        <!-- Bottom Nav -->
+        <div class="bottom-nav">
+          <div class="nav-item active"><span class="nav-icon">🏠</span>Home</div>
+          <div class="nav-item"><span class="nav-icon">🏆</span>Podium</div>
+          <div class="nav-item"><span class="nav-icon">🎁</span>Prizes</div>
+          <div class="nav-item"><span class="nav-icon">⚙️</span>Settings</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 6: INVITE CO-PARENT -->
+  <div>
+    <div class="screen-label">6 — Invite Co-Parent</div>
+    <div class="phone">
+      <div class="phone-bar"><div class="phone-notch"></div></div>
+      <div class="phone-body" style="padding:20px 18px 24px;min-height:540px;display:flex;flex-direction:column;justify-content:space-between;">
+        <div>
+          <!-- Header -->
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px;">
+            <div style="font-size:18px;">←</div>
+            <div style="font-size:16px;font-weight:800;color:#3D2B1F;">Invite Co-Parent</div>
+          </div>
+
+          <div style="text-align:center;margin-bottom:20px;">
+            <div style="font-size:48px;margin-bottom:8px;">👨‍👩‍👧‍👦</div>
+            <div style="font-size:15px;font-weight:800;color:#3D2B1F;">The Johnsons</div>
+            <div style="font-size:12px;color:#a8714a;margin-top:4px;">Invite your partner to manage<br>your children's good deeds together</div>
+          </div>
+
+          <!-- Current members -->
+          <div style="margin-bottom:16px;">
+            <div style="font-size:11px;font-weight:700;color:#a8714a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Current members</div>
+            <div style="background:white;border-radius:14px;padding:10px 12px;border:1.5px solid #f0e4d4;display:flex;align-items:center;gap:10px;">
+              <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#F97316,#fb923c);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;font-weight:700;">S</div>
+              <div>
+                <div style="font-size:13px;font-weight:700;color:#3D2B1F;">Sarah Johnson</div>
+                <div style="font-size:11px;color:#a8714a;">sarah@email.com · Admin</div>
+              </div>
+              <div style="margin-left:auto;font-size:10px;background:#dcfce7;color:#166534;padding:3px 8px;border-radius:20px;font-weight:700;">You</div>
+            </div>
+          </div>
+
+          <!-- Invite via email -->
+          <div style="margin-bottom:12px;">
+            <div style="font-size:11px;font-weight:700;color:#a8714a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Invite by email</div>
+            <div style="display:flex;gap:6px;">
+              <input style="flex:1;background:white;border:1.5px solid #e9d5c3;border-radius:12px;padding:9px 12px;font-size:12px;color:#3D2B1F;" placeholder="partner@email.com"/>
+              <button style="background:linear-gradient(135deg,#F97316,#fb923c);color:white;border:none;border-radius:12px;padding:9px 14px;font-size:12px;font-weight:700;white-space:nowrap;">Send</button>
+            </div>
+          </div>
+
+          <!-- OR copy link -->
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+            <div style="flex:1;height:1px;background:#e9d5c3;"></div>
+            <div style="font-size:11px;color:#c4a882;font-weight:600;">or share link</div>
+            <div style="flex:1;height:1px;background:#e9d5c3;"></div>
+          </div>
+
+          <div style="background:white;border-radius:14px;padding:10px 12px;border:1.5px dashed #F97316;display:flex;align-items:center;gap:8px;">
+            <div style="font-size:11px;color:#a8714a;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">tinyheroes.app/join/abc123</div>
+            <button style="background:linear-gradient(135deg,#F97316,#fb923c);color:white;border:none;border-radius:8px;padding:5px 12px;font-size:11px;font-weight:700;">Copy</button>
+          </div>
+        </div>
+
+        <div style="background:#FFF3E8;border-radius:12px;padding:10px 12px;border:1.5px solid #fcd9b0;margin-top:16px;">
+          <div style="font-size:11px;color:#7c5a3e;">💡 Co-parents can add deeds and view the podium, but only admins can manage prizes and settings.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle">Next: screens 7–9 — Add Child, Child Profile, Add Good Deed. Continue?</p>

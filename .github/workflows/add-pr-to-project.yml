@@ -6,7 +6,7 @@ on:
 
 jobs:
   add-to-project:
-    runs-on: [self-hosted, m5-pro-local]
+    runs-on: [self-hosted, m5-TinyHeroes-Backend]
     steps:
       - uses: actions/add-to-project@v1.0.2
         with:

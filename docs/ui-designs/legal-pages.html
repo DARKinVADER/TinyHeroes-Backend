@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UI Design — Privacy Policy & Terms of Service</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'brand-orange': '#F97316',
+            'brand-green':  '#22C55E',
+            'brand-purple': '#A855F7',
+            'brand-cream':  '#FFF8F0',
+            'brand-bg':     '#FFF3E8',
+            'brand-border': '#F0E4D4',
+            'brand-text':   '#3D2B1F',
+            'brand-muted':  '#A8714A',
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #FFF3E8; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .nav-tab { cursor: pointer; }
+    .nav-tab.active { background: #F97316; color: white; }
+  </style>
+</head>
+<body class="font-sans">
+
+  <!-- ═══════════════════════════════════════════════
+       DESIGN SWITCHER (meta UI, not part of the app)
+       ═══════════════════════════════════════════════ -->
+  <div class="bg-brand-text text-white text-xs px-4 py-2 flex items-center gap-3 flex-wrap sticky top-0 z-[999]">
+    <span class="font-bold uppercase tracking-widest text-white/50">Design Preview</span>
+    <span class="text-white/30">·</span>
+    <button onclick="show('welcome')"  class="nav-tab active px-3 py-1 rounded-full transition-colors hover:bg-white/20">Welcome (footer)</button>
+    <button onclick="show('privacy')"  class="nav-tab px-3 py-1 rounded-full transition-colors hover:bg-white/20">Privacy Policy</button>
+    <button onclick="show('terms')"    class="nav-tab px-3 py-1 rounded-full transition-colors hover:bg-white/20">Terms of Service</button>
+    <button onclick="show('changelog')" class="nav-tab px-3 py-1 rounded-full transition-colors hover:bg-white/20">Changelog (refactored)</button>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       PAGE 1 — WELCOME SCREEN (footer update only)
+       ═══════════════════════════════════════════════ -->
+  <div id="page-welcome" class="page active">
+    <div class="min-h-screen bg-brand-cream flex flex-col items-center justify-center p-6">
+      <div class="flex flex-col items-center gap-6 w-full max-w-sm">
+
+        <!-- Hero -->
+        <div class="text-center">
+          <div class="text-6xl mb-3">🌟</div>
+          <h1 class="text-3xl font-black text-brand-orange">TinyHeroes</h1>
+          <p class="text-brand-muted text-sm mt-1">Celebrate every good deed</p>
+        </div>
+
+        <!-- Feature cards -->
+        <div class="grid grid-cols-3 gap-3 w-full">
+          <div class="bg-white rounded-2xl p-3 text-center border border-brand-border">
+            <div class="text-2xl mb-1">🏆</div>
+            <div class="text-xs font-bold text-brand-muted leading-tight">Weekly Podium</div>
+          </div>
+          <div class="bg-white rounded-2xl p-3 text-center border border-brand-border">
+            <div class="text-2xl mb-1">⭐</div>
+            <div class="text-xs font-bold text-brand-muted leading-tight">Track Deeds</div>
+          </div>
+          <div class="bg-white rounded-2xl p-3 text-center border border-brand-border">
+            <div class="text-2xl mb-1">🎁</div>
+            <div class="text-xs font-bold text-brand-muted leading-tight">Win Prizes</div>
+          </div>
+        </div>
+
+        <!-- CTAs -->
+        <div class="w-full flex flex-col gap-3">
+          <a href="#" class="block w-full text-center bg-gradient-to-r from-brand-orange to-orange-400 text-white font-bold py-3 rounded-2xl text-base">
+            Get Started ✨
+          </a>
+          <a href="#" class="block text-center text-brand-orange font-semibold text-sm">
+            Already have an account? Log In
+          </a>
+          <a href="#" class="block text-center text-brand-muted text-xs">❓ Help &amp; Guide</a>
+          <a href="#" class="block text-center text-brand-muted text-xs">📋 What's New</a>
+        </div>
+
+        <!-- ★ UPDATED FOOTER — new Privacy + Terms links -->
+        <div class="flex flex-col items-center gap-1">
+          <p class="text-xs text-brand-muted/50 text-center">
+            v1.0.0 · API v1.0.0
+            <span class="mx-1">·</span>
+            <a href="#" onclick="show('privacy')" class="underline hover:text-brand-orange transition-colors">Privacy</a>
+            <span class="mx-1">·</span>
+            <a href="#" onclick="show('terms')" class="underline hover:text-brand-orange transition-colors">Terms</a>
+          </p>
+          <!-- Annotation -->
+          <span class="mt-2 inline-flex items-center gap-1 bg-brand-orange/10 border border-brand-orange/30 rounded-full px-2.5 py-0.5 text-[10px] font-semibold text-brand-orange">
+            ★ New links added here
+          </span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       SHARED PUBLIC LAYOUT COMPONENT
+       (used as wrapper on pages 2, 3, 4)
+       ═══════════════════════════════════════════════ -->
+  <template id="public-header">
+    <!-- injected by JS per page -->
+  </template>
+
+
+  <!-- ═══════════════════════════════════════════════
+       PAGE 2 — PRIVACY POLICY
+       ═══════════════════════════════════════════════ -->
+  <div id="page-privacy" class="page min-h-screen bg-brand-cream flex flex-col">
+
+    <!-- PublicLayoutComponent: Header -->
+    <header class="bg-white border-b border-brand-border sticky top-8 z-50">
+      <div class="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+        <a href="#" onclick="show('welcome')" class="flex items-center gap-2 flex-shrink-0">
+          <span class="text-xl">🌟</span>
+          <span class="font-black text-brand-orange text-base hidden sm:inline">TinyHeroes</span>
+        </a>
+        <nav class="flex items-center gap-4 text-xs text-brand-muted flex-shrink-0">
+          <a href="#" onclick="show('welcome')" class="hover:text-brand-orange transition-colors hidden sm:inline">Home</a>
+          <a href="#" class="hover:text-brand-orange transition-colors hidden sm:inline">Help</a>
+          <a href="#" onclick="show('changelog')" class="hover:text-brand-orange transition-colors hidden sm:inline">Changelog</a>
+          <a href="#" onclick="show('privacy')" class="text-brand-orange font-semibold">Privacy</a>
+          <a href="#" onclick="show('terms')" class="hover:text-brand-orange transition-colors">Terms</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- PublicLayoutComponent: <ng-content /> -->
+    <main class="flex-1 max-w-3xl mx-auto w-full px-4 py-10">
+
+      <!-- Page heading -->
+      <div class="mb-8 pb-8 border-b border-brand-border">
+        <div class="text-4xl mb-2">🔒</div>
+        <h1 class="text-2xl font-black text-brand-text">Privacy Policy</h1>
+        <p class="text-xs text-brand-muted mt-1">Last updated: May 2025</p>
+      </div>
+
+      <!-- GDPR/COPPA notice banner -->
+      <div class="bg-orange-50 border border-brand-orange/20 rounded-2xl p-4 mb-8 flex gap-3">
+        <span class="text-xl flex-shrink-0">⚠️</span>
+        <div>
+          <p class="text-sm font-semibold text-brand-text mb-1">GDPR &amp; COPPA Notice</p>
+          <p class="text-sm text-brand-muted leading-relaxed">
+            This app stores information about children. By using TinyHeroes, you confirm you are the parent or legal guardian of any child whose data you add.
+          </p>
+        </div>
+      </div>
+
+      <!-- Section 1 -->
+      <div class="mb-6">
+        <h2 class="text-lg font-bold text-brand-text mb-2">1. Introduction</h2>
+        <p class="text-sm text-brand-muted leading-relaxed">
+          TinyHeroes ("we", "us", "our") operates the TinyHeroes family good-deed tracking application. This Privacy Policy explains what personal data we collect, how we use it, and your rights regarding that data. The data controller is TinyHeroes — contact us at <a href="mailto:privacy@tinyheroes.app" class="text-brand-orange underline">privacy@tinyheroes.app</a>.
+        </p>
+      </div>
+
+      <!-- Section 2 — data list card -->
+      <div class="mb-6">
+        <h2 class="text-lg font-bold text-brand-text mb-3">2. Data We Collect</h2>
+        <div class="bg-white rounded-2xl border border-brand-border divide-y divide-brand-border overflow-hidden">
+          <div class="flex items-start gap-3 p-4">
+            <span class="text-lg flex-shrink-0">👤</span>
+            <div>
+              <p class="text-sm font-semibold text-brand-text">Account</p>
+              <p class="text-xs text-brand-muted mt-0.5">Email address, display name</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-4">
+            <span class="text-lg flex-shrink-0">🧒</span>
+            <div>
+              <p class="text-sm font-semibold text-brand-text">Children</p>
+              <p class="text-xs text-brand-muted mt-0.5">Names, ages, gender, emoji avatar or uploaded photo</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-4">
+            <span class="text-lg flex-shrink-0">⭐</span>
+            <div>
+              <p class="text-sm font-semibold text-brand-text">Good Deeds</p>
+              <p class="text-xs text-brand-muted mt-0.5">Deed descriptions, AI-generated deed illustrations</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-4">
+            <span class="text-lg flex-shrink-0">🔑</span>
+            <div>
+              <p class="text-sm font-semibold text-brand-text">Authentication</p>
+              <p class="text-xs text-brand-muted mt-0.5">JWT access token stored in browser localStorage (<code class="text-xs bg-brand-cream px-1 rounded">th_access_token</code>)</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-4">
+            <span class="text-lg flex-shrink-0">👨‍👩‍👧</span>
+            <div>
+              <p class="text-sm font-semibold text-brand-text">Family</p>
+              <p class="text-xs text-brand-muted mt-0.5">Family name, week start preference, member roles</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3 -->
+      <div class="mb-6">
+        <h2 class="text-lg font-bold text-brand-text mb-2">3. How We Use Your Data</h2>
+        <p class="text-sm text-brand-muted leading-relaxed">
+          We use your data solely to operate the app — to display podium standings, award prizes, and generate weekly and monthly summaries. Deed descriptions are sent to the Hugging Face Inference API to generate illustrations; no personal identifiers (names, photos) are included in those prompts.
+        </p>
+      </div>
+
+      <!-- Section 4 -->
+      <div class="mb-6">
+        <h2 class="text-lg font-bold text-brand-text mb-2">4. Data Storage</h2>
+        <p class="text-sm text-brand-muted leading-relaxed">
+          Data is stored on our servers [location placeholder]. Uploaded child photos are stored as static files and served directly from our server. We do not use third-party CDNs, analytics, or tracking scripts.
+        </p>
+      </div>
+
+      <!-- Section 5 -->
+      <div class="mb-6">
+        <h2 class="text-lg font-bold text-brand-text mb-2">5. Third Parties</h2>
+        <p class="text-sm text-brand-muted leading-relaxed mb-3">
+          We share data with the following third parties only:
+        </p>
+        <div class="bg-white rounded-2xl border border-brand-border divide-y divide-brand-border overflow-hidden">
+          <div class="flex items-center gap-3 p-4">
+            <span class="text-lg">🤖</span>
+            <div>
+              <p class="text-sm font-semibold text-brand-text">Hugging Face</p>
+              <p class="text-xs text-brand-muted">Deed descriptions only — for AI image generation. No personal data.</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 p-4">
+            <span class="text-lg">🔐</span>
+            <div>
+              <p class="text-sm font-semibold text-brand-text">Google / Apple / Facebook (optional)</p>
+              <p class="text-xs text-brand-muted">Only if you choose social sign-in. Governed by each provider's privacy policy.</p>
+            </div>
+          </div>
+        </div>
+        <p class="text-sm text-brand-muted mt-3 leading-relaxed">We do not sell, rent, or share your personal data with advertisers or any other parties.</p>
+      </div>
+
+      <!-- Section 6 -->
+      <div class="mb-6">
+        <h2 class="text-lg font-bold text-brand-text mb-2">6. Data Deletion</h2>
+        <p class="text-sm text-brand-muted leading-relaxed">
+          You can delete your family at any time via <strong class="text-brand-text font-semibold">Settings → Family Settings → Danger zone</strong>. This permanently and irreversibly removes all child records, good deeds, photos, and history. For account deletion, contact us at <a href="mailto:privacy@tinyheroes.app" class="text-brand-orange underline">privacy@tinyheroes.app</a>.
+        </p>
+      </div>
+
+      <!-- Section 7 -->
+      <div class="mb-6">
+        <h2 class="text-lg font-bold text-brand-text mb-2">7. Children's Privacy (GDPR &amp; COPPA)</h2>
+        <p class="text-sm text-brand-muted leading-relaxed">
+          TinyHeroes is a tool for parents and guardians. It may store data about children under 13. We rely on the account-holding parent or guardian to provide verifiable consent on behalf of their children. If you believe data about a child has been added without consent, contact us immediately and we will remove it.
+        </p>
+        <p class="text-xs text-brand-muted/60 mt-2 italic"><!-- LEGAL REVIEW NEEDED: GDPR Art. 17 erasure, COPPA verifiable parental consent --></p>
+      </div>
+
+      <!-- Contact card -->
+      <div class="bg-white rounded-2xl border border-brand-border p-6 mt-8 flex items-start gap-4">
+        <span class="text-3xl">✉️</span>
+        <div>
+          <p class="text-sm font-semibold text-brand-text mb-1">Questions about your privacy?</p>
+          <p class="text-sm text-brand-muted">
+            Reach us at <a href="mailto:privacy@tinyheroes.app" class="text-brand-orange underline font-medium">privacy@tinyheroes.app</a>. We aim to respond within 5 business days.
+          </p>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- PublicLayoutComponent: Footer -->
+    <footer class="border-t border-brand-border text-center text-xs text-brand-muted/50 py-6">
+      © TinyHeroes ·
+      <a href="#" onclick="show('privacy')" class="underline hover:text-brand-orange transition-colors">Privacy</a> ·
+      <a href="#" onclick="show('terms')" class="underline hover:text-brand-orange transition-colors">Terms</a>
+    </footer>
+
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       PAGE 3 — TERMS OF SERVICE
+       ═══════════════════════════════════════════════ -->
+  <div id="page-terms" class="page min-h-screen bg-brand-cream flex flex-col">
+
+    <!-- PublicLayoutComponent: Header -->
+    <header class="bg-white border-b border-brand-border sticky top-8 z-50">
+      <div class="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+        <a href="#" onclick="show('welcome')" class="flex items-center gap-2 flex-shrink-0">
+          <span class="text-xl">🌟</span>
+          <span class="font-black text-brand-orange text-base hidden sm:inline">TinyHeroes</span>
+        </a>
+        <nav class="flex items-center gap-4 text-xs text-brand-muted flex-shrink-0">
+          <a href="#" onclick="show('welcome')" class="hover:text-brand-orange transition-colors hidden sm:inline">Home</a>
+          <a href="#" class="hover:text-brand-orange transition-colors hidden sm:inline">Help</a>
+          <a href="#" onclick="show('changelog')" class="hover:text-brand-orange transition-colors hidden sm:inline">Changelog</a>
+          <a href="#" onclick="show('privacy')" class="hover:text-brand-orange transition-colors">Privacy</a>
+          <a href="#" onclick="show('terms')" class="text-brand-orange font-semibold">Terms</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- PublicLayoutComponent: <ng-content /> -->
+    <main class="flex-1 max-w-3xl mx-auto w-full px-4 py-10">
+
+      <!-- Page heading -->
+      <div class="mb-8 pb-8 border-b border-brand-border">
+        <div class="text-4xl mb-2">📜</div>
+        <h1 class="text-2xl font-black text-brand-text">Terms of Service</h1>
+        <p class="text-xs text-brand-muted mt-1">Last updated: May 2025</p>
+      </div>
+
+      <!-- Section 1 -->
+      <div class="mb-6">
+        <h2 class="text-lg font-bold text-brand-text mb-2">1. Acceptance of Terms</h2>
+        <p class="text-sm text-brand-muted leading-relaxed">
+          By accessing or using TinyHeroes, you agree to be bound by these Terms of Service. If you do not agree, please do not use the app.
+        </p>
+      </div>
+
+      <!-- Section 2 -->
+      <div class="mb-6">
+        <h2 class="text-lg font-bold text-brand-text mb-2">2. Service Description</h2>
+        <p class="text-sm text-brand-muted leading-relaxed">
+          TinyHeroes is a family good-deed tracking application for personal, non-commercial use. It enables parents and guardians to log children's positive behaviour, view weekly and monthly standings, and manage prizes.
+        </p>
+      </div>
+
+      <!-- Section 3 — list version -->
+      <div class="mb-6">
+        <h2 class="text-lg font-bold text-brand-text mb-3">3. Acceptable Use</h2>
+        <p class="text-sm text-brand-muted leading-relaxed mb-3">You agree not to:</p>
+        <div class="bg-white rounded-2xl border border-brand-border p-4 space-y-2">
+          <div class="flex items-start gap-2 text-sm text-brand-muted">
+            <span class="text-brand-orange font-bold mt-0.5 flex-shrink-0">·</span>
+            <span>Upload unlawful, harmful, or abusive content</span>
+          </div>
+          <div class="flex items-start gap-2 text-sm text-brand-muted">
+            <span class="text-brand-orange font-bold mt-0.5 flex-shrink-0">·</span>
+            <span>Add a child's personal data without that child's parent or guardian's consent</span>
+          </div>
+          <div class="flex items-start gap-2 text-sm text-brand-muted">
+            <span class="text-brand-orange font-bold mt-0.5 flex-shrink-0">·</span>
+            <span>Use automated tools, bots, or scrapers to access the service</span>
+          </div>
+          <div class="flex items-start gap-2 text-sm text-brand-muted">
+            <span class="text-brand-orange font-bold mt-0.5 flex-shrink-0">·</span>
+            <span>Attempt to reverse-engineer, disrupt, or gain unauthorised access to the service</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 4 -->
+      <div class="mb-6">
+        <h2 class="text-lg font-bold text-brand-text mb-2">4. Account Termination</h2>
+        <p class="text-sm text-brand-muted leading-relaxed">
+          You may delete your family and account at any time via Settings. We reserve the right to suspend or terminate accounts that violate these terms, with or without prior notice.
+        </p>
+      </div>
+
+      <!-- Section 5 — liability (slightly prominent) -->
+      <div class="mb-6">
+        <h2 class="text-lg font-bold text-brand-text mb-2">5. Liability Disclaimer</h2>
+        <div class="bg-brand-cream rounded-2xl border border-brand-border p-4">
+          <p class="text-sm text-brand-muted leading-relaxed">
+            The service is provided <strong class="text-brand-text font-semibold">"as is"</strong> without warranty of any kind. We do not guarantee uninterrupted access or permanent data retention. AI-generated deed images may occasionally be unexpected — please report inappropriate images to <a href="mailto:privacy@tinyheroes.app" class="text-brand-orange underline">privacy@tinyheroes.app</a>. To the maximum extent permitted by law, TinyHeroes is not liable for any indirect or consequential damages.
+          </p>
+        </div>
+      </div>
+
+      <!-- Section 6 -->
+      <div class="mb-6">
+        <h2 class="text-lg font-bold text-brand-text mb-2">6. Governing Law</h2>
+        <p class="text-sm text-brand-muted leading-relaxed">
+          These Terms are governed by the laws of [Country / Jurisdiction — placeholder]. Any disputes shall be resolved in the courts of that jurisdiction.
+        </p>
+      </div>
+
+      <!-- Contact card -->
+      <div class="bg-white rounded-2xl border border-brand-border p-6 mt-8 flex items-start gap-4">
+        <span class="text-3xl">✉️</span>
+        <div>
+          <p class="text-sm font-semibold text-brand-text mb-1">Questions about these terms?</p>
+          <p class="text-sm text-brand-muted">
+            Contact us at <a href="mailto:privacy@tinyheroes.app" class="text-brand-orange underline font-medium">privacy@tinyheroes.app</a>.
+          </p>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- PublicLayoutComponent: Footer -->
+    <footer class="border-t border-brand-border text-center text-xs text-brand-muted/50 py-6">
+      © TinyHeroes ·
+      <a href="#" onclick="show('privacy')" class="underline hover:text-brand-orange transition-colors">Privacy</a> ·
+      <a href="#" onclick="show('terms')" class="underline hover:text-brand-orange transition-colors">Terms</a>
+    </footer>
+
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       PAGE 4 — CHANGELOG (refactored to use PublicLayoutComponent)
+       Shows how changelog.component.ts changes after the refactor
+       ═══════════════════════════════════════════════ -->
+  <div id="page-changelog" class="page min-h-screen bg-brand-cream flex flex-col">
+
+    <!-- PublicLayoutComponent: Header (identical to above) -->
+    <header class="bg-white border-b border-brand-border sticky top-8 z-50">
+      <div class="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+        <a href="#" onclick="show('welcome')" class="flex items-center gap-2 flex-shrink-0">
+          <span class="text-xl">🌟</span>
+          <span class="font-black text-brand-orange text-base hidden sm:inline">TinyHeroes</span>
+        </a>
+        <nav class="flex items-center gap-4 text-xs text-brand-muted flex-shrink-0">
+          <a href="#" onclick="show('welcome')" class="hover:text-brand-orange transition-colors hidden sm:inline">Home</a>
+          <a href="#" class="hover:text-brand-orange transition-colors hidden sm:inline">Help</a>
+          <a href="#" onclick="show('changelog')" class="hover:text-brand-orange transition-colors hidden sm:inline">Changelog</a>
+          <a href="#" onclick="show('privacy')" class="hover:text-brand-orange transition-colors">Privacy</a>
+          <a href="#" onclick="show('terms')" class="hover:text-brand-orange transition-colors">Terms</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- PublicLayoutComponent: <ng-content /> -->
+    <main class="flex-1 max-w-3xl mx-auto w-full px-4 py-10">
+
+      <div class="mb-8 pb-8 border-b border-brand-border">
+        <div class="text-4xl mb-2">📋</div>
+        <h1 class="text-2xl font-black text-brand-text">Changelog</h1>
+        <p class="text-xs text-brand-muted mt-1">What's new in TinyHeroes</p>
+      </div>
+
+      <!-- Simulated changelog content -->
+      <div class="space-y-8">
+        <div>
+          <h2 class="text-lg font-bold text-brand-text mb-1">v1.1.0</h2>
+          <p class="text-xs text-brand-muted mb-3">May 2025</p>
+          <div class="space-y-1">
+            <p class="text-xs font-bold text-brand-orange uppercase tracking-wide mb-1">Added</p>
+            <p class="text-sm text-brand-muted">· Privacy Policy and Terms of Service pages</p>
+            <p class="text-sm text-brand-muted">· Public layout component for consistent header/footer</p>
+            <p class="text-sm text-brand-muted">· Legal footer links on the welcome screen</p>
+          </div>
+        </div>
+        <div>
+          <h2 class="text-lg font-bold text-brand-text mb-1">v1.0.0</h2>
+          <p class="text-xs text-brand-muted mb-3">April 2025</p>
+          <div class="space-y-1">
+            <p class="text-xs font-bold text-brand-orange uppercase tracking-wide mb-1">Added</p>
+            <p class="text-sm text-brand-muted">· Initial release</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Annotation showing the refactor difference -->
+      <div class="mt-10 bg-brand-orange/5 border border-brand-orange/20 rounded-2xl p-4">
+        <p class="text-xs font-bold text-brand-orange mb-1">★ Refactor note (not rendered in production)</p>
+        <p class="text-xs text-brand-muted">This page previously had its own inline header/footer. After the refactor it uses <code class="bg-brand-cream px-1 rounded">PublicLayoutComponent</code> — same visual result, one less copy of the header markup.</p>
+      </div>
+
+    </main>
+
+    <!-- PublicLayoutComponent: Footer -->
+    <footer class="border-t border-brand-border text-center text-xs text-brand-muted/50 py-6">
+      © TinyHeroes ·
+      <a href="#" onclick="show('privacy')" class="underline hover:text-brand-orange transition-colors">Privacy</a> ·
+      <a href="#" onclick="show('terms')" class="underline hover:text-brand-orange transition-colors">Terms</a>
+    </footer>
+
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       SWITCHER SCRIPT
+       ═══════════════════════════════════════════════ -->
+  <script>
+    function show(name) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('page-' + name).classList.add('active');
+      document.querySelectorAll('.nav-tab').forEach(t => {
+        if (t.textContent.toLowerCase().includes(name === 'welcome' ? 'welcome' : name === 'privacy' ? 'privacy' : name === 'terms' ? 'terms' : 'changelog')) {
+          t.classList.add('active');
+        }
+      });
+      window.scrollTo(0, 0);
+    }
+  </script>
+
+</body>
+</html>

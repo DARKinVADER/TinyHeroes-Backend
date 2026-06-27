@@ -25,7 +25,7 @@ on:
 jobs:
   check-pr:
     name: Check for open PR
-    runs-on: [self-hosted, m5-pro-local]
+    runs-on: [self-hosted, m5-TinyHeroes-Backend]
     outputs:
       has_pr: ${{ steps.check.outputs.has_pr }}
     steps:
@@ -48,7 +48,7 @@ jobs:
 
   test-backend:
     name: Backend Tests
-    runs-on: [self-hosted, m5-pro-local]
+    runs-on: [self-hosted, m5-TinyHeroes-Backend]
     steps:
       - uses: actions/checkout@v7
 
@@ -88,7 +88,7 @@ jobs:
       always() &&
       needs.check-pr.outputs.has_pr == 'true' &&
       needs.test-backend.result == 'success'
-    runs-on: [self-hosted, m5-pro-local]
+    runs-on: [self-hosted, m5-TinyHeroes-Backend]
     steps:
       - uses: actions/checkout@v7
 

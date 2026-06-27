@@ -6,7 +6,7 @@ on:
 
 jobs:
   close-issue:
-    runs-on: [self-hosted, m5-pro-local]
+    runs-on: [self-hosted, m5-TinyHeroes-Backend]
     steps:
       - name: Close linked issue when status becomes Done
         uses: actions/github-script@v7

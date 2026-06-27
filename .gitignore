@@ -1,0 +1,13 @@
+**/bin/
+**/obj/
+.env
+.env.local
+docker-compose.override.yml
+.superpowers/
+.playwright-mcp/
+.claude/settings.local.json
+.claude/settings.json
+.claude/worktrees/
+.claude/todos/
+.claude/memory/
+**/TestResults/

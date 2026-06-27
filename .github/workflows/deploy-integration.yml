@@ -1,0 +1,180 @@
+name: Deploy to Integration
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  contents: read
+  checks: write
+  statuses: write
+  pull-requests: write
+
+on:
+  push:
+    branches-ignore:
+      - master
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+  pull_request:
+    types: [opened, reopened, synchronize]
+    branches-ignore:
+      - master
+  workflow_dispatch:
+
+jobs:
+  check-pr:
+    name: Check for open PR
+    runs-on: [self-hosted, m5-pro-local]
+    outputs:
+      has_pr: ${{ steps.check.outputs.has_pr }}
+    steps:
+      - name: Check for open PR on this branch
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "has_pr=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          COUNT=$(gh pr list --repo ${{ github.repository }} --head ${{ github.ref_name }} --state open --json number --jq 'length')
+          echo "Count of open PRs: $COUNT"
+          if [ "$COUNT" -gt 0 ]; then
+            echo "has_pr=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_pr=false" >> $GITHUB_OUTPUT
+          fi
+
+  test-backend:
+    name: Backend Tests
+    runs-on: [self-hosted, m5-pro-local]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.x'
+
+      - name: Restore
+        run: dotnet restore TinyHeroes.slnx
+
+      - name: Build
+        run: dotnet build TinyHeroes.slnx --no-restore --configuration Release
+
+      - name: Test
+        run: >
+          dotnet test TinyHeroes.slnx
+          --no-build --configuration Release
+          --logger "trx;LogFileName=test-results.trx"
+          --results-directory TestResults
+          --collect:"XPlat Code Coverage"
+          --
+          DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov
+
+      - name: Publish backend test results
+        if: success() || failure()
+        uses: dorny/test-reporter@v3
+        with:
+          name: Backend Test Results (Integration)
+          path: TestResults/*.trx
+          reporter: dotnet-trx
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy-integration-api:
+    name: Backend → Integration App Service
+    needs: [check-pr, test-backend]
+    if: |
+      always() &&
+      needs.check-pr.outputs.has_pr == 'true' &&
+      needs.test-backend.result == 'success'
+    runs-on: [self-hosted, m5-pro-local]
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Extract API version
+        id: api_version
+        run: |
+          VERSION=$(grep -o '<Version>[^<]*' TinyHeroes.Api/TinyHeroes.Api.csproj | sed 's/<Version>//')
+          echo "value=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Log in to Azure Container Registry
+        run: docker login "$ACR_SERVER" -u "$ACR_USER" -p "$ACR_PASS"
+        env:
+          ACR_SERVER: ${{ secrets.ACR_LOGIN_SERVER }}
+          ACR_USER: ${{ secrets.ACR_USERNAME }}
+          ACR_PASS: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Build and push Docker image (integration tag)
+        id: build
+        run: |
+          IMAGE="${ACR_SERVER}/tinyheroes-api-integration:latest"
+          docker buildx build \
+            --platform linux/amd64 \
+            --provenance=false \
+            --label "api-version=${API_VERSION}" \
+            --tag "$IMAGE" \
+            --push \
+            --file TinyHeroes.Api/Dockerfile \
+            .
+          DIGEST=$(docker buildx imagetools inspect "$IMAGE" --format '{{.Manifest.Digest}}')
+          echo "digest=$DIGEST" >> $GITHUB_OUTPUT
+        env:
+          ACR_SERVER: ${{ secrets.ACR_LOGIN_SERVER }}
+          API_VERSION: ${{ steps.api_version.outputs.value }}
+
+      - name: Purge old untagged manifests (keep last 1 for rollback)
+        env:
+          ACR: ${{ secrets.ACR_LOGIN_SERVER }}
+          USER: ${{ secrets.ACR_USERNAME }}
+          PASS: ${{ secrets.ACR_PASSWORD }}
+          REPO: tinyheroes-api-integration
+        run: |
+          TOKEN=$(curl -sf "https://${ACR}/oauth2/token?service=${ACR}&scope=repository:${REPO}:*" \
+            -u "${USER}:${PASS}" | jq -r '.access_token')
+          DIGESTS=$(curl -sf -H "Authorization: Bearer $TOKEN" \
+            "https://${ACR}/acr/v1/${REPO}/_manifests" | \
+            jq -r '.manifests[] | select(.tags == null or (.tags | length) == 0) | [.digest, .lastUpdateTime] | @tsv' | \
+            sort -k2 -r)
+          SKIP=true
+          while IFS=$'\t' read -r digest _; do
+            if $SKIP; then SKIP=false; echo "Keeping rollback: $digest"; continue; fi
+            echo "Deleting old: $digest"
+            curl -sf -X DELETE -H "Authorization: Bearer $TOKEN" \
+              "https://${ACR}/v2/${REPO}/manifests/${digest}"
+          done <<< "$DIGESTS"
+
+      - name: Wait for healthy deployment
+        run: |
+          VERSION="${{ steps.api_version.outputs.value }}"
+          URL="https://api.integration.mytinyheroes.net/api/info"
+          for i in $(seq 1 20); do
+            DEPLOYED=$(curl -sf --max-time 5 "$URL" | jq -r '.version' 2>/dev/null || echo "")
+            if [ "$DEPLOYED" = "$VERSION" ]; then
+              echo "Version $VERSION is live"
+              exit 0
+            fi
+            echo "Attempt $i/20: got '$DEPLOYED', expected '$VERSION'"
+            sleep 10
+          done
+          echo "Timed out waiting for version $VERSION"
+          exit 1
+
+      - name: Verify health endpoints
+        run: |
+          BASE="https://api.integration.mytinyheroes.net"
+          for endpoint in /health /ready; do
+            for i in $(seq 1 30); do
+              STATUS=$(curl -sf --max-time 5 -o /dev/null -w "%{http_code}" "$BASE$endpoint" || echo "000")
+              if [ "$STATUS" = "200" ]; then
+                echo "$endpoint → $STATUS OK"
+                break
+              fi
+              echo "Attempt $i/30: $endpoint → $STATUS, retrying in 5s..."
+              sleep 5
+              if [ "$i" = "30" ]; then
+                echo "$endpoint → $STATUS FAILED after 30 attempts"
+                exit 1
+              fi
+            done
+          done

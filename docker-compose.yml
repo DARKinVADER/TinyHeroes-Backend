@@ -1,0 +1,92 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: TinyHeroes.Api/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__Default: "Host=postgres;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
+      Jwt__Secret: ${JWT_SECRET}
+      Jwt__Issuer: ${JWT_ISSUER}
+      Jwt__Audience: ${JWT_AUDIENCE}
+      Jwt__ExpiryMinutes: ${JWT_EXPIRY_MINUTES}
+      Auth__FrontendUrl: ${FRONTEND_URL:-http://localhost:4200}
+      Auth__Google__ClientId: ${GOOGLE_CLIENT_ID}
+      Auth__Google__ClientSecret: ${GOOGLE_CLIENT_SECRET}
+      Auth__Apple__ClientId: ${APPLE_CLIENT_ID}
+      Auth__Apple__ClientSecret: ${APPLE_CLIENT_SECRET}
+      Auth__Facebook__AppId: ${FACEBOOK_APP_ID}
+      Auth__Facebook__AppSecret: ${FACEBOOK_APP_SECRET}
+      Storage__ConnectionString: ${STORAGE_CONNECTION_STRING}
+      AiImage__Provider: HuggingFace
+      AiImage__HuggingFace__ApiKey: ${HUGGINGFACE_API_KEY}
+      AiImage__HuggingFace__Model: ${HUGGINGFACE_MODEL}
+      Email__SmtpHost: ${SMTP_HOST:-localhost}
+      Email__SmtpPort: ${SMTP_PORT:-1025}
+      Email__Username: ${SMTP_USERNAME:-}
+      Email__Password: ${SMTP_PASSWORD:-}
+      Email__FromAddress: ${SMTP_FROM:-noreply@mytinyheroes.net}
+      Email__AdminAddress: ${SMTP_ADMIN_ADDRESS:-feedback@mytinyheroes.net}
+    volumes:
+      - uploads_data:/app/uploads
+    ports:
+      - "5001:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seq:
+        condition: service_started
+      mailpit:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@tinyheroes.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+
+  seq:
+    image: datalust/seq:latest
+    ports:
+      - "5341:80"
+    environment:
+      ACCEPT_EULA: Y
+    volumes:
+      - seq_data:/data
+
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "1025:1025"   # SMTP — used by the API in development
+      - "8025:8025"   # Web UI — view sent emails at http://localhost:8025
+
+volumes:
+  postgres_data:
+  uploads_data:
+  seq_data:

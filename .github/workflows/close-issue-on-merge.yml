@@ -1,0 +1,91 @@
+name: Close issue and move project card on PR merge
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [master]
+
+jobs:
+  close-and-move:
+    if: github.event.pull_request.merged == true
+    runs-on: [self-hosted, m5-pro-local]
+    steps:
+      - name: Move linked issues to Done in Project #5
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.ADD_TO_PROJECT_TOKEN }}
+          script: |
+            const projectId = 'PVT_kwHOACNlms4BZWnC';
+            const statusFieldId = 'PVTSSF_lAHOACNlms4BZWnCzhUV0xU';
+            const doneOptionId = '59250bf3';
+
+            // Resolve closing issues via GraphQL
+            const { repository } = await github.graphql(`
+              query($owner: String!, $repo: String!, $pr: Int!) {
+                repository(owner: $owner, name: $repo) {
+                  pullRequest(number: $pr) {
+                    closingIssuesReferences(first: 10) {
+                      nodes { number }
+                    }
+                  }
+                }
+              }
+            `, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pr: context.payload.pull_request.number,
+            });
+
+            const issues = repository.pullRequest.closingIssuesReferences.nodes;
+            if (!issues.length) {
+              console.log('No closing issues found — nothing to do.');
+              return;
+            }
+
+            for (const issue of issues) {
+              console.log(`Processing issue #${issue.number}`);
+
+              // Find the project item for this issue
+              const { node } = await github.graphql(`
+                query($projectId: ID!) {
+                  node(id: $projectId) {
+                    ... on ProjectV2 {
+                      items(first: 100) {
+                        nodes {
+                          id
+                          content { ... on Issue { number } }
+                        }
+                      }
+                    }
+                  }
+                }
+              `, { projectId });
+
+              const item = node.items.nodes.find(
+                n => n.content?.number === issue.number
+              );
+
+              if (!item) {
+                console.log(`Issue #${issue.number} not found in project — skipping.`);
+                continue;
+              }
+
+              // Move card to Done
+              await github.graphql(`
+                mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
+                  updateProjectV2ItemFieldValue(input: {
+                    projectId: $projectId
+                    itemId: $itemId
+                    fieldId: $fieldId
+                    value: { singleSelectOptionId: $optionId }
+                  }) { projectV2Item { id } }
+                }
+              `, {
+                projectId,
+                itemId: item.id,
+                fieldId: statusFieldId,
+                optionId: doneOptionId,
+              });
+
+              console.log(`Issue #${issue.number} moved to Done.`);
+            }

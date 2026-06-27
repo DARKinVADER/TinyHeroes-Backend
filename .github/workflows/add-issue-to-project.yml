@@ -1,0 +1,14 @@
+name: Add new issue to project
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  add-to-project:
+    runs-on: [self-hosted, m5-pro-local]
+    steps:
+      - uses: actions/add-to-project@v1.0.2
+        with:
+          project-url: https://github.com/users/DARKinVADER/projects/5
+          github-token: ${{ secrets.ADD_TO_PROJECT_TOKEN }}

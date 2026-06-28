@@ -66,22 +66,21 @@ Feature: Login
     Then the "Log In" button is disabled
 
   Scenario: L-05 Successful login redirects to dashboard (family exists)
-    Given the login API will return a token with hasFamily=true
+    Given the user has an account and a family
     And the user navigates to /login
     When the user enters valid credentials
     And clicks "Log In"
     Then the URL changes to /dashboard
 
   Scenario: L-06 Successful login redirects to create-family (no family)
-    Given the login API will return a token with hasFamily=false
+    Given the user has an account but no family
     And the user navigates to /login
     When the user enters valid credentials
     And clicks "Log In"
     Then the URL changes to /create-family
 
   Scenario: L-07 Shows error on failed login (401)
-    Given the login API will return 401
-    And the user navigates to /login
+    Given the user navigates to /login
     When the user enters wrong credentials
     And clicks "Log In"
     Then a red error text "Invalid email or password" is visible
@@ -152,14 +151,13 @@ Feature: Signup
     Then the "Create Account" button is disabled
 
   Scenario: S-05 Successful registration redirects to create-family
-    Given the register API will return a valid token
-    And the user navigates to /signup
+    Given the user navigates to /signup
     When the user fills in valid name, email, and password
     And clicks "Create Account"
     Then the URL changes to /create-family
 
   Scenario: S-06 Shows error on failed registration (422)
-    Given the register API will return 422 "Email already in use"
+    Given the email is already registered
     And the user navigates to /signup
     When the user fills in valid credentials
     And clicks "Create Account"
@@ -225,19 +223,19 @@ Feature: Forgot Password
     Then the "Send Reset Link" button is enabled
 
   Scenario: FP-05 Shows success message after submission
-    Given the forgot-password API will return 200
+    Given a user account exists with the email
     And the user navigates to /forgot-password
     When the user enters a valid email and clicks "Send Reset Link"
     Then "Check your email for the reset link" is visible
 
   Scenario: FP-06 Hides form after successful submission
-    Given the forgot-password API will return 200
+    Given a user account exists with the email
     And the user navigates to /forgot-password
     When the user enters a valid email and clicks "Send Reset Link"
     Then the "Send Reset Link" button is no longer visible
 
   Scenario: FP-07 Shows error on failed submission (500)
-    Given the forgot-password API will return 500
+    Given the backend service will fail
     And the user navigates to /forgot-password
     When the user enters a valid email and clicks "Send Reset Link"
     Then a red error text "Something went wrong" is visible
@@ -350,8 +348,8 @@ Feature: Create Family
     Then the "Sun" button has the border-brand-orange class
 
   Scenario: CF-05 Successful submission redirects to dashboard
-    Given the families API will return 201 with a family object
-    And the user navigates to /create-family
+    Given the user is authenticated with no family
+    And navigates to /create-family
     When the user enters "The Testers" as family name
     And clicks "Create My Family"
     Then the URL changes to /dashboard
@@ -419,8 +417,8 @@ Feature: Add Child
     Then the "Boy" button has the bg-brand-orange class
 
   Scenario: AC-06 Successful submission redirects to dashboard
-    Given the children API will return 201
-    And the user navigates to /add-child
+    Given the user is authenticated with a family
+    And navigates to /add-child
     When the user enters "Alice" and clicks "Add Hero"
     Then the URL changes to /dashboard
 ```
@@ -766,13 +764,13 @@ Feature: Feedback Button
     Then no field with placeholder "Your email (optional)" is visible
 
   Scenario: FB-08 Successful submission shows success state
-    Given the feedback API will return 204
-    And the user submits a bug report with text "The button does not work."
+    Given the feedback service is operational
+    When the user submits a bug report with text "The button does not work."
     Then "Thanks! We've received your feedback." is visible
 
   Scenario: FB-09 Failed submission shows error state
-    Given the feedback API will return 500
-    And the user submits a bug report with text "Something is wrong."
+    Given the feedback service encounters an error
+    When the user submits a bug report with text "Something is wrong."
     Then "Something went wrong — please try again." is visible
 
   Scenario: FB-10 Clicking backdrop closes the modal
@@ -799,33 +797,21 @@ All e2e tests import from `frontend/e2e/helpers/index.ts`.
 
 | Export | Purpose |
 |---|---|
-| `injectAuth(page)` | Injects a fake JWT into `localStorage` so the app treats the browser as logged-in |
-| `makeFakeJwt(overrides?)` | Creates a Base64-encoded fake JWT (no real signature) — use `overrides` to change claims |
-| `TEST_USER` | Constant `{ userId, displayName, email }` used by `injectAuth` |
+| `setupTestState(page, request, options)` | Registers a new user or logs in an integration user (depending on `options.hasFamily` / `options.childrenCount`) and injects the token into `localStorage`. Returns credentials used. |
 
-### API mock helpers
+### API client
 
 | Export | Purpose |
 |---|---|
-| `mockAuthApi(page, { hasFamily? })` | Stubs `/api/auth/register` and `/api/auth/login` |
-| `mockFamilyApi(page)` | Stubs `GET /api/families/mine` and `POST /api/families` |
-| `mockChildrenApi(page, children?)` | Stubs `GET/POST /api/children` and avatar endpoint |
-| `mockDeedsApi(page)` | Stubs `GET/POST /api/deeds` and `/api/deeds/stats` |
-| `mockPresetsApi(page)` | Stubs `GET/POST /api/presets` with two system presets |
-| `mockSummariesApi(page)` | Stubs weekly summaries, monthly summaries, and prize assignments |
-| `mockPrizeClaimsApi(page, initialClaims?)` | Stubs full prize claims CRUD (GET, POST, PATCH /used, DELETE /comments/:id) with in-memory state |
-| `mockAllApi(page)` | Calls all of the above — use in `test.beforeEach` for authenticated pages |
+| `ApiClient` | A wrapper around Playwright's `APIRequestContext` to make real backend calls (login, register, createFamily, etc.) |
 
 ### Base test fixture
 
-`frontend/e2e/helpers/base-test.ts` extends Playwright's `test` so that every `page` fixture
-automatically catches any unmatched `**/api/**` request and returns `200 {}`.
-This prevents noise from API calls that a test doesn't care about.
+`frontend/e2e/helpers/base-test.ts` extends Playwright's `test` to provide globally configured `page` fixtures, waits for hydration on integration environments, and logs API errors.
 
 ### Adding a new test
 
 1. Create `frontend/e2e/<flow>.spec.ts`
 2. Import from `'./helpers'`
-3. Use `injectAuth(page)` + `mockAllApi(page)` in `test.beforeEach` for authenticated flows
-4. Override specific endpoints with `page.route(...)` before `page.goto()`
-5. Mark the corresponding gap row in this catalogue as ✅ and add the scenario
+3. Use `setupTestState(page, request, ...)` in `test.beforeEach` or within the test to set up the DB state and auth token.
+4. Mark the corresponding gap row in this catalogue as ✅ and add the scenario.
